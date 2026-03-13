@@ -13,19 +13,19 @@
         </File>
     </Appenders>
     <Loggers>
-        <Root level="ALL" additivity="false">
+        <Root level="ALL">
             <AppenderRef ref="MAIN"/>
         </Root>
-        <Logger name="iecd.a51597.server.consoleLog" level="ALL">
+        <Logger name="iecd.a51597.server.consoleLog" level="ALL" additivity="false">
             <AppenderRef ref="CONSOLE_LOGGER"/>
         </Logger>
-        <Logger name="iecd.a51597.server.Server" level="ALL">
+        <Logger name="iecd.a51597.server.Server" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.ListenerThread" level="ALL">
+        <Logger name="iecd.a51597.server.ListenerThread" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.CLIHandler" level="ALL">
+        <Logger name="iecd.a51597.server.CLIHandler" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
     </Loggers>

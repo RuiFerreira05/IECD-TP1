@@ -36,8 +36,6 @@ public class Server {
     static void init(String[] args) {
         handleCLIParams(args);
         Server.logger.info("Initializing Server...");
-
-        Server.listener = new ListenerThread();
     }
 
     static void loop() {
@@ -45,18 +43,31 @@ public class Server {
         cliThread.start();
     }
 
-    public static void startListener() {
-        if (!listener.isAlive()) {
-            Server.listener.start();
+    public static void startListener(int port) {
+        if (!Server.isListening()) {
+            listener = new ListenerThread(port);
+            listener.start();
             Server.logger.info("Server listening on port: {}", Server.port);
         }
     }
 
+    public static void startListener() {
+        startListener(Server.port);
+    }
+
     public static void stopListener() {
-        if (listener.isAlive()) {
+        if (Server.isListening()) {
             Server.listener.stopListener();
             logger.info("Server stopping listener");
         }
+    }
+
+    public static boolean isListening() {
+        if (Server.listener != null) {
+            return Server.listener.running;
+        }
+
+        return false;
     }
 
     public static void shutdown() {

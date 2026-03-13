@@ -9,17 +9,13 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.function.Consumer;
 
 public class CLIHandler {
 
-    public boolean running = false;
-    public Scanner scanner = new Scanner(System.in);
+    private boolean running = false;
 
-    private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
-    private Logger logger = LogManager.getLogger(CLIHandler.class);
+    private final Logger logger = LogManager.getLogger(CLIHandler.class);
 
     private final Map<String, Command> commands = new HashMap<>();
 
@@ -32,14 +28,15 @@ public class CLIHandler {
 
     void loop() {
         running = true;
-        while (running) {
-            try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            while (running) {
                 System.out.print(">> ");
                 String line = reader.readLine();
                 if (line == null) break;
                 handleCommand(line);
-            } catch (IOException e) {
-                if (!running) break;
+            }
+        } catch (IOException e) {
+            if (running) {
                 logger.error("CLI read error: {}", e.getMessage());
             }
         }
@@ -72,22 +69,42 @@ public class CLIHandler {
     }
 
     private void start(String[] args) {
-        Server.startListener();
-        System.out.println("Server started listening for connections on port: " + Server.port);
-        logger.info("Server started listening for connections on port: {}", Server.port);
+        int port = Server.port;
+
+        if (args.length != 0) {
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid port number: " + args[0]);
+                logger.error("Invalid port number in start command: {}", args[0]);
+                return;
+            }
+        }
+
+        if (!Server.isListening()) {
+            Server.startListener(port);
+            System.out.println("Server started on port: " + port);
+            logger.info("Server started on port: {}", port);
+        } else {
+            System.out.println("Server is already listening for connections");
+        }
     }
 
     private void stop(String[] args) {
-        Server.stopListener();
-        System.out.println("Server stopped listening for connections");
-        logger.info("Server stopped listening for connections");
+        if (Server.isListening()) {
+            Server.stopListener();
+            System.out.println("Server stopped listening for connections");
+            logger.info("Server stopped listening for connections");
+        } else  {
+            System.out.println("Server is already not listening for connections");
+        }
     }
 
     public void exit(String[] args) {
         running = false;
-        Server.shutdown();
         logger.info("Server shutting down");
         System.out.println("Shutting down server...");
+        Server.shutdown();
     }
 }
 
