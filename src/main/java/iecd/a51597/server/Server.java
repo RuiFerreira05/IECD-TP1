@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Server {
 
-    static int port = 5555;
-    static ListenerThread listener;
+    private static int port = 5555;
+    private static ListenerThread listener;
 
     private static final CLIHandler cliHandler = new CLIHandler();
 
@@ -31,6 +31,12 @@ public class Server {
     public static void addConnection(Connection connection) {
         synchronized (connections) {
             connections.add(connection);
+        }
+    }
+
+    public static void removeConnection(Connection connection) {
+        synchronized (connections) {
+            connections.remove(connection);
         }
     }
 
@@ -59,7 +65,7 @@ public class Server {
         if (!Server.isListening()) {
             listener = new ListenerThread(port);
             listener.start();
-            Server.logger.info("Server listening on port: {}", Server.port);
+            Server.logger.info("Server listening on port: {}", port);
         }
     }
 
@@ -86,6 +92,13 @@ public class Server {
         stopListener();
         //TODO: save state
         //TODO: close connections
-        System.exit(0);
+    }
+
+    public static int getPort() {
+        return Server.port;
+    }
+
+    public static ListenerThread getListener() {
+        return listener;
     }
 }

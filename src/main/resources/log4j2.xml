@@ -13,7 +13,7 @@
         </File>
     </Appenders>
     <Loggers>
-        <Root level="ALL">
+        <Root level="WARN">
             <AppenderRef ref="MAIN"/>
         </Root>
         <Logger name="iecd.a51597.server.consoleLog" level="ALL" additivity="false">

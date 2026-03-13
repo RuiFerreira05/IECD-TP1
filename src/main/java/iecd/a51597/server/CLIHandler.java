@@ -69,7 +69,7 @@ public class CLIHandler {
     }
 
     private void start(String[] args) {
-        int port = Server.port;
+        int port = Server.getPort();
 
         if (args.length != 0) {
             try {

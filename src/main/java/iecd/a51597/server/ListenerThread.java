@@ -30,8 +30,11 @@ public class ListenerThread extends Thread {
                 logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
                 logger.info("Total Connections: {}", Server.getConnections().size());
             }
-        } catch (Exception e) {
-            logger.error("Error in ListenerThread: {}", e.getMessage());
+        } catch (IOException e) {
+            if (running) {
+                logger.error("Error in ListenerThread: {}", e.getMessage());
+            }
+        } finally {
             running = false;
         }
     }
