@@ -15,7 +15,6 @@ public class CLIHandler {
     public Scanner scanner = new Scanner(System.in);
 
     private Logger logger = LogManager.getLogger(CLIHandler.class);
-    private Logger consoleLogger = LogManager.getLogger("iecd.a51597.server.consoleOutput");
 
     private final Map<String, Consumer<String[]>> commands = new HashMap<>();
 
@@ -28,7 +27,7 @@ public class CLIHandler {
     void loop() {
         running = true;
         while(running) {
-            consoleLogger.info(">> ");
+            System.out.print(">> ");
             handleCommand(scanner.nextLine());
         }
     }
@@ -40,28 +39,28 @@ public class CLIHandler {
 
         Consumer<String[]> command = commands.get(name);
         if(command == null) {
-            consoleLogger.warn("Unknown command: {}\n", name);
+            System.out.println("Unknown command: {}" + name);
         } else {
             try {
                 command.accept(args);
             } catch (Exception e) {
-                consoleLogger.error("Error executing command '{}': {}\n", name, e.getMessage());
+                System.out.println("Error executing command '" + name + "': " + e.getMessage());
             }
         }
     }
 
     private void help(String[] args) {
-        consoleLogger.info("test\n");
+        System.out.println("test");
     }
 
     private void start(String[] args) {
         Server.startListener();
-        consoleLogger.info("Server started listening for connections on port: {}\n", Server.port);
+        System.out.println("Server started listening for connections on port: " + Server.port);
     }
 
     private void stop(String[] args) {
         Server.stopListener();
-        consoleLogger.info("Server stopped listening for connections\n");
+        System.out.println("Server stopped listening for connections");
     }
 
 }
