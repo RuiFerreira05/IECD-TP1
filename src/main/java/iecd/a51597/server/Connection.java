@@ -12,7 +12,7 @@ public class Connection extends Thread {
 
     @Override
     public void run() {
-
+        //TODO: Connection logic
     }
 
     public Socket getClientSocket() {

@@ -3,13 +3,15 @@ package iecd.a51597.server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 
 public class ListenerThread extends Thread {
 
-    public boolean running = false;
+    public volatile boolean running = false;
     private final int port;
     private final Logger logger = LogManager.getLogger(ListenerThread.class);
+    private ServerSocket serverSocket;
 
     public ListenerThread(int port) {
         this.port = port;
@@ -18,22 +20,26 @@ public class ListenerThread extends Thread {
     @Override
     public void run() {
         running = true;
-        try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)){
+            this.serverSocket = serverSocket;
             while (running) {
                 Connection conn = new Connection(serverSocket.accept());
-                Server.connections.add(conn);
+                Server.addConnection(conn);
                 conn.start();
 
-                Server.logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
-                Server.logger.info("Total Connections: {}", Server.connections.size());
+                logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
+                logger.info("Total Connections: {}", Server.getConnections().size());
             }
         } catch (Exception e) {
             logger.error("Error in ListenerThread: {}", e.getMessage());
+            running = false;
         }
     }
 
     public void stopListener() {
         running = false;
+        try { if (serverSocket != null) serverSocket.close(); }
+        catch (IOException e) { logger.error("Error closing socket: {}", e.getMessage()); }
         logger.info("Stopping ListenerThread");
     }
 }

@@ -100,7 +100,7 @@ public class CLIHandler {
         }
     }
 
-    public void exit(String[] args) {
+    private void exit(String[] args) {
         running = false;
         logger.info("Server shutting down");
         System.out.println("Shutting down server...");

@@ -11,15 +11,27 @@ public class Server {
     static int port = 5555;
     static ListenerThread listener;
 
-    static CLIHandler cliHandler = new CLIHandler();
+    private static final CLIHandler cliHandler = new CLIHandler();
 
-    static Logger logger = LogManager.getLogger(Server.class);
+    private static final Logger logger = LogManager.getLogger(Server.class);
 
-    static List<Connection> connections = new ArrayList<>();
+    private static final List<Connection> connections = new ArrayList<>();
 
     public static void main(String[] args) {
         Server.init(args);
         Server.loop();
+    }
+
+    public static List<Connection> getConnections() {
+        synchronized (connections) {
+            return connections;
+        }
+    }
+
+    public static void addConnection(Connection connection) {
+        synchronized (connections) {
+            connections.add(connection);
+        }
     }
 
     static private void handleCLIParams(String[] args) {
@@ -73,6 +85,7 @@ public class Server {
     public static void shutdown() {
         stopListener();
         //TODO: save state
+        //TODO: close connections
         System.exit(0);
     }
 }
