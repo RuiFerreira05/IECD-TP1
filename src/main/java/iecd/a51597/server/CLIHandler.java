@@ -3,14 +3,11 @@ package iecd.a51597.server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class CLIHandler {
 
@@ -18,19 +15,20 @@ public class CLIHandler {
     public Scanner scanner = new Scanner(System.in);
 
     private Logger logger = LogManager.getLogger(CLIHandler.class);
+    private Logger consoleLogger = LogManager.getLogger("iecd.a51597.server.consoleOutput");
 
     private final Map<String, Consumer<String[]>> commands = new HashMap<>();
 
     public CLIHandler() {
-        commands.put("help", args -> {
-            help(args);
-        });
+        commands.put("help", this::help);
+        commands.put("start", this::start);
+        commands.put("stop", this::stop);
     }
 
     void loop() {
         running = true;
         while(running) {
-            logger.info(">> ");
+            consoleLogger.info(">> ");
             handleCommand(scanner.nextLine());
         }
     }
@@ -42,17 +40,28 @@ public class CLIHandler {
 
         Consumer<String[]> command = commands.get(name);
         if(command == null) {
-            logger.warn("Unknown command: {}\n", name);
+            consoleLogger.warn("Unknown command: {}\n", name);
         } else {
             try {
                 command.accept(args);
             } catch (Exception e) {
-                logger.error("Error executing command '{}': {}\n", name, e.getMessage());
+                consoleLogger.error("Error executing command '{}': {}\n", name, e.getMessage());
             }
         }
     }
 
     private void help(String[] args) {
-        logger.info("test\n");
+        consoleLogger.info("test\n");
     }
+
+    private void start(String[] args) {
+        Server.startListener();
+        consoleLogger.info("Server started listening for connections on port: {}\n", Server.port);
+    }
+
+    private void stop(String[] args) {
+        Server.stopListener();
+        consoleLogger.info("Server stopped listening for connections\n");
+    }
+
 }

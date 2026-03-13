@@ -22,6 +22,9 @@
         <Logger name="iecd.a51597.server.consoleLog" level="ALL">
             <AppenderRef ref="CONSOLE_LOGGER"/>
         </Logger>
+        <Logger name="iecd.a51597.server.consoleOutput" level="ALL">
+            <AppenderRef ref="CONSOLE_OUTPUT"/>
+        </Logger>
         <Logger name="iecd.a51597.server.Server" level="ALL">
             <AppenderRef ref="MAIN"/>
         </Logger>
@@ -29,7 +32,7 @@
             <AppenderRef ref="MAIN"/>
         </Logger>
         <Logger name="iecd.a51597.server.CLIHandler" level="ALL">
-            <AppenderRef ref="CONSOLE_OUTPUT"/>
+            <AppenderRef ref="MAIN"/>
         </Logger>
     </Loggers>
 </Configuration>

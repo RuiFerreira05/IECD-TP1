@@ -30,4 +30,9 @@ public class ListenerThread extends Thread {
             logger.error("Error in ListenerThread: {}", e.getMessage());
         }
     }
+
+    public void stopListener() {
+        running = false;
+        logger.info("Stopping ListenerThread");
+    }
 }

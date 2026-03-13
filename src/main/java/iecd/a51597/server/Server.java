@@ -44,4 +44,13 @@ public class Server {
         Server.cliHandler.loop();
     }
 
+    public static void startListener() {
+        Server.listener.start();
+        Server.logger.info("Server listening on port: {}", Server.port);
+    }
+
+    public static void stopListener() {
+        Server.listener.stopListener();
+        logger.info("Server stopping listener");
+    }
 }
