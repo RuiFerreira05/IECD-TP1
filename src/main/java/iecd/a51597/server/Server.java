@@ -1,34 +1,43 @@
 package iecd.a51597.server;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 public class Server {
 
-    ListenerThread listener;
     int port = 5555;
-    CLIHandler cliHandler;
+    ListenerThread listener;
+
+    CLIHandler cliHandler = new CLIHandler(this);
+
+    Logger logger = LogManager.getLogger(Server.class);
 
     static void main(String[] args) {
         Server server = new Server();
         server.handleCLIParams(args);
         server.init();
+        server.loop();
     }
 
     void handleCLIParams(String[] args) {
         try {
             if (args.length > 0) {
                 this.port = Integer.parseInt(args[0]);
+                logger.info("Server port assigned to: {}", this.port);
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid port number. Using default port: " + this.port);
+            logger.error("Invalid port number: {}", e.getMessage());
         }
     }
 
     void init() {
+        this.logger.info("Initializing Server...");
+
         this.listener = new ListenerThread(this);
-        this.CLIHandler = new CLIHandler(this);
     }
 
     void loop() {
-        this.cliHandler.start();
+//        this.cliHandler.loop();
     }
 
 }
