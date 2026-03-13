@@ -15,9 +15,9 @@ public class Server {
 
     static Logger logger = LogManager.getLogger(Server.class);
 
-    static List<Connection> connection = new ArrayList<Connection>();
+    static List<Connection> connections = new ArrayList<Connection>();
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         Server.init(args);
         Server.loop();
     }

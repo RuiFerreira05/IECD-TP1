@@ -4,8 +4,10 @@ import java.net.Socket;
 
 public class Connection extends Thread {
 
-    public Connection(Socket client) {
+    private Socket clientSocket;
 
+    public Connection(Socket client) {
+        this.clientSocket = client;
     }
 
     @Override

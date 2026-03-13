@@ -17,14 +17,17 @@ public class ListenerThread extends Thread {
     @Override
     public void run() {
         running = true;
-        while (running) {
-            try (ServerSocket serverSocket = new ServerSocket(Server.port)) {
+        try (ServerSocket serverSocket = new ServerSocket(Server.port)) {
+            while (running) {
                 Connection conn = new Connection(serverSocket.accept());
+                Server.connections.add(conn);
+                conn.start();
 
-                Server.logger.info("New connection established.");
-            } catch (Exception e) {
-                logger.error("Error in ListenerThread: {}", e.getMessage());
+//                Server.logger.info("New connection established from IP: {}", ); TODO: Log IP address of the new connection
+                Server.logger.info("Total Connections: {}", Server.connections.size());
             }
+        } catch (Exception e) {
+            logger.error("Error in ListenerThread: {}", e.getMessage());
         }
     }
 }
