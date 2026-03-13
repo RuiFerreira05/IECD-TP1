@@ -5,8 +5,11 @@
                    https://logging.apache.org/xml/ns
                    https://logging.apache.org/xml/ns/log4j-config-2.xsd">
     <Appenders>
-        <Console name="CONSOLE">
+        <Console name="CONSOLE_LOGGER">
             <PatternLayout pattern="%d{HH:mm:ss} %-5level %msg%n"/>
+        </Console>
+        <Console name="CONSOLE_OUTPUT">
+            <PatternLayout pattern="%msg"/>
         </Console>
         <File name="MAIN" fileName="logs/main.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
@@ -17,13 +20,16 @@
             <AppenderRef ref="MAIN"/>
         </Root>
         <Logger name="iecd.a51597.server.consoleLog" level="ALL">
-            <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="CONSOLE_LOGGER"/>
         </Logger>
         <Logger name="iecd.a51597.server.Server" level="ALL">
             <AppenderRef ref="MAIN"/>
         </Logger>
         <Logger name="iecd.a51597.server.ListenerThread" level="ALL">
             <AppenderRef ref="MAIN"/>
+        </Logger>
+        <Logger name="iecd.a51597.server.CLIHandler" level="ALL">
+            <AppenderRef ref="CONSOLE_OUTPUT"/>
         </Logger>
     </Loggers>
 </Configuration>

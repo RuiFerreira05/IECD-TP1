@@ -41,7 +41,7 @@ public class Server {
     }
 
     static void loop() {
-//        this.cliHandler.loop();
+        Server.cliHandler.loop();
     }
 
 }
