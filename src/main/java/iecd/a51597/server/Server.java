@@ -15,7 +15,7 @@ public class Server {
 
     static Logger logger = LogManager.getLogger(Server.class);
 
-    static List<Connection> connections = new ArrayList<Connection>();
+    static List<Connection> connections = new ArrayList<>();
 
     public static void main(String[] args) {
         Server.init(args);
@@ -41,16 +41,27 @@ public class Server {
     }
 
     static void loop() {
-        Server.cliHandler.loop();
+        Thread cliThread = new Thread(cliHandler::loop);
+        cliThread.start();
     }
 
     public static void startListener() {
-        Server.listener.start();
-        Server.logger.info("Server listening on port: {}", Server.port);
+        if (!listener.isAlive()) {
+            Server.listener.start();
+            Server.logger.info("Server listening on port: {}", Server.port);
+        }
     }
 
     public static void stopListener() {
-        Server.listener.stopListener();
-        logger.info("Server stopping listener");
+        if (listener.isAlive()) {
+            Server.listener.stopListener();
+            logger.info("Server stopping listener");
+        }
+    }
+
+    public static void shutdown() {
+        stopListener();
+        //TODO: save state
+        System.exit(0);
     }
 }
