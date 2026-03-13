@@ -16,11 +16,14 @@
         <Root level="ALL">
             <AppenderRef ref="MAIN"/>
         </Root>
+        <Logger name="iecd.a51597.server.consoleLog" level="ALL">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
         <Logger name="iecd.a51597.server.Server" level="ALL">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.consoleLog" level="ALL">
-            <AppenderRef ref="CONSOLE"/>
+        <Logger name="iecd.a51597.server.ListenerThread" level="ALL">
+            <AppenderRef ref="MAIN"/>
         </Logger>
     </Loggers>
 </Configuration>

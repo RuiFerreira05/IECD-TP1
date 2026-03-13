@@ -3,40 +3,44 @@ package iecd.a51597.server;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Server {
 
-    int port = 5555;
-    ListenerThread listener;
+    static int port = 5555;
+    static ListenerThread listener;
 
-    CLIHandler cliHandler = new CLIHandler(this);
+    static CLIHandler cliHandler = new CLIHandler();
 
-    Logger logger = LogManager.getLogger(Server.class);
+    static Logger logger = LogManager.getLogger(Server.class);
+
+    static List<Connection> connection = new ArrayList<Connection>();
 
     static void main(String[] args) {
-        Server server = new Server();
-        server.handleCLIParams(args);
-        server.init();
-        server.loop();
+        Server.init(args);
+        Server.loop();
     }
 
-    void handleCLIParams(String[] args) {
+    static private void handleCLIParams(String[] args) {
         try {
             if (args.length > 0) {
-                this.port = Integer.parseInt(args[0]);
-                logger.info("Server port assigned to: {}", this.port);
+                Server.port = Integer.parseInt(args[0]);
+                logger.info("Server port assigned to: {}", Server.port);
             }
         } catch (NumberFormatException e) {
             logger.error("Invalid port number: {}", e.getMessage());
         }
     }
 
-    void init() {
-        this.logger.info("Initializing Server...");
+    static void init(String[] args) {
+        handleCLIParams(args);
+        Server.logger.info("Initializing Server...");
 
-        this.listener = new ListenerThread(this);
+        Server.listener = new ListenerThread();
     }
 
-    void loop() {
+    static void loop() {
 //        this.cliHandler.loop();
     }
 
