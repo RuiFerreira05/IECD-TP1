@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 
 public class ListenerThread extends Thread {
 
-    public volatile boolean running = false;
+    public volatile boolean running = true;
     private final int port;
     private final Server server;
     private final Logger logger = LogManager.getLogger(ListenerThread.class);
@@ -21,13 +21,12 @@ public class ListenerThread extends Thread {
 
     @Override
     public void run() {
-        running = true;
         try (ServerSocket serverSocket = new ServerSocket(port)){
             this.serverSocket = serverSocket;
             while (running) {
-                Connection conn = new Connection(serverSocket.accept());
+                Connection conn = new Connection(serverSocket.accept(), server);
                 server.addConnection(conn);
-                conn.start();
+                new Thread(conn).start();
 
                 logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
                 logger.info("Total Connections: {}", server.getConnections().size());

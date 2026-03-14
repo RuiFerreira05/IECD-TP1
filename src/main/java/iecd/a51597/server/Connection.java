@@ -3,12 +3,14 @@ package iecd.a51597.server;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Connection extends Thread {
+public class Connection implements Runnable {
 
     private final Socket clientSocket;
+    private final Server server;
 
-    public Connection(Socket client) {
+    public Connection(Socket client, Server server) {
         this.clientSocket = client;
+        this.server = server;
     }
 
     @Override
@@ -16,7 +18,9 @@ public class Connection extends Thread {
         try {
             // TODO: protocol logic
         } finally {
-            try { clientSocket.close(); } catch (IOException ignored) {}
+            try { clientSocket.close(); } catch (IOException ignored) {
+                server.removeConnection(this);
+            }
         }
     }
 

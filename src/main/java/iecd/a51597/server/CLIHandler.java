@@ -109,8 +109,8 @@ public class CLIHandler {
         System.out.println("Shutting down Server...");
         server.shutdown();
     }
-}
 
-record Command(Consumer<String[]> action, String description) {
-    void execute(String[] args) { action.accept(args); }
+    private record Command(Consumer<String[]> action, String description) {
+        void execute(String[] args) { action.accept(args); }
+    }
 }

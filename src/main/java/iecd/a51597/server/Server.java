@@ -41,7 +41,7 @@ public class Server {
 
     public List<Connection> getConnections() {
         synchronized (connections) {
-            return connections;
+            return List.copyOf(connections);
         }
     }
 
@@ -71,6 +71,7 @@ public class Server {
     void loop() {
         Thread cliThread = new Thread(cliHandler::loop);
         cliThread.start();
+        this.startListener();
     }
 
     public void startListener(int port) {
@@ -83,6 +84,7 @@ public class Server {
     }
 
     public void startListener() {
+        logger.info("Starting Listener thread with default port: {}", this.port);
         startListener(this.port);
     }
 
