@@ -10,11 +10,13 @@ public class ListenerThread extends Thread {
 
     public volatile boolean running = false;
     private final int port;
+    private final Server server;
     private final Logger logger = LogManager.getLogger(ListenerThread.class);
     private ServerSocket serverSocket;
 
-    public ListenerThread(int port) {
+    public ListenerThread(int port, Server server) {
         this.port = port;
+        this.server = server;
     }
 
     @Override
@@ -24,11 +26,11 @@ public class ListenerThread extends Thread {
             this.serverSocket = serverSocket;
             while (running) {
                 Connection conn = new Connection(serverSocket.accept());
-                Server.addConnection(conn);
+                server.addConnection(conn);
                 conn.start();
 
                 logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
-                logger.info("Total Connections: {}", Server.getConnections().size());
+                logger.info("Total Connections: {}", server.getConnections().size());
             }
         } catch (IOException e) {
             if (running) {

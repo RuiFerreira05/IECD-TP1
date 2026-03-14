@@ -8,97 +8,110 @@ import java.util.List;
 
 public class Server {
 
-    private static int port = 5555;
-    private static ListenerThread listener;
+    private static volatile Server instance;
 
-    private static final CLIHandler cliHandler = new CLIHandler();
+    private int port = 5555;
+    private ListenerThread listener;
 
-    private static final Logger logger = LogManager.getLogger(Server.class);
+    private final CLIHandler cliHandler;
+    private final Logger logger = LogManager.getLogger(Server.class);
+    private final List<Connection> connections = new ArrayList<>();
 
-    private static final List<Connection> connections = new ArrayList<>();
-
-    public static void main(String[] args) {
-        Server.init(args);
-        Server.loop();
+    private Server() {
+        logger.info("Initializing Server...");
+        this.cliHandler = new CLIHandler(this);
     }
 
-    public static List<Connection> getConnections() {
+    public static Server getInstance() {
+        if (instance == null) {
+            synchronized (Server.class) {
+                if (instance == null) {
+                    instance = new Server();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public static void main(String[] args) {
+        Server server = Server.getInstance();
+        server.handleCLIParams(args);
+        server.loop();
+    }
+
+    public List<Connection> getConnections() {
         synchronized (connections) {
             return connections;
         }
     }
 
-    public static void addConnection(Connection connection) {
+    public void addConnection(Connection connection) {
         synchronized (connections) {
             connections.add(connection);
         }
     }
 
-    public static void removeConnection(Connection connection) {
+    public void removeConnection(Connection connection) {
         synchronized (connections) {
             connections.remove(connection);
         }
     }
 
-    static private void handleCLIParams(String[] args) {
+    private void handleCLIParams(String[] args) {
         try {
             if (args.length > 0) {
-                Server.port = Integer.parseInt(args[0]);
-                logger.info("Server port assigned to: {}", Server.port);
+                this.port = Integer.parseInt(args[0]);
+                logger.info("Server port assigned to: {}", this.port);
             }
         } catch (NumberFormatException e) {
             logger.error("Invalid port number: {}", e.getMessage());
         }
     }
 
-    static void init(String[] args) {
-        handleCLIParams(args);
-        Server.logger.info("Initializing Server...");
-    }
-
-    static void loop() {
+    void loop() {
         Thread cliThread = new Thread(cliHandler::loop);
         cliThread.start();
     }
 
-    public static void startListener(int port) {
-        if (!Server.isListening()) {
-            listener = new ListenerThread(port);
+    public void startListener(int port) {
+        if (!this.isListening()) {
+            listener = new ListenerThread(port, this);
+            logger.info("Server creating new Listener Thread instance");
             listener.start();
-            Server.logger.info("Server listening on port: {}", port);
+            logger.info("Server listening on port: {}", port);
         }
     }
 
-    public static void startListener() {
-        startListener(Server.port);
+    public void startListener() {
+        startListener(this.port);
     }
 
-    public static void stopListener() {
-        if (Server.isListening()) {
-            Server.listener.stopListener();
+    public void stopListener() {
+        if (this.isListening()) {
+            this.listener.stopListener();
             logger.info("Server stopping listener");
         }
     }
 
-    public static boolean isListening() {
-        if (Server.listener != null) {
-            return Server.listener.running;
+    public boolean isListening() {
+        if (this.listener != null) {
+            return this.listener.running;
         }
 
         return false;
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         stopListener();
         //TODO: save state
         //TODO: close connections
     }
 
-    public static int getPort() {
-        return Server.port;
+    public int getPort() {
+        return this.port;
     }
 
-    public static ListenerThread getListener() {
+    public ListenerThread getListener() {
         return listener;
     }
 }

@@ -13,13 +13,16 @@ import java.util.function.Consumer;
 
 public class CLIHandler {
 
+
+    private final Server server;
     private boolean running = false;
 
     private final Logger logger = LogManager.getLogger(CLIHandler.class);
 
     private final Map<String, Command> commands = new HashMap<>();
 
-    public CLIHandler() {
+    public CLIHandler(Server server) {
+        this.server = server;
         commands.put("help", new Command(this::help, "Show this help message"));
         commands.put("start", new Command(this::start, "Start the server"));
         commands.put("stop", new Command(this::stop, "Stop the server"));
@@ -69,7 +72,7 @@ public class CLIHandler {
     }
 
     private void start(String[] args) {
-        int port = Server.getPort();
+        int port = server.getPort();
 
         if (args.length != 0) {
             try {
@@ -81,8 +84,8 @@ public class CLIHandler {
             }
         }
 
-        if (!Server.isListening()) {
-            Server.startListener(port);
+        if (!server.isListening()) {
+            server.startListener(port);
             System.out.println("Server started on port: " + port);
             logger.info("Server started on port: {}", port);
         } else {
@@ -91,8 +94,8 @@ public class CLIHandler {
     }
 
     private void stop(String[] args) {
-        if (Server.isListening()) {
-            Server.stopListener();
+        if (server.isListening()) {
+            server.stopListener();
             System.out.println("Server stopped listening for connections");
             logger.info("Server stopped listening for connections");
         } else  {
@@ -103,8 +106,8 @@ public class CLIHandler {
     private void exit(String[] args) {
         running = false;
         logger.info("Server shutting down");
-        System.out.println("Shutting down server...");
-        Server.shutdown();
+        System.out.println("Shutting down Server...");
+        server.shutdown();
     }
 }
 
