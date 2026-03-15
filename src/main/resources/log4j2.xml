@@ -14,6 +14,9 @@
         <File name="CLIENTS" fileName="logs/clients.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <File name="PROTOCOL" fileName="logs/protocol.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="WARN">
@@ -33,6 +36,9 @@
         </Logger>
         <Logger name="iecd.a51597.server.Connection" level="ALL" additivity="false">
             <AppenderRef ref="CLIENTS"/>
+        </Logger>
+        <Logger name="iecd.a51597.server.protocol" level="ALL">
+            <AppenderRef ref="PROTOCOL"/>
         </Logger>
     </Loggers>
 </Configuration>

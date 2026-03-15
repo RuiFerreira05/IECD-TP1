@@ -22,6 +22,8 @@ public class Server {
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
+
+    // Probably should be a CopyOnWriteArrayList, but I have no experience with it
     private final List<Connection> connections = new ArrayList<>();
 
     private Server() {
@@ -133,14 +135,11 @@ public class Server {
     public void shutdown() {
         stopListener();
         //TODO: save state
-        //TODO: close connections
+        connections.forEach(Connection::closeConnection);
+        logger.info("Server shutdown complete");
     }
 
     public int getPort() {
         return this.port;
-    }
-
-    public ListenerThread getListener() {
-        return listener;
     }
 }

@@ -5,15 +5,15 @@ import java.util.UUID;
 
 public class Session {
 
-    private final String token;
-    private final int userId;
+    private final UUID token;
+    private final UUID userId;
     private final String username;
     private volatile Instant lastActivity;
 
-    public Session(int userId, String username) {
-        this.token = UUID.randomUUID().toString();  // the session token IS a UUID
-        this.userId = userId;
-        this.username = username;
+    public Session(User user) {
+        this.token = UUID.randomUUID();
+        this.userId = user.getUserId();
+        this.username = user.getUsername();
         this.lastActivity = Instant.now();
     }
 
@@ -25,8 +25,8 @@ public class Session {
         this.lastActivity = Instant.now();
     }
 
-    public String getToken()    { return token; }
-    public int getUserId()      { return userId; }
+    public UUID getToken()    { return token; }
+    public UUID getUserId()      { return userId; }
     public String getUsername() { return username; }
     public Instant getLastActivity() { return lastActivity; }
 }

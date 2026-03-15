@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
@@ -12,28 +13,28 @@ public class SessionManager {
     private static final long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
     private static final Logger logger = LogManager.getLogger(SessionManager.class);
 
-    // UUID -> Session
-    private final Map<String, Session> sessions = new ConcurrentHashMap<>();
+    // sessionId -> session
+    private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
-    // userId -> UUID
-    private final Map<Integer, String> userSessionIndex = new ConcurrentHashMap<>();
+    // userId -> sessionId
+    private final Map<UUID, UUID> userSessionIndex = new ConcurrentHashMap<>();
 
-    public Session createSession(int userId, String username) {
-        String existingToken = userSessionIndex.get(userId);
+    public Session createSession(User user) {
+        UUID existingToken = userSessionIndex.get(user.getUserId());
         if (existingToken != null) {
             sessions.remove(existingToken);
-            logger.info("Invalidated previous session for user {}", userId);
+            logger.info("Invalidated previous session for user {}", user.getUsername());
         }
 
-        Session session = new Session(userId, username);
+        Session session = new Session(user);
         sessions.put(session.getToken(), session);
-        userSessionIndex.put(userId, session.getToken());
+        userSessionIndex.put(user.getUserId(), session.getToken());
 
-        logger.info("Session created for user {} [token={}]", username, session.getToken());
+        logger.info("Session created for user {} [token={}]", user.getUsername(), session.getToken());
         return session;
     }
 
-    public Optional<Session> validate(String token) {
+    public Optional<Session> validate(UUID token) {
         if (token == null) return Optional.empty();
 
         Session session = sessions.get(token);
@@ -52,7 +53,7 @@ public class SessionManager {
         return Optional.of(session);
     }
 
-    public void invalidate(String token) {
+    public void invalidate(UUID token) {
         Session removed = sessions.remove(token);
         if (removed != null) {
             userSessionIndex.remove(removed.getUserId());
