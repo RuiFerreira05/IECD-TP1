@@ -161,7 +161,7 @@ ENVELOPE STRUCTURE (every message)
                 <photo>base64_or_url</photo>
             </user>
             <user>
-                <id>57</id>
+                <id>uuid</id>
                 <username>alistar</username>
                 <photo>base64_or_url</photo>
             </user>
@@ -183,7 +183,7 @@ ENVELOPE STRUCTURE (every message)
 
   REQUEST (sender → server)
     <body>
-        <target-user-id>57</target-user-id>
+        <target-user-id>uuid</target-user-id>
     </body>
 
   RESPONSE (to sender)
