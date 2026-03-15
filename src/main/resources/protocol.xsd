@@ -93,7 +93,7 @@
     <!-- <user><id>42</id><username>alice</username><photo>...</photo></user> -->
     <xs:complexType name="UserType">
         <xs:sequence>
-            <xs:element name="id"       type="xs:positiveInteger"/>
+            <xs:element name="id"       type="UUIDType"/>
             <xs:element name="username" type="xs:string"/>
             <xs:element name="photo"    type="xs:string" minOccurs="0"/>
         </xs:sequence>
@@ -192,15 +192,15 @@
             <xs:element name="results"           type="ResultsType"        minOccurs="0"/>
 
             <!-- Game -->
-            <xs:element name="target-user-id"    type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="target-user-id"    type="UUIDType" minOccurs="0"/>
             <xs:element name="game-id"           type="UUIDType"           minOccurs="0"/>
-            <xs:element name="from-user-id"      type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="from-user-id"      type="UUIDType" minOccurs="0"/>
             <xs:element name="from-username"     type="xs:string"          minOccurs="0"/>
             <xs:element name="accept"            type="xs:boolean"         minOccurs="0"/>
             <xs:element name="accepted"          type="xs:boolean"         minOccurs="0"/>
             <xs:element name="opponent-username" type="xs:string"          minOccurs="0"/>
             <xs:element name="move"              type="MoveType"           minOccurs="0"/>
-            <xs:element name="winner-id"         type="xs:positiveInteger" minOccurs="0"/>
+            <xs:element name="winner-id"         type="UUIDType" minOccurs="0"/>
             <xs:element name="winner-username"   type="xs:string"          minOccurs="0"/>
         </xs:all>
     </xs:complexType>

@@ -1,5 +1,6 @@
-package iecd.a51597.server.protocol;
+package iecd.a51597.server.protocol.parsers;
 
+import iecd.a51597.server.protocol.Message;
 import iecd.a51597.server.protocol.exceptions.CommException;
 import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.server.protocol.exceptions.MessageParseException;
@@ -13,6 +14,7 @@ import org.xml.sax.SAXException;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
@@ -26,17 +28,19 @@ import java.util.UUID;
 public class XMLParser implements CommParser {
 
     private final Schema schema;
+    private final DocumentBuilderFactory dbf;
 
-    public XMLParser() throws SAXException {
+    public XMLParser() throws SAXException, FactoryConfigurationError {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schema = sf.newSchema(getClass().getResource("/protocol.xsd"));
-    }
 
-    private DocumentBuilder getNewBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(false);
         dbf.setIgnoringComments(true);
         dbf.setNamespaceAware(true);
+    }
+
+    private DocumentBuilder getNewBuilder() throws ParserConfigurationException {
         return dbf.newDocumentBuilder();
     }
 

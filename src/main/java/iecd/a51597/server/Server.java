@@ -1,7 +1,9 @@
 package iecd.a51597.server;
 
-import iecd.a51597.server.protocol.CommParser;
-import iecd.a51597.server.protocol.XMLParser;
+import iecd.a51597.server.protocol.builders.MessageBuilder;
+import iecd.a51597.server.protocol.builders.XMLMessageBuilder;
+import iecd.a51597.server.protocol.parsers.CommParser;
+import iecd.a51597.server.protocol.parsers.XMLParser;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -16,6 +18,7 @@ public class Server {
     private ListenerThread listener;
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
+    private final MessageBuilder messageBuilder;
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
@@ -24,6 +27,7 @@ public class Server {
     private Server() {
         logger.info("Initializing Server...");
         this.cliHandler = new CLIHandler(this);
+        this.messageBuilder = new XMLMessageBuilder();
 
         try {
             commParser = new XMLParser();
@@ -31,6 +35,10 @@ public class Server {
             logger.error("Failed to initialize CommParser: {}", e.getMessage());
             throw new RuntimeException("Server initialization failed", e);
         }
+    }
+
+    public MessageBuilder getMessageBuilder() {
+        return messageBuilder;
     }
 
     public CommParser getCommParser() {
