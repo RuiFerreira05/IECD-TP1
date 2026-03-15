@@ -12,11 +12,8 @@ public enum ActionType {
     GAME_OVER;
 
     public static ActionType fromString(String string) {
-        for (ActionType type : ActionType.values()) {
-            if (type.toString().equalsIgnoreCase(string)) {
-                return type;
-            }
-        }
-        return null;
+        String normalized = string.replace("-", "_").toUpperCase();
+        try { return ActionType.valueOf(normalized); }
+        catch (IllegalArgumentException e) { return null; }
     }
 }

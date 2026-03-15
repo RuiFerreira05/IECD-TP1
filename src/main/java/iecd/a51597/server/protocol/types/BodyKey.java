@@ -22,11 +22,8 @@ public enum BodyKey {
     WINNER_USERNAME;
 
     public static BodyKey fromString(String string) {
-        for (BodyKey type : BodyKey.values()) {
-            if (type.toString().equalsIgnoreCase(string)) {
-                return type;
-            }
-        }
-        return null;
+        String normalized = string.replace("-", "_").toUpperCase();
+        try { return BodyKey.valueOf(normalized); }
+        catch (IllegalArgumentException e) { return null; }
     }
 }

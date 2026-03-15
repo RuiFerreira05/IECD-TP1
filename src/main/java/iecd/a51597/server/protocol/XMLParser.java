@@ -18,54 +18,53 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public class XMLParser implements CommParser {
 
-    DocumentBuilder builder;
-    Validator validator;
+    private final Schema schema;
 
-    public XMLParser() throws ParserConfigurationException, SAXException {
-        // Build the document builder
-        try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setValidating(false);
-            dbf.setIgnoringComments(true);
-            dbf.setNamespaceAware(true);
-            builder = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new ParserConfigurationException(e.getMessage());
-        }
+    public XMLParser() throws SAXException {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schema = sf.newSchema(getClass().getResource("/protocol.xsd"));
+    }
 
-        // Build the schema validator
-        try {
-            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(new File("src/main/resources/protocol.xsd"));
-            validator = schema.newValidator();
-        } catch (SAXException e) {
-            throw new SAXException(e);
-        }
+    private DocumentBuilder getNewBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setValidating(false);
+        dbf.setIgnoringComments(true);
+        dbf.setNamespaceAware(true);
+        return dbf.newDocumentBuilder();
+    }
+
+    private Validator getNewValidator() {
+        return schema.newValidator();
     }
 
     @Override
     public Message parseMessage(InputStream input) throws CommException {
-        Document doc;
 
+        Validator validator = getNewValidator();
+        DocumentBuilder builder;
+        try {
+            builder = getNewBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new MessageParseException("Failed to initialize document builder: " + e.getMessage(), e);
+        }
+
+        Document doc;
         try {
             doc = builder.parse(input);
         } catch (Exception e) {
             throw new MessageParseException("Failed to parse XML message: " + e.getMessage(), e);
         }
 
-        if (validateMessage(doc)) {
-            return createMessage(doc);
-        } else {
-            throw new MalformedMessageException("XML message does not conform to schema");
-        }
+        validateMessage(doc, validator);
+
+        return createMessage(doc);
     }
 
     private Message createMessage(Document doc) {
@@ -77,14 +76,15 @@ public class XMLParser implements CommParser {
         Element header = (Element) doc.getElementsByTagName("header").item(0);
         Element body = (Element) doc.getElementsByTagName("body").item(0);
 
+        // Won't be null since document has already been checked by the validator
         ActionType action = ActionType.fromString(getField(header, "action"));
-        String sessionTokenRaw = getField(header, "sessionToken");
+        String sessionTokenRaw = getField(header, "session");
 
-        Optional<UUID> sessionToken;
+        UUID sessionToken;
         if (sessionTokenRaw != null) {
-            sessionToken = Optional.of(UUID.fromString(sessionTokenRaw));
+            sessionToken = UUID.fromString(sessionTokenRaw);
         } else {
-            sessionToken = Optional.empty();
+            sessionToken = null;
         }
 
         Map<BodyKey, String> bodyMap = mapBodyFields(body);
@@ -93,14 +93,14 @@ public class XMLParser implements CommParser {
     }
 
     private Map<BodyKey, String> mapBodyFields(Element body) {
-        Map<BodyKey, String> bodyMap = new java.util.HashMap<>();
+        Map<BodyKey, String> bodyMap = new HashMap<>();
         var fields = body.getChildNodes();
         for (int i = 0; i < fields.getLength(); i++) {
             if (fields.item(i) instanceof Element field) {
                 String key = field.getTagName();
                 String value = field.getTextContent().trim();
                 BodyKey bodyKey = BodyKey.fromString(key);
-                bodyMap.put(bodyKey, value);
+                if (bodyKey != null) bodyMap.put(bodyKey, value);
             }
         }
         return bodyMap;
@@ -112,12 +112,11 @@ public class XMLParser implements CommParser {
         return nodes.item(0).getTextContent().trim();
     }
 
-    public boolean validateMessage(Document document) {
+    private void validateMessage(Document document, Validator validator) throws MalformedMessageException {
         try {
             validator.validate(new DOMSource(document));
-            return true;
         } catch (Exception e) {
-            return false;
+            throw new MalformedMessageException("XML message does not conform to schema: " + e.getMessage(), e);
         }
     }
 }

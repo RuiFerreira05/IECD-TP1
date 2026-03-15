@@ -6,11 +6,8 @@ public enum MessageType {
     PUSH;
 
     public static MessageType fromString(String string) {
-        for (MessageType type : MessageType.values()) {
-            if (type.toString().equalsIgnoreCase(string)) {
-                return type;
-            }
-        }
-        return null;
+        String normalized = string.replace("-", "_").toUpperCase();
+        try { return MessageType.valueOf(normalized); }
+        catch (IllegalArgumentException e) { return null; }
     }
 }
