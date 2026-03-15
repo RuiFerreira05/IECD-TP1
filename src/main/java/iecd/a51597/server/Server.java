@@ -135,7 +135,7 @@ public class Server {
     public void shutdown() {
         stopListener();
         //TODO: save state
-        connections.forEach(Connection::closeConnection);
+        synchronized (connections) { connections.forEach(Connection::closeConnection); }
         logger.info("Server shutdown complete");
     }
 
