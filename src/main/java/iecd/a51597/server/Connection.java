@@ -1,5 +1,6 @@
 package iecd.a51597.server;
 
+import iecd.a51597.server.protocol.CommParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,10 +16,14 @@ public class Connection implements Runnable {
     private final Logger logger = LogManager.getLogger();
     private InputStream  inputStream;
     private OutputStream outputStream;
+    private SessionManager sessionManager;
+    private CommParser commParser;
 
-    public Connection(Socket client, Server server) {
+    public Connection(Socket client, Server server, SessionManager sessionManager, CommParser commParser) {
         this.clientSocket = client;
         this.server = server;
+        this.sessionManager = sessionManager;
+        this.commParser = commParser;
         initStreams();
     }
 
@@ -35,7 +40,9 @@ public class Connection implements Runnable {
     @Override
     public void run() {
         try {
-            // TODO: protocol logic
+            while (!clientSocket.isClosed()) {
+
+            }
         } finally {
             closeConnection();
         }
