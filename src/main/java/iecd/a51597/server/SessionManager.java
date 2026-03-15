@@ -45,7 +45,7 @@ public class SessionManager {
 
         if (session.isExpired(SESSION_TIMEOUT_SECONDS)) {
             invalidate(token);
-            logger.info("Session expired for user {}", session.getUsername());
+            logger.info("Session expired for user {}", session.getUser().getUsername());
             return Optional.empty();
         }
 
@@ -57,7 +57,7 @@ public class SessionManager {
         Session removed = sessions.remove(token);
         if (removed != null) {
             userSessionIndex.remove(removed.getUserId());
-            logger.info("Session invalidated for user {}", removed.getUsername());
+            logger.info("Session invalidated for user {}", removed.getUser().getUsername());
         }
     }
 
