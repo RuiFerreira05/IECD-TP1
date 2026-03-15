@@ -40,6 +40,10 @@ public class ListenerThread extends Thread {
         }
     }
 
+    public int getPort() {
+        return port;
+    }
+
     public void stopListener() {
         running = false;
         try { if (serverSocket != null) serverSocket.close(); }

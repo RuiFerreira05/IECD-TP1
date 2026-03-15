@@ -14,7 +14,7 @@ public class Server {
 
     private static volatile Server instance;
 
-    private int port = 5555;
+    private int startupPort = 5555;
     private ListenerThread listener;
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
@@ -37,6 +37,10 @@ public class Server {
             logger.error("Failed to initialize CommParser: {}", e.getMessage());
             throw new RuntimeException("Server initialization failed", e);
         }
+    }
+
+    public ListenerThread getListener() {
+        return listener;
     }
 
     public MessageBuilder getMessageBuilder() {
@@ -89,8 +93,8 @@ public class Server {
     private void handleCLIParams(String[] args) {
         try {
             if (args.length > 0) {
-                this.port = Integer.parseInt(args[0]);
-                logger.info("Server port assigned to: {}", this.port);
+                this.startupPort = Integer.parseInt(args[0]);
+                logger.info("Server port assigned to: {}", this.startupPort);
             }
         } catch (NumberFormatException e) {
             logger.error("Invalid port number: {}", e.getMessage());
@@ -99,8 +103,8 @@ public class Server {
 
     void loop() {
         Thread cliThread = new Thread(cliHandler::loop);
-        cliThread.start();
         this.startListener();
+        cliThread.start();
     }
 
     public void startListener(int port) {
@@ -113,8 +117,8 @@ public class Server {
     }
 
     public void startListener() {
-        logger.info("Starting Listener thread with default port: {}", this.port);
-        startListener(this.port);
+        logger.info("Starting Listener thread with default port: {}", this.startupPort);
+        startListener(this.startupPort);
     }
 
     public void stopListener() {
@@ -139,7 +143,7 @@ public class Server {
         logger.info("Server shutdown complete");
     }
 
-    public int getPort() {
-        return this.port;
+    public int getStartupPort() {
+        return this.startupPort;
     }
 }

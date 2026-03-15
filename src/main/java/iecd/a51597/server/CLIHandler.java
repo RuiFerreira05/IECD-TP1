@@ -6,6 +6,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +17,13 @@ import java.util.function.Consumer;
 
 public class CLIHandler {
 
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
-    private final Server server;
+    private final Server  server;
+    private final Instant startedAt = Instant.now();
     private boolean running = false;
 
     private final Logger logger = LogManager.getLogger(CLIHandler.class);
@@ -23,14 +32,16 @@ public class CLIHandler {
 
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help", new Command(this::help, "Show this help message"));
-        commands.put("start", new Command(this::start, "Start the server"));
-        commands.put("stop", new Command(this::stop, "Stop the server"));
-        commands.put("exit", new Command(this::exit, "Shutdown the server"));
+        commands.put("help",   new Command(this::help,              "Show this help message"));
+        commands.put("status", new Command(this::status,            "Print server status header"));
+        commands.put("start",  new Command(this::start,             "Start the server"));
+        commands.put("stop",   new Command(this::stop,              "Stop the server"));
+        commands.put("exit",   new Command(this::exit,              "Shutdown the server"));
     }
 
     void loop() {
         running = true;
+        printStatusHeader();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             while (running) {
                 System.out.print(">> ");
@@ -45,13 +56,69 @@ public class CLIHandler {
         }
     }
 
+    public void printStatusHeader() {
+        final int W = 46; // inner width (between the ║ borders)
+
+        boolean   listening   = server.isListening();
+        int       connections = server.getConnections().size();
+        int       sessions    = server.getSessionManager().activeSessionCount();
+        Instant   now         = Instant.now();
+
+        String statusLine = listening
+                ? "● LISTENING  (port " + server.getListener().getPort() + ")"
+                : "○ IDLE";
+
+        Duration uptime  = Duration.between(startedAt, now);
+        String uptimeLine = String.format("%dd %02dh %02dm %02ds",
+                uptime.toDaysPart(),
+                uptime.toHoursPart(),
+                uptime.toMinutesPart(),
+                uptime.toSecondsPart());
+
+        String timeLine = DATE_FMT.format(now) + "  " + TIME_FMT.format(now);
+
+        String border  = "═".repeat(W);
+        String top     = "╔" + border + "╗";
+        String mid     = "╠" + border + "╣";
+        String bot     = "╚" + border + "╝";
+        String title   = centre("IECD-TP1 - SERVER STATUS", W);
+
+        System.out.println(top);
+        System.out.println("║" + title + "║");
+        System.out.println(mid);
+        System.out.println(row("Status",      statusLine,              W));
+        System.out.println(row("Connections", String.valueOf(connections), W));
+        System.out.println(row("Sessions",    String.valueOf(sessions),    W));
+        System.out.println(row("Uptime",      uptimeLine,              W));
+        System.out.println(row("Time",        timeLine,                W));
+        System.out.println(bot);
+    }
+
+    private static String centre(String text, int width) {
+        int padding = width - text.length();
+        int left    = padding / 2;
+        int right   = padding - left;
+        return " ".repeat(left) + text + " ".repeat(right);
+    }
+
+    private static String row(String label, String value, int innerWidth) {
+        String content = String.format("  %-12s: %s", label, value);
+        // Pad or truncate to exactly innerWidth
+        if (content.length() < innerWidth) {
+            content = content + " ".repeat(innerWidth - content.length());
+        } else if (content.length() > innerWidth) {
+            content = content.substring(0, innerWidth);
+        }
+        return "║" + content + "║";
+    }
+
     private void handleCommand(String input) {
         String[] parts = input.trim().split("\\s+");
-        String name = parts[0].toLowerCase();
-        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
+        String   name  = parts[0].toLowerCase();
+        String[] args  = Arrays.copyOfRange(parts, 1, parts.length);
 
         Command command = commands.get(name);
-        if(command == null) {
+        if (command == null) {
             System.out.println("Unknown command: " + name);
             System.out.println("Type 'help' for available commands.");
             logger.warn("Unknown command entered: {}", name);
@@ -71,8 +138,12 @@ public class CLIHandler {
         );
     }
 
+    private void status(String[] args) {
+        printStatusHeader();
+    }
+
     private void start(String[] args) {
-        int port = server.getPort();
+        int port = server.getStartupPort();
 
         if (args.length != 0) {
             try {
