@@ -1,8 +1,8 @@
 package iecd.a51597.server.protocol;
 
-import iecd.a51597.server.protocol.errors.CommError;
-import iecd.a51597.server.protocol.errors.MalformedMessageException;
-import iecd.a51597.server.protocol.errors.MessageParseException;
+import iecd.a51597.server.protocol.exceptions.CommException;
+import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.server.protocol.exceptions.MessageParseException;
 import iecd.a51597.server.protocol.types.ActionType;
 import iecd.a51597.server.protocol.types.BodyKey;
 import iecd.a51597.server.protocol.types.MessageType;
@@ -19,7 +19,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +52,7 @@ public class XMLParser implements CommParser {
     }
 
     @Override
-    public Message parseMessage(InputStream input) throws CommError {
+    public Message parseMessage(InputStream input) throws CommException {
         Document doc;
 
         try {

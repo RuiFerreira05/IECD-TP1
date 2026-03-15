@@ -1,6 +1,6 @@
-package iecd.a51597.server.protocol.errors;
+package iecd.a51597.server.protocol.exceptions;
 
-public class MessageParseException extends CommError {
+public class MessageParseException extends CommException {
 
     public MessageParseException() {
         super();

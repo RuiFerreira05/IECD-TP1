@@ -1,6 +1,6 @@
-package iecd.a51597.server.protocol.errors;
+package iecd.a51597.server.protocol.exceptions;
 
-public class MalformedMessageException extends CommError {
+public class MalformedMessageException extends CommException {
 
     public MalformedMessageException() {
         super();
