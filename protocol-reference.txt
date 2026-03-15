@@ -61,7 +61,7 @@ ENVELOPE STRUCTURE (every message)
         <status>OK</status>
         <session>SESSION_TOKEN_UUID</session>
         <user>
-            <id>42</id>
+            <id>uuid</id>
             <username>alice</username>
             <photo>base64_or_url</photo>
         </user>
@@ -156,7 +156,7 @@ ENVELOPE STRUCTURE (every message)
         <status>OK</status>
         <results>
             <user>
-                <id>42</id>
+                <id>uuid</id>
                 <username>alice</username>
                 <photo>base64_or_url</photo>
             </user>
@@ -194,7 +194,7 @@ ENVELOPE STRUCTURE (every message)
 
   PUSH (server → target, unsolicited)
     <body>
-        <from-user-id>42</from-user-id>
+        <from-user-id>uuid</from-user-id>
         <from-username>alice</from-username>
         <game-id>GAME_UUID</game-id>
     </body>
@@ -258,7 +258,7 @@ ENVELOPE STRUCTURE (every message)
   PUSH (server → both players)
     <body>
         <game-id>GAME_UUID</game-id>
-        <winner-id>42</winner-id>
+        <winner-id>uuid</winner-id>
         <winner-username>alice</winner-username>
     </body>
 
