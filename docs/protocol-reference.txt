@@ -4,7 +4,7 @@
 
 ENVELOPE STRUCTURE (every message)
 ────────────────────────────────────────────────────────────────────────────────
-<message type="REQUEST|RESPONSE|PUSH" id="uuid">
+<message type="REQUEST|RESPONSE|PUSH" id="uuid" version="1.0">
     <header>
         <action>ACTION_NAME</action>
         <session>SESSION_TOKEN</session>   <!-- omit if not authenticated -->
@@ -276,8 +276,30 @@ ENVELOPE STRUCTURE (every message)
   INVALID_PASSWORD     Password does not meet requirements
   UNKNOWN_ACTION       Server does not recognise the action
   INTERNAL_ERROR       Unhandled server-side exception
-  MALFORMED_REQUEST    XML could not be parsed
+  MALFORMED_REQUEST    XML could not be parsed (Accompanied by UNKNOWN Action Type)
 
+================================================================================
+  PROTOCOL VERSIONING
+================================================================================
+
+  version      String attribute on every message envelope.
+               Current version: 1.0
+               Server rejects connections where the client version does not
+               match. Clients should reject responses with a mismatched
+               version.
+               A major version bump signals a breaking protocol change — both
+               sides must be updated together.
+               A minor version bump signals a backward-compatible change.
+
+================================================================================
+  SPECIAL VALUES
+================================================================================
+
+  ERROR_NO_ID    00000000-0000-0000-0000-000000000000
+                 Used as the message id in RESPONSE messages where the
+                 server could not extract the original request id.
+                 Clients must not use this UUID for their own requests.
+                 Is accompanied by an UNKNOWN action type and a MALFORMED_REQUEST error code.
 
 ================================================================================
   UUID ROLES AT A GLANCE
