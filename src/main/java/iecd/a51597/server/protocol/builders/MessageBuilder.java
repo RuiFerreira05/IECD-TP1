@@ -15,7 +15,7 @@ public interface MessageBuilder {
 
     byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description);
 
-    byte[] ok(UUID messageId);
+    byte[] ok(UUID messageId, ActionType actionType);
 
     // AUTH
     byte[] loginSuccess(UUID messageId, UUID sessionToken, User user);
