@@ -11,8 +11,10 @@ import java.util.UUID;
 public interface MessageBuilder {
 
     //  GENERIC
-    byte[] errorNoId(ErrorCodeType errorCode, String description) throws ParserConfigurationException;
-    byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description) throws ParserConfigurationException;
+    byte[] errorNoId(ErrorCodeType errorCode, String description);
+
+    byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description);
+
     byte[] ok(UUID messageId);
 
     // AUTH

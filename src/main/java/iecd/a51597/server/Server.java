@@ -31,14 +31,8 @@ public class Server {
         logger.info("Initializing Server...");
         this.cliHandler = new CLIHandler(this);
         this.messageBuilder = new XMLMessageBuilder();
-        try {
-            commParser = new XMLParser();
-        } catch (Exception e) {
-            logger.error("Failed to initialize CommParser: {}", e.getMessage());
-            throw new RuntimeException("Server initialization failed", e);
-        }
-        this.messageHandler = new MessageHandler(commParser, messageBuilder);
-
+        this.commParser = new XMLParser();
+        this.messageHandler = new MessageHandler(commParser, messageBuilder, sessionManager);
     }
 
     public MessageHandler getMessageHandler() {

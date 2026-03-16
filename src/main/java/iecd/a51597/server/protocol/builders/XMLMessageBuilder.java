@@ -5,6 +5,7 @@ import iecd.a51597.server.protocol.ProtocolConstants;
 import iecd.a51597.server.protocol.types.ActionType;
 import iecd.a51597.server.protocol.types.ErrorCodeType;
 import iecd.a51597.server.protocol.types.MessageType;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -29,40 +30,44 @@ public class XMLMessageBuilder implements MessageBuilder {
 
     private record MessageSkeleton(Document document, Element header, Element body) {}
 
-    private MessageSkeleton getSkeleton(MessageType msgType, UUID id, ActionType actionType) throws ParserConfigurationException {
-        Document doc = dbf.newDocumentBuilder().newDocument();
-        doc.setXmlStandalone(true);
+    private MessageSkeleton getSkeleton(MessageType msgType, UUID id, ActionType actionType) {
+        try {
+            Document doc = dbf.newDocumentBuilder().newDocument();
+            doc.setXmlStandalone(true);
 
-        Element root = doc.createElement("message");
-        root.setAttribute("type", msgType.name());
-        root.setAttribute("id", id.toString());
-        root.setAttribute("version", ProtocolConstants.PROTOCOL_VERSION);
-        doc.appendChild(root);
+            Element root = doc.createElement("message");
+            root.setAttribute("type", msgType.name());
+            root.setAttribute("id", id.toString());
+            root.setAttribute("version", ProtocolConstants.PROTOCOL_VERSION);
+            doc.appendChild(root);
 
-        Element header = doc.createElement("header");
-        root.appendChild(header);
+            Element header = doc.createElement("header");
+            root.appendChild(header);
 
-        Element action = doc.createElement("action");
-        action.setTextContent(actionType.name());
-        header.appendChild(action);
+            Element action = doc.createElement("action");
+            action.setTextContent(actionType.name());
+            header.appendChild(action);
 
-        Element timestamp = doc.createElement("timestamp");
-        timestamp.setTextContent(Instant.now().toString());
-        header.appendChild(timestamp);
+            Element timestamp = doc.createElement("timestamp");
+            timestamp.setTextContent(Instant.now().toString());
+            header.appendChild(timestamp);
 
-        Element body = doc.createElement("body");
-        root.appendChild(body);
+            Element body = doc.createElement("body");
+            root.appendChild(body);
 
-        return new MessageSkeleton(doc, header, body);
+            return new MessageSkeleton(doc, header, body);
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("DocumentBuilder unavailable — check JAXP classpath configuration", e);
+        }
     }
 
     @Override
-    public byte[] errorNoId(ErrorCodeType errorCode, String description) throws ParserConfigurationException {
+    public byte[] errorNoId(ErrorCodeType errorCode, String description) {
         return error(ProtocolConstants.ERROR_NO_ID, ActionType.UNKNOWN, errorCode, description);
     }
 
     @Override
-    public byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description) throws ParserConfigurationException {
+    public byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description) {
         return null; //TODO
     }
 

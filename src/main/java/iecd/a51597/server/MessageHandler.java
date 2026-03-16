@@ -12,10 +12,12 @@ public class MessageHandler {
 
     private final CommParser commParser;
     private final MessageBuilder messageBuilder;
+    private final SessionManager sessionManager;
 
-    public MessageHandler(CommParser commParser, MessageBuilder messageBuilder) {
+    public MessageHandler(CommParser commParser, MessageBuilder messageBuilder, SessionManager sessionManager) {
         this.commParser = commParser;
         this.messageBuilder = messageBuilder;
+        this.sessionManager = sessionManager;
     }
 
     public void handle(byte[] frameBytes, Connection connection) {

@@ -30,9 +30,13 @@ public class XMLParser implements CommParser {
     private final Schema schema;
     private final DocumentBuilderFactory dbf;
 
-    public XMLParser() throws SAXException, FactoryConfigurationError {
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        schema = sf.newSchema(getClass().getResource("/protocol.xsd"));
+    public XMLParser() {
+        try {
+            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schema = sf.newSchema(getClass().getResource("/protocol.xsd"));
+        } catch (SAXException e) {
+            throw new IllegalStateException("Failed to load protocol.xsd — ensure it is on the classpath", e);
+        }
 
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(false);
@@ -40,8 +44,12 @@ public class XMLParser implements CommParser {
         dbf.setNamespaceAware(true);
     }
 
-    private DocumentBuilder getNewBuilder() throws ParserConfigurationException {
-        return dbf.newDocumentBuilder();
+    private DocumentBuilder getNewBuilder() {
+        try {
+            return dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("DocumentBuilder unavailable — check JAXP classpath configuration", e);
+        }
     }
 
     private Validator getNewValidator() {
@@ -53,11 +61,7 @@ public class XMLParser implements CommParser {
 
         Validator validator = getNewValidator();
         DocumentBuilder builder;
-        try {
-            builder = getNewBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new MessageParseException("Failed to initialize document builder: " + e.getMessage(), e);
-        }
+        builder = getNewBuilder();
 
         Document doc;
         try {
@@ -76,12 +80,18 @@ public class XMLParser implements CommParser {
 
         UUID messageId = UUID.fromString(root.getAttribute("id"));
         MessageType type = MessageType.fromString(root.getAttribute("type"));
+        String version = root.getAttribute("version");
 
         Element header = (Element) doc.getElementsByTagName("header").item(0);
         Element body = (Element) doc.getElementsByTagName("body").item(0);
 
-        // Won't be null since document has already been checked by the validator
-        ActionType action = ActionType.fromString(getField(header, "action"));
+        String actionRaw = getField(header, "action");
+        ActionType action;
+        if (actionRaw != null) {
+            action = ActionType.fromString(actionRaw);
+        } else {
+            action = ActionType.UNKNOWN;
+        }
         String sessionTokenRaw = getField(header, "session");
 
         UUID sessionToken;
@@ -93,7 +103,7 @@ public class XMLParser implements CommParser {
 
         Map<BodyKey, String> bodyMap = mapBodyFields(body);
 
-        return new Message(messageId, type, action, sessionToken, bodyMap);
+        return new Message(messageId, type, version, action, sessionToken, bodyMap);
     }
 
     private Map<BodyKey, String> mapBodyFields(Element body) {

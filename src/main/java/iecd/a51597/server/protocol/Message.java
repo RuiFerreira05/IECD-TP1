@@ -10,6 +10,7 @@ import java.util.UUID;
 public record Message(
         UUID messageId,
         MessageType messageType,
+        String version,
         ActionType actionType,
         UUID sessionToken,
         Map<BodyKey, String> body) {

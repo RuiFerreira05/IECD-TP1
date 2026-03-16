@@ -1,5 +1,6 @@
 package iecd.a51597.server;
 
+import iecd.a51597.server.protocol.ProtocolConstants;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
 import iecd.a51597.server.protocol.parsers.CommParser;
 import iecd.a51597.server.protocol.Message;
@@ -28,14 +29,11 @@ public class Connection implements Runnable {
     private DataInputStream  inputStream;
     private DataOutputStream outputStream;
 
-    private final SessionManager sessionManager;
     private final MessageHandler messageHandler;
 
-    public Connection(Socket client, Server server, SessionManager sessionManager,
-                      MessageHandler messageHandler) {
+    public Connection(Socket client, Server server, MessageHandler messageHandler) {
         this.clientSocket   = client;
         this.server         = server;
-        this.sessionManager = sessionManager;
         this.messageHandler = messageHandler;
         initStreams();
     }
@@ -65,9 +63,8 @@ public class Connection implements Runnable {
         try {
             int length = inputStream.readInt();
 
-            if (length <= 0) {
-                logger.warn("Non-positive frame length {} from {}, closing connection",
-                        length, clientSocket.getInetAddress());
+            if (length <= 0 || length > ProtocolConstants.MAX_FRAME_SIZE) {
+                logger.warn("Invalid frame length {} from {}, closing", length, clientSocket.getInetAddress());
                 closeConnection();
                 return;
             }
