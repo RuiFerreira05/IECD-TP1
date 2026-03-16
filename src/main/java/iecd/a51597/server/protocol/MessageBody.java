@@ -29,6 +29,8 @@ public sealed interface MessageBody {
     record GameMove(UUID gameId, Element move) implements MessageBody {
     }
 
+    record GameOver(UUID gameId, UUID winnerId, String winnerUsername) implements MessageBody {}
+
     record Unknown() implements MessageBody {
     }
 }
