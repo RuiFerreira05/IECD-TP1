@@ -57,18 +57,18 @@ public class CLIHandler {
     }
 
     public void printStatusHeader() {
-        final int W = 46; // inner width (between the ║ borders)
+        final int W = 46;
 
-        boolean   listening   = server.isListening();
-        int       connections = server.getConnections().size();
-        int       sessions    = server.getSessionManager().activeSessionCount();
-        Instant   now         = Instant.now();
+        boolean listening = server.isListening();
+        int connections = server.getConnections().size();
+        int sessions = server.getSessionManager().activeSessionCount();
+        Instant now = Instant.now();
 
         String statusLine = listening
                 ? "● LISTENING  (port " + server.getListener().getPort() + ")"
                 : "○ IDLE";
 
-        Duration uptime  = Duration.between(startedAt, now);
+        Duration uptime = Duration.between(startedAt, now);
         String uptimeLine = String.format("%dd %02dh %02dm %02ds",
                 uptime.toDaysPart(),
                 uptime.toHoursPart(),
@@ -77,20 +77,20 @@ public class CLIHandler {
 
         String timeLine = DATE_FMT.format(now) + "  " + TIME_FMT.format(now);
 
-        String border  = "═".repeat(W);
-        String top     = "╔" + border + "╗";
-        String mid     = "╠" + border + "╣";
-        String bot     = "╚" + border + "╝";
-        String title   = centre("IECD-TP1 - SERVER STATUS", W);
+        String border = "═".repeat(W);
+        String top = "╔" + border + "╗";
+        String mid = "╠" + border + "╣";
+        String bot = "╚" + border + "╝";
+        String title = centre("IECD-TP1 - SERVER STATUS", W);
 
         System.out.println(top);
         System.out.println("║" + title + "║");
         System.out.println(mid);
-        System.out.println(row("Status",      statusLine,              W));
+        System.out.println(row("Status", statusLine, W));
         System.out.println(row("Connections", String.valueOf(connections), W));
-        System.out.println(row("Sessions",    String.valueOf(sessions),    W));
-        System.out.println(row("Uptime",      uptimeLine,              W));
-        System.out.println(row("Time",        timeLine,                W));
+        System.out.println(row("Sessions", String.valueOf(sessions), W));
+        System.out.println(row("Uptime", uptimeLine, W));
+        System.out.println(row("Time", timeLine, W));
         System.out.println(bot);
     }
 
@@ -103,7 +103,6 @@ public class CLIHandler {
 
     private static String row(String label, String value, int innerWidth) {
         String content = String.format("  %-12s: %s", label, value);
-        // Pad or truncate to exactly innerWidth
         if (content.length() < innerWidth) {
             content = content + " ".repeat(innerWidth - content.length());
         } else if (content.length() > innerWidth) {
