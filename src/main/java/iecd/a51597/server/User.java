@@ -3,6 +3,7 @@ package iecd.a51597.server;
 import java.util.UUID;
 
 public class User {
+    //TODO
 
     private UUID userId;
     private String username;
