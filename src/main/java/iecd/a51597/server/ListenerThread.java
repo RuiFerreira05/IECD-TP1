@@ -24,7 +24,7 @@ public class ListenerThread extends Thread {
         try (ServerSocket serverSocket = new ServerSocket(port)){
             this.serverSocket = serverSocket;
             while (running) {
-                Connection conn = new Connection(serverSocket.accept(), server, server.getSessionManager(), server.getCommParser(), server.getMessageBuilder());
+                Connection conn = new Connection(serverSocket.accept(), server, server.getSessionManager(), server.getMessageHandler());
                 server.addConnection(conn);
                 new Thread(conn).start();
 

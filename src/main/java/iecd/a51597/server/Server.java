@@ -19,6 +19,7 @@ public class Server {
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
     private final MessageBuilder messageBuilder;
+    private final MessageHandler messageHandler;
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
@@ -30,13 +31,18 @@ public class Server {
         logger.info("Initializing Server...");
         this.cliHandler = new CLIHandler(this);
         this.messageBuilder = new XMLMessageBuilder();
-
         try {
             commParser = new XMLParser();
         } catch (Exception e) {
             logger.error("Failed to initialize CommParser: {}", e.getMessage());
             throw new RuntimeException("Server initialization failed", e);
         }
+        this.messageHandler = new MessageHandler(commParser, messageBuilder);
+
+    }
+
+    public MessageHandler getMessageHandler() {
+        return messageHandler;
     }
 
     public ListenerThread getListener() {

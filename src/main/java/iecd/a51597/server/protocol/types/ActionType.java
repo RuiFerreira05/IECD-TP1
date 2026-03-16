@@ -1,6 +1,7 @@
 package iecd.a51597.server.protocol.types;
 
 public enum ActionType {
+    UNKNOWN,
     REGISTER,
     LOGIN,
     LOGOUT,

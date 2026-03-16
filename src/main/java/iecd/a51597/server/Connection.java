@@ -29,16 +29,14 @@ public class Connection implements Runnable {
     private DataOutputStream outputStream;
 
     private final SessionManager sessionManager;
-    private final CommParser commParser;
-    private final MessageBuilder messageBuilder;
+    private final MessageHandler messageHandler;
 
     public Connection(Socket client, Server server, SessionManager sessionManager,
-                      CommParser commParser, MessageBuilder messageBuilder) {
+                      MessageHandler messageHandler) {
         this.clientSocket   = client;
         this.server         = server;
         this.sessionManager = sessionManager;
-        this.commParser     = commParser;
-        this.messageBuilder = messageBuilder;
+        this.messageHandler = messageHandler;
         initStreams();
     }
 
@@ -76,9 +74,7 @@ public class Connection implements Runnable {
 
             byte[] frameBytes = new byte[length];
             inputStream.readFully(frameBytes);
-
-            Message message = commParser.parseMessage(new ByteArrayInputStream(frameBytes));
-            // TODO: dispatch message to handler
+            messageHandler.handle(frameBytes, this);
 
         } catch (EOFException | SocketException e) {
             // Client closed the connection cleanly (EOF) or the socket was
@@ -91,20 +87,10 @@ public class Connection implements Runnable {
                         clientSocket.getInetAddress(), e.getMessage());
             }
             closeConnection();
-        } catch (MalformedMessageException e) {
-            logger.warn("Malformed message from {}: {}", clientSocket.getInetAddress(), e.getMessage());
-            sendError(ErrorCodeType.MALFORMED_REQUEST, "Message does not conform to schema");
-        } catch (MessageParseException e) {
-            logger.error("Parse failure from {}: {}", clientSocket.getInetAddress(), e.getMessage());
-            sendError(ErrorCodeType.INTERNAL_ERROR, "Failed to parse message");
-        } catch (CommException e) {
-            logger.error("Unexpected comm error from {}: {}",
-                    clientSocket.getInetAddress(), e.getMessage());
-            sendError(ErrorCodeType.INTERNAL_ERROR, "Communication error");
         }
     }
 
-    private void sendMessage(byte[] payload) {
+    public void sendMessage(byte[] payload) {
         try {
             outputStream.writeInt(payload.length);
             outputStream.write(payload);
@@ -114,16 +100,6 @@ public class Connection implements Runnable {
                     clientSocket.getInetAddress(), e.getMessage());
             closeConnection();
         }
-    }
-
-    private void sendError(ErrorCodeType errorCode, String description) {
-        byte[] response = messageBuilder.errorNoId(errorCode, description);
-        sendMessage(response);
-    }
-
-    private void sendError(UUID messageId, ErrorCodeType errorCode, String description) {
-        byte[] response = messageBuilder.error(messageId, errorCode, description);
-        sendMessage(response);
     }
 
     public Socket getClientSocket() {

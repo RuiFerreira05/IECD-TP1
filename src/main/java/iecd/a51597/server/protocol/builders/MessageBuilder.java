@@ -1,16 +1,18 @@
 package iecd.a51597.server.protocol.builders;
 
 import iecd.a51597.server.User;
+import iecd.a51597.server.protocol.types.ActionType;
 import iecd.a51597.server.protocol.types.ErrorCodeType;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageBuilder {
 
     //  GENERIC
-    byte[] errorNoId(ErrorCodeType errorCode, String description);
-    byte[] error(UUID messageId, ErrorCodeType errorCode, String description);
+    byte[] errorNoId(ErrorCodeType errorCode, String description) throws ParserConfigurationException;
+    byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description) throws ParserConfigurationException;
     byte[] ok(UUID messageId);
 
     // AUTH
