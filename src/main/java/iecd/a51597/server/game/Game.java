@@ -1,10 +1,12 @@
 package iecd.a51597.server.game;
 
+import iecd.a51597.server.User;
+
 import java.util.UUID;
 
 public interface Game {
     UUID getGameId();
-    UUID getPlayer1Id();
-    UUID getPlayer2Id();
-    MoveResult applyMove(UUID playerId, String movePayload);
+    User getPlayer1();
+    User getPlayer2();
+    MoveResult applyMove(User player, String movePayload);
 }

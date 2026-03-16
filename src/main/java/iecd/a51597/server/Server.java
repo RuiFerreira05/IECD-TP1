@@ -1,5 +1,6 @@
 package iecd.a51597.server;
 
+import iecd.a51597.server.game.GameFactory;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
 import iecd.a51597.server.protocol.builders.XMLMessageBuilder;
 import iecd.a51597.server.protocol.parsers.CommParser;
@@ -20,6 +21,7 @@ public class Server {
     private final CommParser commParser;
     private final MessageBuilder messageBuilder;
     private final MessageHandler messageHandler;
+    private final GameManager gameManager = new GameManager();
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
@@ -33,6 +35,12 @@ public class Server {
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
         this.messageHandler = new MessageHandler(commParser, messageBuilder, sessionManager);
+
+        // registerGameFactory(GAME GOES HERE BRO);
+    }
+
+    public void registerGameFactory(GameFactory factory) {
+        gameManager.registerFactory(factory);
     }
 
     public MessageHandler getMessageHandler() {
