@@ -9,6 +9,7 @@ import iecd.a51597.server.protocol.types.BodyKey;
 import iecd.a51597.server.protocol.types.MessageType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
@@ -108,7 +109,7 @@ public class XMLParser implements CommParser {
 
     private Map<BodyKey, String> mapBodyFields(Element body) {
         Map<BodyKey, String> bodyMap = new HashMap<>();
-        var fields = body.getChildNodes();
+        NodeList fields = body.getChildNodes();
         for (int i = 0; i < fields.getLength(); i++) {
             if (fields.item(i) instanceof Element field) {
                 String key = field.getTagName();
@@ -121,7 +122,7 @@ public class XMLParser implements CommParser {
     }
 
     private String getField(Element rootElement, String tag) {
-        var nodes = rootElement.getElementsByTagName(tag);
+        NodeList nodes = rootElement.getElementsByTagName(tag);
         if (nodes.getLength() == 0) return null;
         return nodes.item(0).getTextContent().trim();
     }
