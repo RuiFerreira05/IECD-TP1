@@ -1,0 +1,15 @@
+package iecd.a51597.server.protocol;
+
+import java.util.UUID;
+
+public final class ProtocolConstants {
+
+    // This class shouldn't be instantiated
+    private ProtocolConstants() {}
+
+    // Server received a message it couldn't retrieve the id from
+    public static final String PROTOCOL_VERSION = "1.0";
+    public static final UUID ERROR_NO_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final int MAX_FRAME_SIZE = 1024 * 1024;
+    public static final int FRAME_LENGTH_PREFIX_SIZE = 4;
+}
