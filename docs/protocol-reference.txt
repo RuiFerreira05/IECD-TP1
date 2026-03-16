@@ -267,16 +267,18 @@ ENVELOPE STRUCTURE (every message)
   ERROR CODES
 ================================================================================
 
-  AUTH_FAILED          Wrong username or password
-  USERNAME_TAKEN       Username already in use
-  SESSION_EXPIRED      Token not found or timed out
-  USER_NOT_FOUND       Target user does not exist
-  ALREADY_IN_GAME      Player is already in an active game
-  INVALID_MOVE         Move rejected by game logic
-  INVALID_PASSWORD     Password does not meet requirements
-  UNKNOWN_ACTION       Server does not recognise the action
-  INTERNAL_ERROR       Unhandled server-side exception
-  MALFORMED_REQUEST    XML could not be parsed (Accompanied by UNKNOWN Action Type)
+  AUTH_FAILED               Wrong username or password
+  USERNAME_TAKEN            Username already in use
+  SESSION_EXPIRED           Token not found or timed out
+  USER_NOT_FOUND            Target user does not exist
+  ALREADY_IN_GAME           Player is already in an active game
+  INVALID_MOVE              Move rejected by game logic
+  INVALID_PASSWORD          Password does not meet requirements
+  UNKNOWN_ACTION            Server does not recognize the action
+  INTERNAL_ERROR            Unhandled server-side exception
+  MALFORMED_REQUEST         XML could not be parsed (Accompanied by UNKNOWN Action Type)
+  UNEXPECTED_MESSAGE_TYPE   Client sent a RESPONSE or PUSH message type
+  UNEXPECTED_MESSAGE_ACTION Client sent an unexpected action type
 
 ================================================================================
   PROTOCOL VERSIONING

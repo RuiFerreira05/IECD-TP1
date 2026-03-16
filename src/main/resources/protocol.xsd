@@ -65,6 +65,8 @@
             <xs:enumeration value="UNKNOWN_ACTION"/>
             <xs:enumeration value="INTERNAL_ERROR"/>
             <xs:enumeration value="MALFORMED_REQUEST"/>
+            <xs:enumeration value="UNEXPECTED_MESSAGE_TYPE"/>
+            <xs:enumeration value="UNEXPECTED_MESSAGE_ACTION"/>
         </xs:restriction>
     </xs:simpleType>
 
