@@ -34,6 +34,8 @@ public class Server {
 
     private Server() {
         logger.info("Initializing Server...");
+        ServerConfiguration.load();
+
         this.cliHandler = new CLIHandler(this);
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
@@ -56,12 +58,12 @@ public class Server {
         gameManager.registerFactory(factory);
     }
 
-    public MessageHandler getMessageHandler()  { return messageHandler; }
-    public ListenerThread getListener()        { return listener; }
-    public MessageBuilder getMessageBuilder()  { return messageBuilder; }
-    public CommParser getCommParser()          { return commParser; }
-    public SessionManager getSessionManager()  { return sessionManager; }
-    public UserStore getUserStore()            { return userStore; }
+    public MessageHandler getMessageHandler() { return messageHandler; }
+    public ListenerThread getListener() { return listener; }
+    public MessageBuilder getMessageBuilder() { return messageBuilder; }
+    public CommParser getCommParser() { return commParser; }
+    public SessionManager getSessionManager() { return sessionManager; }
+    public UserStore getUserStore() { return userStore; }
 
     public static Server getInstance() {
         if (instance == null) {
