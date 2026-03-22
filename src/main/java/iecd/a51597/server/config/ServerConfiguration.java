@@ -38,9 +38,6 @@ public final class ServerConfiguration {
             return;
         }
 
-
-
-
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(file);
