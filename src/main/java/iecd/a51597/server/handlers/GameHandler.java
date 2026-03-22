@@ -88,25 +88,25 @@ public class GameHandler extends BaseHandler {
 
         User inviter = game.getPlayer1();
 
-        Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviter.getUserId());
-
         // Edge case just to prevent game invite high-jacking, not even sure if it would trigger but might as well
         if (!responder.getUserId().equals(game.getPlayer2().getUserId())) {
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not the invited player");
             return;
         }
 
+        Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviter.getUserId());
+
+
         if (!body.accept()) {
-            gameManager.acceptGame(game.getGameId());
+            gameManager.declineGame(game.getGameId());
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
-            gameManager.endGame(game.getGameId());
             inviterSessionOpt.ifPresent(s ->
                 s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId()))
             );
             return;
         }
 
-        gameManager.declineGame(game.getGameId());
+        gameManager.acceptGame(game.getGameId());
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
         inviterSessionOpt.ifPresent(s ->
                 s.getConnection().sendMessage(messageBuilder.gameInviteAcceptedPush(game.getGameId(), responder))
@@ -133,8 +133,9 @@ public class GameHandler extends BaseHandler {
         // This guard prevents game move injection from third parties, a bit overkill for a uni project, but
         // I'm kinda overkill
         if (!player.getUserId().equals(game.getPlayer1().getUserId())
-                || !player.getUserId().equals(game.getPlayer2().getUserId())) {
+                && !player.getUserId().equals(game.getPlayer2().getUserId())) {
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not a player in this game");
+            return;
         }
 
         Move move;

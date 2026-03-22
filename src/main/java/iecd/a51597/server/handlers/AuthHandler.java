@@ -47,7 +47,7 @@ public class AuthHandler extends BaseHandler {
     }
 
     public void logout(Message message, Connection connection) {
-        if (message.sessionToken() == null) return;
+        if (requireSession(message, connection).isEmpty()) return;
 
         sessionManager.invalidate(message.sessionToken());
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
