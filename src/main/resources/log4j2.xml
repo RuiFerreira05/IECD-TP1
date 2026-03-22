@@ -41,7 +41,7 @@
             <AppenderRef ref="PROTOCOL"/>
         </Logger>
         <Logger name="iecd.a51597.server.PersistenceManager" level="ALL" additivity="false">
-            <AppenderRef ref="PROTOCOL"/>
+            <AppenderRef ref="MAIN"/>
         </Logger>
     </Loggers>
 </Configuration>
