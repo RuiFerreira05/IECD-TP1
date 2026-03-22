@@ -1,7 +1,5 @@
 package iecd.a51597.server.protocol;
 
-import org.w3c.dom.Element;
-
 import java.util.UUID;
 
 public sealed interface MessageBody {
