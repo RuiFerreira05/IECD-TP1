@@ -60,7 +60,7 @@ public class MessageHandler {
             return;
         }
 
-        if (message.version() != ServerConfiguration.PROTOCOL_VERSION) {
+        if (!message.version().equals(ServerConfiguration.PROTOCOL_VERSION)) {
             connection.sendMessage(messageBuilder.error(
                     message.messageId(),
                     message.actionType(),
