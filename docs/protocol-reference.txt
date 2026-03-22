@@ -176,7 +176,7 @@ ENVELOPE STRUCTURE (every message)
 
 
 ================================================================================
-  GAME                                      (* session required on all)
+  GAME
 ================================================================================
 
 ── GAME_INVITE ──────────────────────────────────────────────────────────────
@@ -270,6 +270,7 @@ ENVELOPE STRUCTURE (every message)
   AUTH_FAILED               Wrong username or password
   USERNAME_TAKEN            Username already in use
   SESSION_EXPIRED           Token not found or timed out
+  NOT_AUTHENTICATED         Client did not provide a valid session token
   USER_NOT_FOUND            Target user does not exist
   ALREADY_IN_GAME           Player is already in an active game
   INVALID_MOVE              Move rejected by game logic
