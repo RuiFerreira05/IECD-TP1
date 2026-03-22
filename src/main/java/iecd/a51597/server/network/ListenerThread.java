@@ -13,7 +13,7 @@ public class ListenerThread extends Thread {
     private final int port;
     private final Server server;
     private final Logger logger = LogManager.getLogger(ListenerThread.class);
-    private ServerSocket serverSocket;
+    private volatile ServerSocket serverSocket;
 
     public ListenerThread(int port, Server server) {
         this.port = port;
