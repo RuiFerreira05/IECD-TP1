@@ -272,6 +272,7 @@ ENVELOPE STRUCTURE (every message)
   SESSION_EXPIRED           Token not found or timed out
   NOT_AUTHENTICATED         Client did not provide a valid session token
   USER_NOT_FOUND            Target user does not exist
+  GAME_NOT_FOUND            Target game does not exist
   USER_NOT_ONLINE           Target user is not currently online
   ALREADY_IN_GAME           Player is already in an active game
   INVALID_MOVE              Move rejected by game logic

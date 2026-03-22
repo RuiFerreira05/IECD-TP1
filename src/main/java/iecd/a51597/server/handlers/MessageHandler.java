@@ -6,6 +6,7 @@ import iecd.a51597.server.protocol.Message;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
 import iecd.a51597.server.protocol.exceptions.CommException;
 import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.server.protocol.exceptions.MessageParseException;
 import iecd.a51597.server.protocol.parsers.CommParser;
 import iecd.a51597.server.protocol.types.ErrorCodeType;
 import iecd.a51597.server.protocol.types.MessageType;
@@ -38,8 +39,13 @@ public class MessageHandler {
             dispatch(message, connection);
         } catch (MalformedMessageException e) {
             connection.sendMessage(messageBuilder.errorNoId(
-                ErrorCodeType.MALFORMED_REQUEST,
-                "The message does not conform to protocol"
+                    ErrorCodeType.MALFORMED_REQUEST,
+                    "The message does not conform to protocol"
+            ));
+        } catch (MessageParseException e) {
+            connection.sendMessage(messageBuilder.errorNoId(
+                    ErrorCodeType.MALFORMED_REQUEST,
+                    "The message sent could not be parsed"
             ));
         } catch (CommException e) {
             connection.sendMessage(messageBuilder.errorNoId(
