@@ -17,7 +17,7 @@ public class Server {
 
     private static volatile Server instance;
 
-    private int startupPort = 5555;
+    private int startupPort = ServerConfiguration.DEFAULT_PORT;
     private ListenerThread listener;
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
