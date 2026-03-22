@@ -128,6 +128,13 @@ public class GameHandler extends BaseHandler {
 
         Game game = gameOpt.get();
 
+        // This guard prevents game move injection from third parties, a bit overkill for a uni project, but
+        // I'm kinda overkill
+        if (!player.getUserId().equals(game.getPlayer1().getUserId())
+                || !player.getUserId().equals(game.getPlayer2().getUserId())) {
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not a player in this game");
+        }
+
         Move move;
         try {
             move = gameManager.getCodec().deserialize(body.rawMove());
