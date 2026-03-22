@@ -55,7 +55,7 @@ public class Connection implements Runnable {
         try {
             int length = inputStream.readInt();
 
-            if (length <= 0 || length > ProtocolConstants.MAX_FRAME_SIZE) {
+            if (length <= 0 || length > ServerConfiguration.MAX_FRAME_SIZE) {
                 logger.warn("Invalid frame length {} from {}, closing", length, clientSocket.getInetAddress());
                 closeConnection();
                 return;
