@@ -13,16 +13,16 @@ public class UserStore {
     //Username -> User
     ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
 
-    // CREATION
+    // REGISTER
     public User register(String username, String passwordHash) throws UsernameAlreadyTakenException {
-        if (usernameIndex.containsKey(username)) {
+        UUID userId = UUID.randomUUID();
+        User user = new User(userId, username, passwordHash, null);
+
+        if (usernameIndex.putIfAbsent(username, user) != null) {
             throw new UsernameAlreadyTakenException(username);
         }
 
-        UUID userId = UUID.randomUUID();
-        User user = new User(userId, username, passwordHash, null);
         userMap.put(userId, user);
-        usernameIndex.put(username, user);
         return user;
     }
 
@@ -56,9 +56,10 @@ public class UserStore {
 
     // UPDATE
     public void updateUsername(User user, String newUsername) throws UsernameAlreadyTakenException {
-        if (usernameIndex.containsKey(newUsername)) throw new UsernameAlreadyTakenException(newUsername);
+        if (usernameIndex.putIfAbsent(newUsername, user) != null) {
+            throw new UsernameAlreadyTakenException(newUsername);
+        }
         usernameIndex.remove(user.getUsername());
-        usernameIndex.put(newUsername, user);
         user.setUsername(newUsername);
     }
 
