@@ -98,8 +98,8 @@ public class Connection implements Runnable {
     }
 
     public void closeConnection() {
-        if (clientSocket.isClosed()) return;
         server.removeConnection(this);
+        if (clientSocket.isClosed()) return;
         try {
             clientSocket.close();
         } catch (IOException e) {

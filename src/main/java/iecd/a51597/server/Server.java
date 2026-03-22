@@ -146,7 +146,12 @@ public class Server {
     public void shutdown() {
         stopListener();
         persistenceManager.save();
-        synchronized (connections) { connections.forEach(Connection::closeConnection); }
+
+        // The reason we take a snapshot of the connections list here is to avoid a ConcurrentModificationException when
+        // Connection calls server.removeConnection(). It's a little ugly but it works
+        List<Connection> snapshot;
+        synchronized (connections) { snapshot = List.copyOf(connections); }
+        snapshot.forEach(Connection::closeConnection);
         logger.info("Server shutdown complete");
     }
 
