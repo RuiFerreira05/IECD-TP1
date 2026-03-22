@@ -2,60 +2,87 @@ package iecd.a51597.server.store;
 
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserStore {
 
     // UUID -> User
-    ConcurrentHashMap<UUID, User> userStore = new ConcurrentHashMap<>();
+    ConcurrentHashMap<UUID, User> userMap = new ConcurrentHashMap<>();
 
     //Username -> User
     ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
 
     // CREATION
-    User register(String username, String passwordHash) throws UsernameAlreadyTakenException {
-        return null; //TODO
+    public User register(String username, String passwordHash) throws UsernameAlreadyTakenException {
+        if (usernameIndex.containsKey(username)) {
+            throw new UsernameAlreadyTakenException(username);
+        }
+
+        UUID userId = UUID.randomUUID();
+        User user = new User(userId, username, passwordHash, null);
+        userMap.put(userId, user);
+        usernameIndex.put(username, user);
+        return user;
     }
 
     // LOOKUP
-    Optional<User> findByCredentials(String username, String passwordHash) {
-        return null; //TODO
+    public Optional<User> findByCredentials(String username, String passwordHash) {
+        User user = usernameIndex.get(username);
+        if (user != null && user.getPasswordHash().equals(passwordHash)) {
+            return Optional.of(user);
+        }
+        return Optional.empty();
     }
-    Optional<User> findById(UUID userId) {
-        return null; //TODO
+
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(userMap.get(userId));
     }
-    Optional<User> findByUsername(String username) {
-        return null; //TODO
+
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(usernameIndex.get(username));
     }
-    List<User> searchByUsername(String query) {
-        return null; //TODO
+
+    public List<User> searchByUsername(String query) {
+        List<User> users = new ArrayList<>();
+        query = query.toLowerCase();
+        for (User user : userMap.values()) {
+            if (user.getUsername().toLowerCase().contains(query)) {
+                users.add(user);
+            }
+        }
+        return users;
     }
 
     // UPDATE
-    void updateUsername(UUID userId, String newUsername) throws UsernameAlreadyTakenException {
-        //TODO
+    public void updateUsername(User user, String newUsername) throws UsernameAlreadyTakenException {
+        if (usernameIndex.containsKey(newUsername)) throw new UsernameAlreadyTakenException(newUsername);
+        usernameIndex.remove(user.getUsername());
+        usernameIndex.put(newUsername, user);
+        user.setUsername(newUsername);
     }
-    void updatePassword(UUID userId, String newPasswordHash) {
-        //TODO
+
+    public void updatePassword(User user, String newPasswordHash) {
+        user.setPasswordHash(newPasswordHash);
     }
-    void updatePhoto(UUID userId, String photo) {
-        //TODO
+
+    public void updatePhoto(User user, String photo) {
+        user.setPhoto(photo);
     }
 
     // DELETION
-    void delete(UUID userId) {
-        //TODO
+    public void delete(User user) {
+        userMap.remove(user.getUserId());
+        usernameIndex.remove(user.getUsername());
     }
 
     // PERSISTENCE
-    void loadUser(User user) {
-        //TODO
+    public void loadUser(User user) {
+        userMap.put(user.getUserId(), user);
+        usernameIndex.put(user.getUsername(), user);
     }
-    Collection<User> getAllUsers() {
-        return null; //TODO
+
+    public Collection<User> getAllUsers() {
+        return userMap.values();
     }
 }
