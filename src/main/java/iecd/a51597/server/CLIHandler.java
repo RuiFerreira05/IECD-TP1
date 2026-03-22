@@ -32,11 +32,11 @@ public class CLIHandler {
 
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help",   new Command(this::help,              "Show this help message"));
-        commands.put("status", new Command(this::status,            "Print server status header"));
-        commands.put("start",  new Command(this::start,             "Start the server"));
-        commands.put("stop",   new Command(this::stop,              "Stop the server"));
-        commands.put("exit",   new Command(this::exit,              "Shutdown the server"));
+        commands.put("help", new Command(this::help, "Show this help message"));
+        commands.put("status", new Command(this::status, "Print server status header"));
+        commands.put("start", new Command(this::start, "Start the server"));
+        commands.put("stop", new Command(this::stop, "Stop the server"));
+        commands.put("exit", new Command(this::exit, "Shutdown the server"));
     }
 
     void loop() {
