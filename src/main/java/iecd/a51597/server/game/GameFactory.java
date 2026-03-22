@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface GameFactory {
     Game createGame(UUID gameId, User player1, User player2);
-    MoveDeserializer getMoveDeserializer();
+    MoveCodec getMoveCodec();
 }

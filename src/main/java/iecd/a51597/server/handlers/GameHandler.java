@@ -122,7 +122,7 @@ public class GameHandler extends BaseHandler {
 
         Move move;
         try {
-            move = gameManager.getDeserializer().deserialize(body.rawMove());
+            move = gameManager.getCodec().deserialize(body.rawMove());
         } catch (MalformedMessageException e) {
             sendError(message, connection, ErrorCodeType.MALFORMED_REQUEST, "Invalid move payload");
             return;

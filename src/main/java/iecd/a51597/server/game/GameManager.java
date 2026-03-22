@@ -14,11 +14,11 @@ public class GameManager {
     // UserId -> GameId
     private final Map<UUID, UUID> playerGameIndex = new ConcurrentHashMap<>(); // userId -> gameId
     private GameFactory factory;
-    private MoveDeserializer deserializer;
+    private MoveCodec codec;
 
     public void registerFactory(GameFactory factory) {
         this.factory = factory;
-        this.deserializer = factory.getMoveDeserializer();
+        this.codec = factory.getMoveCodec();
     }
 
     public boolean hasFactory() {
@@ -54,7 +54,7 @@ public class GameManager {
         }
     }
 
-    public MoveDeserializer getDeserializer() {
-        return deserializer;
+    public MoveCodec getCodec() {
+        return codec;
     }
 }
