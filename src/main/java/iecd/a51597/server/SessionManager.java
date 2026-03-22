@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
 
-    private static final long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
+    private static final long SESSION_TIMEOUT_SECONDS = ServerConfiguration.SESSION_TIMEOUT_SECONDS;
     private static final Logger logger = LogManager.getLogger(SessionManager.class);
 
     // sessionToken -> Session

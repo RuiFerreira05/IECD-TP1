@@ -8,4 +8,6 @@ public final class ServerConfiguration {
     public static final String LEADERBOARD_STORE = "data/leaderboard.xml";
     public static final int MAX_FRAME_SIZE = 1024 * 1024;
     public static final int DEFAULT_PORT = 5555;
+    public static final int SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
+    public static final int STATUS_BOX_WIDTH = 46;
 }

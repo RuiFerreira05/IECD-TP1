@@ -57,7 +57,7 @@ public class CLIHandler {
     }
 
     public void printStatusHeader() {
-        final int W = 46;
+        final int W = ServerConfiguration.STATUS_BOX_WIDTH;
 
         boolean listening = server.isListening();
         int connections = server.getConnections().size();
