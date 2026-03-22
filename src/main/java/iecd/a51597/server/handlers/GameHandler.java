@@ -29,6 +29,7 @@ public class GameHandler extends BaseHandler {
     }
 
     public void gameInvite(Message message, Connection connection) {
+        if (!requireConfiguredGame(message, connection)) return;
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
         Session session = sessionOpt.get();
@@ -105,6 +106,7 @@ public class GameHandler extends BaseHandler {
     }
 
     public void gameMove(Message message, Connection connection) {
+        if (!requireConfiguredGame(message, connection)) return;
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
         Session  session = sessionOpt.get();
@@ -160,5 +162,14 @@ public class GameHandler extends BaseHandler {
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
         sessionManager.getSessionByUserId(game.getPlayer2().getUserId())
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
+    }
+
+    private boolean requireConfiguredGame(Message message, Connection connection) {
+        if (gameManager.hasFactory()) {
+            return true;
+        } else {
+            sendError(message, connection, ErrorCodeType.INTERNAL_ERROR, "No game is configured on this server");
+            return false;
+        }
     }
 }
