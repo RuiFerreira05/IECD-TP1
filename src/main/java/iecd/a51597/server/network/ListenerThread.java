@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 
 public class ListenerThread extends Thread {
 
-    public volatile boolean running = true;
+    private volatile boolean running = true;
     private final int port;
     private final Server server;
     private final Logger logger = LogManager.getLogger(ListenerThread.class);
@@ -50,5 +50,9 @@ public class ListenerThread extends Thread {
         try { if (serverSocket != null) serverSocket.close(); }
         catch (IOException e) { logger.error("Error closing socket: {}", e.getMessage()); }
         logger.info("Stopping ListenerThread");
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

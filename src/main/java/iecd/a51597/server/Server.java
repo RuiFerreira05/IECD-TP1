@@ -140,7 +140,7 @@ public class Server {
     }
 
     public boolean isListening() {
-        return this.listener != null && this.listener.running;
+        return this.listener != null && this.listener.isRunning();
     }
 
     public void shutdown() {
