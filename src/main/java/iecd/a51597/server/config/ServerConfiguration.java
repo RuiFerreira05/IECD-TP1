@@ -45,6 +45,7 @@ public final class ServerConfiguration {
             SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeoutSeconds", SESSION_TIMEOUT_SECONDS);
             USER_STORE = parseString(root, "userStore", USER_STORE);
             LEADERBOARD_STORE = parseString(root, "leaderboardStore", LEADERBOARD_STORE);
+            STATUS_BOX_WIDTH = parseInt(root, "statusBoxWidth", STATUS_BOX_WIDTH);
             PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);

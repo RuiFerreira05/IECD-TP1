@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <defaultPort>5555</defaultPort>
-    <maxFrameSize>1048576</maxFrameSize>
-    <sessionTimeoutSeconds>1800</sessionTimeoutSeconds>
+<!--    <maxFrameSize>1048576</maxFrameSize>-->
+<!--    <sessionTimeoutSeconds>1800</sessionTimeoutSeconds>-->
     <userStore>data/users.xml</userStore>
     <leaderboardStore>data/leaderboard.xml</leaderboardStore>
+    <statusBoxWidth>42</statusBoxWidth>
+    <protocolVersion>1.0</protocolVersion>
 </config>
