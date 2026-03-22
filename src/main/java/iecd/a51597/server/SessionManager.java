@@ -13,22 +13,23 @@ public class SessionManager {
     private static final long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
     private static final Logger logger = LogManager.getLogger(SessionManager.class);
 
-    // sessionId -> session
+    // sessionToken -> Session
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
-    // userId -> sessionId
-    private final Map<UUID, UUID> userSessionIndex = new ConcurrentHashMap<>();
+    // userId -> Session
+    private final Map<UUID, Session> userSessions = new ConcurrentHashMap<>();
 
     public Session createSession(User user) {
-        UUID existingToken = userSessionIndex.get(user.getUserId());
-        if (existingToken != null) {
-            sessions.remove(existingToken);
+        Session existing = userSessions.get(user.getUserId());
+        if (existing != null) {
+            sessions.remove(existing.getToken());
+            userSessions.remove(user.getUserId());
             logger.info("Invalidated previous session for user {}", user.getUsername());
         }
 
         Session session = new Session(user);
         sessions.put(session.getToken(), session);
-        userSessionIndex.put(user.getUserId(), session.getToken());
+        userSessions.put(user.getUserId(), session);
 
         logger.info("Session created for user {} [token={}]", user.getUsername(), session.getToken());
         return session;
@@ -49,15 +50,22 @@ public class SessionManager {
             return Optional.empty();
         }
 
-        session.refresh(); // sliding window — activity resets the clock
+        session.refresh();
         return Optional.of(session);
     }
 
     public void invalidate(UUID token) {
         Session removed = sessions.remove(token);
         if (removed != null) {
-            userSessionIndex.remove(removed.getUserId());
+            userSessions.remove(removed.getUserId());
             logger.info("Session invalidated for user {}", removed.getUser().getUsername());
+        }
+    }
+
+    public void invalidateByUserId(UUID userId) {
+        Session session = userSessions.get(userId);
+        if (session != null) {
+            invalidate(session.getToken());
         }
     }
 
