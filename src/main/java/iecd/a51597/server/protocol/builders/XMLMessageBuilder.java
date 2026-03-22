@@ -16,9 +16,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -220,8 +218,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         Document doc = s.document();
         Element body = s.body();
 
-        body.appendChild(textElement(doc, "game-id", gameId.toString()));
-        body.appendChild(textElement(doc, "move", rawMove));
+        Element moveEl = doc.createElement("move");
+        moveEl.appendChild(doc.createCDATASection(rawMove));
+        body.appendChild(moveEl);
 
         return serialize(doc);
     }
