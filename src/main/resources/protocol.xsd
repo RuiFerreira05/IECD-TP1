@@ -88,15 +88,6 @@
         </xs:simpleContent>
     </xs:complexType>
 
-    <!-- <photo encoding="base64">iVBORw0KGgo...</photo> -->
-    <xs:complexType name="PhotoType">
-        <xs:simpleContent>
-            <xs:extension base="xs:string">
-                <xs:attribute name="encoding" type="xs:string" use="optional"/>
-            </xs:extension>
-        </xs:simpleContent>
-    </xs:complexType>
-
     <!-- <user><id>42</id><username>alice</username><photo>...</photo></user> -->
     <xs:complexType name="UserType">
         <xs:sequence>
@@ -186,7 +177,7 @@
             <!-- Auth / profile -->
             <xs:element name="username"          type="xs:string"          minOccurs="0"/>
             <xs:element name="password"          type="xs:string"          minOccurs="0"/>
-            <xs:element name="photo"             type="PhotoType"          minOccurs="0"/>
+            <xs:element name="photo"             type="xs:string"          minOccurs="0"/>
 
             <!-- Generic response fields -->
             <xs:element name="status"            type="StatusType"         minOccurs="0"/>

@@ -131,7 +131,7 @@ ENVELOPE STRUCTURE (every message)
 
   REQUEST
     <body>
-        <photo encoding="base64">iVBORw0KGgo...</photo>
+        <photo>iVBORw0KGgo...</photo>
     </body>
 
   RESPONSE (success)
