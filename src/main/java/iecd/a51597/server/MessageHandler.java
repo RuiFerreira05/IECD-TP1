@@ -51,33 +51,15 @@ public class MessageHandler {
         }
 
         switch (message.actionType()) {
-            case REGISTER:
-                // TODO
-                break;
-            case LOGIN:
-                // TODO
-                break;
-            case LOGOUT:
-                // TODO
-                break;
-            case UPDATE_PROFILE:
-                // TODO
-                break;
-            case SEARCH_USERS:
-                // TODO
-                break;
-            case GAME_INVITE:
-                // TODO
-                break;
-            case GAME_INVITE_RESPONSE:
-                // TODO
-                break;
-            case GAME_MOVE:
-                // TODO
-                break;
-            case GAME_OVER:
-                // TODO
-                break;
+            case REGISTER: register(message);
+            case LOGIN: login(message);
+            case LOGOUT: logout(message);
+            case UPDATE_PROFILE: updateProfile(message);
+            case SEARCH_USERS: searchUsers(message);
+            case GAME_INVITE: gameInvite(message);
+            case GAME_INVITE_RESPONSE: gameInviteResponse(message);
+            case GAME_MOVE: gameMove(message);
+            case GAME_OVER: gameOver(message);
             case UNKNOWN:
                 connection.sendMessage(messageBuilder.error(
                         message.messageId(),
@@ -86,6 +68,7 @@ public class MessageHandler {
                         "Action not expected by server"
                 ));
                 break;
+
             default:
                 connection.sendMessage(messageBuilder.error(
                         message.messageId(),
@@ -93,7 +76,42 @@ public class MessageHandler {
                         ErrorCodeType.UNKNOWN_ACTION,
                         "Unknown action type"
                 ));
-                break;
         }
+    }
+
+    private void gameOver(Message message) {
+        //TODO
+    }
+
+    private void gameMove(Message message) {
+        //TODO
+    }
+
+    private void gameInviteResponse(Message message) {
+        //TODO
+    }
+
+    private void gameInvite(Message message) {
+        //TODO
+    }
+
+    private void searchUsers(Message message) {
+        //TODO
+    }
+
+    private void updateProfile(Message message) {
+        //TODO
+    }
+
+    private void logout(Message message) {
+        //TODO
+    }
+
+    private void login(Message message) {
+        //TODO
+    }
+
+    private void register(Message message) {
+        //TODO
     }
 }
