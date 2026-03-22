@@ -109,7 +109,7 @@ public class XMLParser implements CommParser {
             case GAME_INVITE -> new MessageBody.GameInvite(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponse(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
             case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), serializeElement(requireElement(body, "move")));
-            case GAME_OVER -> new MessageBody.GameOver(requireUUID(body, "game-id"), requireUUID(body, "winner-id"), require(body, "winner-username"));
+            case GAME_OVER -> new MessageBody.GameOver(null, null, null); // not supposed to happen
             case UNKNOWN -> new MessageBody.Unknown();
         };
     }
