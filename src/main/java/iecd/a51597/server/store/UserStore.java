@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserStore {
 
     // UUID -> User
-    ConcurrentHashMap<UUID, User> userMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, User> userMap = new ConcurrentHashMap<>();
 
     //Username -> User
-    ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
 
     // REGISTER
     public User register(String username, String passwordHash) throws UsernameAlreadyTakenException {
