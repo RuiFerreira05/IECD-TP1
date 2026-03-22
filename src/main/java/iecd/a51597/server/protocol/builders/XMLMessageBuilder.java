@@ -218,7 +218,7 @@ public class XMLMessageBuilder implements MessageBuilder {
         Document doc = s.document();
         Element body = s.body();
 
-        doc.appendChild(textElement(doc, "game-id", gameId.toString()));
+        body.appendChild(textElement(doc, "game-id", gameId.toString()));
 
         Element moveEl = doc.createElement("move");
         moveEl.appendChild(doc.createCDATASection(rawMove));
