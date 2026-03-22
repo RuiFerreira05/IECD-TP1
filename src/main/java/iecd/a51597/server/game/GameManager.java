@@ -37,6 +37,9 @@ public class GameManager {
     public Optional<Game> acceptGame(UUID gameId) {
         Game game = pendingGames.remove(gameId);
         if (game == null) return Optional.empty();
+        if (isInGame(game.getPlayer1().getUserId()) || isInGame(game.getPlayer2().getUserId())) {
+            return Optional.empty();
+        }
         activeGames.put(gameId, game);
         playerGameIndex.put(game.getPlayer1().getUserId(), gameId);
         playerGameIndex.put(game.getPlayer2().getUserId(), gameId);
