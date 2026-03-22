@@ -1,9 +1,9 @@
 package iecd.a51597.server.handlers;
 
-import iecd.a51597.server.Connection;
-import iecd.a51597.server.GameManager;
-import iecd.a51597.server.Session;
-import iecd.a51597.server.SessionManager;
+import iecd.a51597.server.network.Connection;
+import iecd.a51597.server.game.GameManager;
+import iecd.a51597.server.session.Session;
+import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.server.game.Game;
 import iecd.a51597.server.game.MoveResult;
 import iecd.a51597.server.protocol.Message;

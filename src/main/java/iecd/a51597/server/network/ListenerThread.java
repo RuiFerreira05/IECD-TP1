@@ -1,5 +1,6 @@
-package iecd.a51597.server;
+package iecd.a51597.server.network;
 
+import iecd.a51597.server.Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

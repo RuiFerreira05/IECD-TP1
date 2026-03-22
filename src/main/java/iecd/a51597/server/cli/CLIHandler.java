@@ -1,5 +1,7 @@
-package iecd.a51597.server;
+package iecd.a51597.server.cli;
 
+import iecd.a51597.server.Server;
+import iecd.a51597.server.config.ServerConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,7 +24,7 @@ public class CLIHandler {
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 
-    private final Server  server;
+    private final Server server;
     private final Instant startedAt = Instant.now();
     private boolean running = false;
 
@@ -39,7 +41,7 @@ public class CLIHandler {
         commands.put("exit", new Command(this::exit, "Shutdown the server"));
     }
 
-    void loop() {
+    public void loop() {
         running = true;
         printStatusHeader();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {

@@ -28,19 +28,19 @@
         <Logger name="iecd.a51597.server.Server" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.ListenerThread" level="ALL" additivity="false">
+        <Logger name="iecd.a51597.server.network.ListenerThread" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.CLIHandler" level="ALL" additivity="false">
+        <Logger name="iecd.a51597.server.cli.CLIHandler" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.Connection" level="ALL" additivity="false">
+        <Logger name="iecd.a51597.server.network.Connection" level="ALL" additivity="false">
             <AppenderRef ref="CLIENTS"/>
         </Logger>
         <Logger name="iecd.a51597.server.protocol" level="ALL">
             <AppenderRef ref="PROTOCOL"/>
         </Logger>
-        <Logger name="iecd.a51597.server.PersistenceManager" level="ALL" additivity="false">
+        <Logger name="iecd.a51597.server.persistence.PersistenceManager" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
     </Loggers>

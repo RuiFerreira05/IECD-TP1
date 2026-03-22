@@ -1,6 +1,6 @@
 package iecd.a51597.server.handlers;
 
-import iecd.a51597.server.Connection;
+import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.protocol.Message;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
 import iecd.a51597.server.protocol.exceptions.CommException;

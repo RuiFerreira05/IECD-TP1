@@ -1,5 +1,6 @@
-package iecd.a51597.server;
+package iecd.a51597.server.session;
 
+import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.store.User;
 
 import java.time.Instant;

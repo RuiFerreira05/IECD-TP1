@@ -1,7 +1,5 @@
-package iecd.a51597.server;
+package iecd.a51597.server.game;
 
-import iecd.a51597.server.game.Game;
-import iecd.a51597.server.game.GameFactory;
 import iecd.a51597.server.store.User;
 
 import java.util.Map;

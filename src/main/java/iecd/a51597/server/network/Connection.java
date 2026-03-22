@@ -1,7 +1,8 @@
-package iecd.a51597.server;
+package iecd.a51597.server.network;
 
+import iecd.a51597.server.Server;
+import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.handlers.MessageHandler;
-import iecd.a51597.server.protocol.ProtocolConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

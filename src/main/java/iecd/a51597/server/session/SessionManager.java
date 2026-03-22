@@ -1,5 +1,7 @@
-package iecd.a51597.server;
+package iecd.a51597.server.session;
 
+import iecd.a51597.server.config.ServerConfiguration;
+import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.store.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
