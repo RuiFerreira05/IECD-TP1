@@ -39,11 +39,11 @@ public final class ServerConfiguration {
 
             Element root = doc.getDocumentElement();
 
-            DEFAULT_PORT = parseInt(root, "port", DEFAULT_PORT);
+            DEFAULT_PORT = parseInt(root, "defaultPort", DEFAULT_PORT);
             MAX_FRAME_SIZE = parseInt(root, "maxFrameSize", MAX_FRAME_SIZE);
-            SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeout", SESSION_TIMEOUT_SECONDS);
-            USER_STORE = parseString(root, "usersFile", USER_STORE);
-            LEADERBOARD_STORE = parseString(root, "leaderboardFile", LEADERBOARD_STORE);
+            SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeoutSeconds", SESSION_TIMEOUT_SECONDS);
+            USER_STORE = parseString(root, "userStore", USER_STORE);
+            LEADERBOARD_STORE = parseString(root, "leaderboardStore", LEADERBOARD_STORE);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {
