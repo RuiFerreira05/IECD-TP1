@@ -122,7 +122,7 @@ public class GameHandler extends BaseHandler {
 
         Optional<Game> gameOpt = gameManager.getGame(body.gameId());
         if (gameOpt.isEmpty()) {
-            sendError(message, connection, ErrorCodeType.USER_NOT_FOUND, "Game not found");
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Game not found");
             return;
         }
 
