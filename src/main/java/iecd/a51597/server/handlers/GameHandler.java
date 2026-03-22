@@ -75,6 +75,10 @@ public class GameHandler extends BaseHandler {
         if (sessionOpt.isEmpty()) return;
         Session session = sessionOpt.get();
 
+        if (gameManager.isInGame(session.getUserId())) {
+            sendError(message, connection, ErrorCodeType.ALREADY_IN_GAME, "You are already in a game");
+        }
+
         User responder = session.getUser();
 
         MessageBody.GameInviteResponse body = (MessageBody.GameInviteResponse) message.body();
