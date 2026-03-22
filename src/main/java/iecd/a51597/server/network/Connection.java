@@ -81,6 +81,7 @@ public class Connection implements Runnable {
     }
 
     public void sendMessage(byte[] payload) {
+        if (payload == null) {return;}
         try {
             outputStream.writeInt(payload.length);
             outputStream.write(payload);
