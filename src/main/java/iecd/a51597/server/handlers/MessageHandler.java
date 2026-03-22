@@ -1,5 +1,6 @@
 package iecd.a51597.server.handlers;
 
+import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.protocol.Message;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
@@ -55,6 +56,16 @@ public class MessageHandler {
                     message.actionType(),
                     ErrorCodeType.UNEXPECTED_MESSAGE_TYPE,
                     "Server only accepts REQUEST messages"
+            ));
+            return;
+        }
+
+        if (message.version() != ServerConfiguration.PROTOCOL_VERSION) {
+            connection.sendMessage(messageBuilder.error(
+                    message.messageId(),
+                    message.actionType(),
+                    ErrorCodeType.OUTDATED_PROTOCOL,
+                    "Unsupported protocol version"
             ));
             return;
         }

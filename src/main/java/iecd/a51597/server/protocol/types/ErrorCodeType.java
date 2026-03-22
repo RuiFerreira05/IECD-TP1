@@ -14,7 +14,8 @@ public enum ErrorCodeType {
     INTERNAL_ERROR,
     MALFORMED_REQUEST,
     UNEXPECTED_MESSAGE_TYPE,
-    UNEXPECTED_MESSAGE_ACTION;
+    UNEXPECTED_MESSAGE_ACTION,
+    OUTDATED_PROTOCOL;
 
     public static ErrorCodeType fromString(String string) {
         String normalized = string.replace("-", "_").toUpperCase();

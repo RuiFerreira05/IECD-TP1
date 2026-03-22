@@ -24,7 +24,7 @@ public class Server {
 
     private static volatile Server instance;
 
-    private int startupPort = ServerConfiguration.DEFAULT_PORT;
+    private int port;
     private ListenerThread listener;
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
@@ -43,6 +43,7 @@ public class Server {
         logger.info("Initializing Server...");
         ServerConfiguration.load();
 
+        this.port = ServerConfiguration.DEFAULT_PORT;
         this.cliHandler = new CLIHandler(this);
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
@@ -104,8 +105,8 @@ public class Server {
     private void handleCLIParams(String[] args) {
         try {
             if (args.length > 0) {
-                this.startupPort = Integer.parseInt(args[0]);
-                logger.info("Server port assigned to: {}", this.startupPort);
+                this.port = Integer.parseInt(args[0]);
+                logger.info("Server port assigned to: {}", this.port);
             }
         } catch (NumberFormatException e) {
             logger.error("Invalid port number: {}", e.getMessage());
@@ -127,8 +128,8 @@ public class Server {
     }
 
     public void startListener() {
-        logger.info("Starting Listener thread with default port: {}", this.startupPort);
-        startListener(this.startupPort);
+        logger.info("Starting Listener thread with default port: {}", this.port);
+        startListener(this.port);
     }
 
     public void stopListener() {
@@ -149,5 +150,5 @@ public class Server {
         logger.info("Server shutdown complete");
     }
 
-    public int getStartupPort() { return this.startupPort; }
+    public int getStartupPort() { return this.port; }
 }

@@ -24,6 +24,7 @@ public final class ServerConfiguration {
     public static String USER_STORE = "data/users.xml";
     public static String LEADERBOARD_STORE = "data/leaderboard.xml";
     public static int STATUS_BOX_WIDTH = 42;
+    public static String PROTOCOL_VERSION = "1.0";
 
     public static void load() {
         File file = new File(CONFIG_FILE);
@@ -44,6 +45,7 @@ public final class ServerConfiguration {
             SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeoutSeconds", SESSION_TIMEOUT_SECONDS);
             USER_STORE = parseString(root, "userStore", USER_STORE);
             LEADERBOARD_STORE = parseString(root, "leaderboardStore", LEADERBOARD_STORE);
+            PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {

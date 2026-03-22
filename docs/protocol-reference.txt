@@ -281,6 +281,7 @@ ENVELOPE STRUCTURE (every message)
   MALFORMED_REQUEST         XML could not be parsed (Accompanied by UNKNOWN Action Type)
   UNEXPECTED_MESSAGE_TYPE   Client sent a RESPONSE or PUSH message type
   UNEXPECTED_MESSAGE_ACTION Client sent an unexpected action type
+  OUTDATED_PROTOCOL         Client version does not match server version
 
 ================================================================================
   PROTOCOL VERSIONING

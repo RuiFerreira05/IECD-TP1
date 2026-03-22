@@ -1,5 +1,6 @@
 package iecd.a51597.server.protocol.builders;
 
+import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.store.User;
 import iecd.a51597.server.protocol.ProtocolConstants;
 import iecd.a51597.server.protocol.types.ActionType;
@@ -47,7 +48,7 @@ public class XMLMessageBuilder implements MessageBuilder {
             Element root = doc.createElement("message");
             root.setAttribute("type", msgType.name());
             root.setAttribute("id", id.toString());
-            root.setAttribute("version", ProtocolConstants.PROTOCOL_VERSION);
+            root.setAttribute("version", ServerConfiguration.PROTOCOL_VERSION);
             doc.appendChild(root);
 
             Element header = doc.createElement("header");

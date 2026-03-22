@@ -13,7 +13,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
 
-    private static final long SESSION_TIMEOUT_SECONDS = ServerConfiguration.SESSION_TIMEOUT_SECONDS;
     private static final Logger logger = LogManager.getLogger(SessionManager.class);
 
     // sessionToken -> Session
@@ -44,7 +43,7 @@ public class SessionManager {
         Session session = sessions.get(token);
         if (session == null) return Optional.empty();
 
-        if (session.isExpired(SESSION_TIMEOUT_SECONDS)) {
+        if (session.isExpired(ServerConfiguration.SESSION_TIMEOUT_SECONDS)) {
             invalidate(token);
             logger.info("Session expired for user {}", session.getUser().getUsername());
             return Optional.empty();
