@@ -90,6 +90,12 @@ public class GameHandler extends BaseHandler {
 
         Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviter.getUserId());
 
+        // Edge case just to prevent game invite high-jacking, not even sure if it would trigger but might as well
+        if (!responder.getUserId().equals(game.getPlayer2().getUserId())) {
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not the invited player");
+            return;
+        }
+
         if (!body.accept()) {
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
             gameManager.endGame(game.getGameId());
