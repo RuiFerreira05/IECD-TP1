@@ -62,7 +62,7 @@ public class GameHandler extends BaseHandler {
             return;
         }
 
-        Game game = gameManager.createGame(sender, target);
+        Game game = gameManager.createPendingGame(sender, target);
 
         connection.sendMessage(messageBuilder.gameInviteResponse(message.messageId(), game.getGameId()));
         targetSession.getConnection().sendMessage(
@@ -79,7 +79,7 @@ public class GameHandler extends BaseHandler {
 
         MessageBody.GameInviteResponse body = (MessageBody.GameInviteResponse) message.body();
 
-        Optional<Game> gameOpt = gameManager.getGame(body.gameId());
+        Optional<Game> gameOpt = gameManager.getPendingGame(body.gameId());
         if (gameOpt.isEmpty()) {
             sendError(message, connection, ErrorCodeType.USER_NOT_FOUND, "Game not found");
             return;
@@ -97,6 +97,7 @@ public class GameHandler extends BaseHandler {
         }
 
         if (!body.accept()) {
+            gameManager.acceptGame(game.getGameId());
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
             gameManager.endGame(game.getGameId());
             inviterSessionOpt.ifPresent(s ->
@@ -105,6 +106,7 @@ public class GameHandler extends BaseHandler {
             return;
         }
 
+        gameManager.declineGame(game.getGameId());
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
         inviterSessionOpt.ifPresent(s ->
                 s.getConnection().sendMessage(messageBuilder.gameInviteAcceptedPush(game.getGameId(), responder))

@@ -11,6 +11,7 @@ public class GameManager {
 
     // GameId -> Game Object
     private final Map<UUID, Game> activeGames     = new ConcurrentHashMap<>();
+    private final Map<UUID, Game> pendingGames = new ConcurrentHashMap<>();
     // UserId -> GameId
     private final Map<UUID, UUID> playerGameIndex = new ConcurrentHashMap<>(); // userId -> gameId
     private GameFactory factory;
@@ -25,13 +26,29 @@ public class GameManager {
         return factory != null;
     }
 
-    public Game createGame(User player1, User player2) {
+    public Game createPendingGame(User player1, User player2) {
         UUID gameId = UUID.randomUUID();
         Game game = factory.createGame(gameId, player1, player2);
-        activeGames.put(gameId, game);
-        playerGameIndex.put(player1.getUserId(), gameId);
-        playerGameIndex.put(player2.getUserId(), gameId);
+        pendingGames.put(gameId, game);
+        // playerGameIndex intentionally not touched
         return game;
+    }
+
+    public Optional<Game> acceptGame(UUID gameId) {
+        Game game = pendingGames.remove(gameId);
+        if (game == null) return Optional.empty();
+        activeGames.put(gameId, game);
+        playerGameIndex.put(game.getPlayer1().getUserId(), gameId);
+        playerGameIndex.put(game.getPlayer2().getUserId(), gameId);
+        return Optional.of(game);
+    }
+
+    public void declineGame(UUID gameId) {
+        pendingGames.remove(gameId);
+    }
+
+    public Optional<Game> getPendingGame(UUID gameId) {
+        return Optional.ofNullable(pendingGames.get(gameId));
     }
 
     public Optional<Game> getGame(UUID gameId) {
