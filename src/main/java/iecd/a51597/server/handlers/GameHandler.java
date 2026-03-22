@@ -43,6 +43,11 @@ public class GameHandler extends BaseHandler {
 
         MessageBody.GameInvite body = (MessageBody.GameInvite) message.body();
 
+        if (body.targetUserId().equals(sender.getUserId())) {
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Cannot invite yourself to a game");
+            return;
+        }
+
         Optional<User> targetOpt = userStore.findById(body.targetUserId());
         if (targetOpt.isEmpty()) {
             sendError(message, connection, ErrorCodeType.USER_NOT_FOUND, "Target user does not exist");
@@ -77,6 +82,7 @@ public class GameHandler extends BaseHandler {
 
         if (gameManager.isInGame(session.getUserId())) {
             sendError(message, connection, ErrorCodeType.ALREADY_IN_GAME, "You are already in a game");
+            return;
         }
 
         User responder = session.getUser();
@@ -128,7 +134,7 @@ public class GameHandler extends BaseHandler {
 
         Optional<Game> gameOpt = gameManager.getGame(body.gameId());
         if (gameOpt.isEmpty()) {
-            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Game not found");
+            sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
             return;
         }
 
