@@ -22,15 +22,18 @@ public class ListenerThread extends Thread {
 
     @Override
     public void run() {
-        try (ServerSocket serverSocket = new ServerSocket(port)){
-            this.serverSocket = serverSocket;
-            while (running) {
-                Connection conn = new Connection(serverSocket.accept(), server, server.getMessageHandler());
-                server.addConnection(conn);
-                new Thread(conn).start();
+        try {
+            ServerSocket ss = new ServerSocket(port);
+            try (ss) {
+                this.serverSocket = ss;
+                while (running) {
+                    Connection conn = new Connection(serverSocket.accept(), server, server.getMessageHandler());
+                    server.addConnection(conn);
+                    new Thread(conn).start();
 
-                logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
-                logger.info("Total Connections: {}", server.getConnections().size());
+                    logger.info("New connection established from IP: {}", conn.getClientSocket().getInetAddress().getHostAddress());
+                    logger.info("Total Connections: {}", server.getConnections().size());
+                }
             }
         } catch (IOException e) {
             if (running) {

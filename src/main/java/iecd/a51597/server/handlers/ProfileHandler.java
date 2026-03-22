@@ -30,9 +30,9 @@ public class ProfileHandler extends BaseHandler {
         MessageBody.UpdateProfile body = (MessageBody.UpdateProfile) message.body();
 
         try {
-            if (body.username() != null) userStore.updateUsername(user, body.username());
-            if (body.password() != null) userStore.updatePassword(user, body.password());
-            if (body.photo()    != null) userStore.updatePhoto(user, body.photo());
+            if (body.username() != null && !body.username().isBlank()) userStore.updateUsername(user, body.username());
+            if (body.password() != null && !body.password().isBlank()) userStore.updatePassword(user, body.password());
+            if (body.photo() != null) userStore.updatePhoto(user, body.photo());
         } catch (UsernameAlreadyTakenException e) {
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
             return;

@@ -106,6 +106,11 @@ public class GameHandler extends BaseHandler {
 
         Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviter.getUserId());
 
+        if (inviterSessionOpt.isEmpty()) {
+            gameManager.declineGame(game.getGameId());
+            sendError(message, connection, ErrorCodeType.USER_NOT_ONLINE, "The inviting player is no longer online");
+            return;
+        }
 
         if (!body.accept()) {
             gameManager.declineGame(game.getGameId());
@@ -171,6 +176,13 @@ public class GameHandler extends BaseHandler {
                     sendError(message, connection, ErrorCodeType.INVALID_MOVE, reason);
             case MoveResult.GameOver(User winner) -> {
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+                User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
+                        ? game.getPlayer2() : game.getPlayer1();
+                sessionManager.getSessionByUserId(opponent.getUserId()).ifPresent(s ->
+                        s.getConnection().sendMessage(
+                                messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
+                        )
+                );
                 pushGameOver(game, winner);
                 gameManager.endGame(game.getGameId());
             }
