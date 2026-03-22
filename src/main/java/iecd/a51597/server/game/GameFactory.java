@@ -1,6 +1,6 @@
 package iecd.a51597.server.game;
 
-import iecd.a51597.server.User;
+import iecd.a51597.server.store.User;
 
 import java.util.UUID;
 

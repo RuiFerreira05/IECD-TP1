@@ -1,4 +1,4 @@
-package iecd.a51597.server;
+package iecd.a51597.server.store;
 
 import java.util.UUID;
 

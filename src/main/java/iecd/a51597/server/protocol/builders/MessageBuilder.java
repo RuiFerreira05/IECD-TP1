@@ -1,10 +1,9 @@
 package iecd.a51597.server.protocol.builders;
 
-import iecd.a51597.server.User;
+import iecd.a51597.server.store.User;
 import iecd.a51597.server.protocol.types.ActionType;
 import iecd.a51597.server.protocol.types.ErrorCodeType;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.util.List;
 import java.util.UUID;
 

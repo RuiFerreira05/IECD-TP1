@@ -1,5 +1,7 @@
 package iecd.a51597.server;
 
+import iecd.a51597.server.store.User;
+
 import java.time.Instant;
 import java.util.UUID;
 

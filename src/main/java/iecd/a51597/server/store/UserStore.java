@@ -1,6 +1,5 @@
 package iecd.a51597.server.store;
 
-import iecd.a51597.server.User;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
 import java.util.Collection;
