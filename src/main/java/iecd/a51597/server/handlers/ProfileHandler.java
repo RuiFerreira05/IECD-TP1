@@ -32,7 +32,7 @@ public class ProfileHandler extends BaseHandler {
         try {
             if (body.username() != null && !body.username().isBlank()) userStore.updateUsername(user, body.username());
             if (body.password() != null && !body.password().isBlank()) userStore.updatePassword(user, body.password());
-            if (body.photo() != null) userStore.updatePhoto(user, body.photo());
+            if (body.photo() != null && !body.photo().isBlank()) userStore.updatePhoto(user, body.photo());
         } catch (UsernameAlreadyTakenException e) {
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
             return;
