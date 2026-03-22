@@ -1,6 +1,5 @@
-package iecd.a51597.server.persistence;
+package iecd.a51597.server;
 
-import iecd.a51597.server.ServerConfiguration;
 import iecd.a51597.server.store.User;
 import iecd.a51597.server.store.UserStore;
 import org.apache.logging.log4j.LogManager;

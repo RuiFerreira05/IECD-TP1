@@ -25,6 +25,7 @@ public class Server {
     private final MessageHandler messageHandler;
     private final GameManager gameManager = new GameManager();
     private final UserStore userStore;
+    private final PersistenceManager persistenceManager;
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
@@ -37,8 +38,9 @@ public class Server {
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
         this.userStore = new UserStore();
+        this.persistenceManager = new PersistenceManager(userStore);
 
-        // TODO: persistenceManager.load() here once PersistenceManager is implemented
+        persistenceManager.load();
 
         AuthHandler authHandler = new AuthHandler(messageBuilder, sessionManager, userStore);
         ProfileHandler profileHandler = new ProfileHandler(messageBuilder, sessionManager, userStore);
@@ -133,7 +135,7 @@ public class Server {
 
     public void shutdown() {
         stopListener();
-        // TODO: persistenceManager.save() once PersistenceManager is implemented
+        persistenceManager.save();
         synchronized (connections) { connections.forEach(Connection::closeConnection); }
         logger.info("Server shutdown complete");
     }
