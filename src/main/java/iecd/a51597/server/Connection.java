@@ -1,5 +1,6 @@
 package iecd.a51597.server;
 
+import iecd.a51597.server.handlers.MessageHandler;
 import iecd.a51597.server.protocol.ProtocolConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,10 +1,12 @@
 package iecd.a51597.server;
 
 import iecd.a51597.server.game.GameFactory;
+import iecd.a51597.server.handlers.*;
 import iecd.a51597.server.protocol.builders.MessageBuilder;
 import iecd.a51597.server.protocol.builders.XMLMessageBuilder;
 import iecd.a51597.server.protocol.parsers.CommParser;
 import iecd.a51597.server.protocol.parsers.XMLParser;
+import iecd.a51597.server.store.UserStore;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -22,11 +24,11 @@ public class Server {
     private final MessageBuilder messageBuilder;
     private final MessageHandler messageHandler;
     private final GameManager gameManager = new GameManager();
+    private final UserStore userStore;
 
     private final CLIHandler cliHandler;
     private final Logger logger = LogManager.getLogger(Server.class);
 
-    // Probably should be a CopyOnWriteArrayList, but I have no experience with it
     private final List<Connection> connections = new ArrayList<>();
 
     private Server() {
@@ -34,34 +36,30 @@ public class Server {
         this.cliHandler = new CLIHandler(this);
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
-        this.messageHandler = new MessageHandler(commParser, messageBuilder, sessionManager);
+        this.userStore = new UserStore();
 
-        // registerGameFactory(GAME GOES HERE BRO);
+        // TODO: persistenceManager.load() here once PersistenceManager is implemented
+
+        AuthHandler authHandler = new AuthHandler(messageBuilder, sessionManager, userStore);
+        ProfileHandler profileHandler = new ProfileHandler(messageBuilder, sessionManager, userStore);
+        SearchHandler searchHandler = new SearchHandler(messageBuilder, userStore);
+        GameHandler gameHandler = new GameHandler(messageBuilder, sessionManager, userStore, gameManager);
+
+        this.messageHandler = new MessageHandler(commParser, messageBuilder, authHandler, profileHandler, searchHandler, gameHandler);
+
+        // registerGameFactory(GAME GOES HERE);
     }
 
     public void registerGameFactory(GameFactory factory) {
         gameManager.registerFactory(factory);
     }
 
-    public MessageHandler getMessageHandler() {
-        return messageHandler;
-    }
-
-    public ListenerThread getListener() {
-        return listener;
-    }
-
-    public MessageBuilder getMessageBuilder() {
-        return messageBuilder;
-    }
-
-    public CommParser getCommParser() {
-        return commParser;
-    }
-
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
+    public MessageHandler getMessageHandler()  { return messageHandler; }
+    public ListenerThread getListener()        { return listener; }
+    public MessageBuilder getMessageBuilder()  { return messageBuilder; }
+    public CommParser getCommParser()          { return commParser; }
+    public SessionManager getSessionManager()  { return sessionManager; }
+    public UserStore getUserStore()            { return userStore; }
 
     public static Server getInstance() {
         if (instance == null) {
@@ -81,21 +79,15 @@ public class Server {
     }
 
     public List<Connection> getConnections() {
-        synchronized (connections) {
-            return List.copyOf(connections);
-        }
+        synchronized (connections) { return List.copyOf(connections); }
     }
 
     public void addConnection(Connection connection) {
-        synchronized (connections) {
-            connections.add(connection);
-        }
+        synchronized (connections) { connections.add(connection); }
     }
 
     public void removeConnection(Connection connection) {
-        synchronized (connections) {
-            connections.remove(connection);
-        }
+        synchronized (connections) { connections.remove(connection); }
     }
 
     private void handleCLIParams(String[] args) {
@@ -118,7 +110,6 @@ public class Server {
     public void startListener(int port) {
         if (!this.isListening()) {
             listener = new ListenerThread(port, this);
-            logger.info("Server creating new Listener Thread instance");
             listener.start();
             logger.info("Server listening on port: {}", port);
         }
@@ -137,21 +128,15 @@ public class Server {
     }
 
     public boolean isListening() {
-        if (this.listener != null) {
-            return this.listener.running;
-        }
-
-        return false;
+        return this.listener != null && this.listener.running;
     }
 
     public void shutdown() {
         stopListener();
-        //TODO: save state
+        // TODO: persistenceManager.save() once PersistenceManager is implemented
         synchronized (connections) { connections.forEach(Connection::closeConnection); }
         logger.info("Server shutdown complete");
     }
 
-    public int getStartupPort() {
-        return this.startupPort;
-    }
+    public int getStartupPort() { return this.startupPort; }
 }

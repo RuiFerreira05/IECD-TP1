@@ -20,7 +20,7 @@ public class SessionManager {
     // userId -> Session
     private final Map<UUID, Session> userSessions = new ConcurrentHashMap<>();
 
-    public Session createSession(User user) {
+    public Session createSession(User user, Connection connection) {
         Session existing = userSessions.get(user.getUserId());
         if (existing != null) {
             sessions.remove(existing.getToken());
@@ -28,7 +28,7 @@ public class SessionManager {
             logger.info("Invalidated previous session for user {}", user.getUsername());
         }
 
-        Session session = new Session(user);
+        Session session = new Session(user, connection);
         sessions.put(session.getToken(), session);
         userSessions.put(user.getUserId(), session);
 
@@ -40,10 +40,7 @@ public class SessionManager {
         if (token == null) return Optional.empty();
 
         Session session = sessions.get(token);
-
-        if (session == null) {
-            return Optional.empty();
-        }
+        if (session == null) return Optional.empty();
 
         if (session.isExpired(SESSION_TIMEOUT_SECONDS)) {
             invalidate(token);
@@ -68,6 +65,10 @@ public class SessionManager {
         if (session != null) {
             invalidate(session.getToken());
         }
+    }
+
+    public Optional<Session> getSessionByUserId(UUID userId) {
+        return Optional.ofNullable(userSessions.get(userId));
     }
 
     public int activeSessionCount() {

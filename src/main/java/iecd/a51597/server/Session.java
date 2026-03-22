@@ -10,12 +10,14 @@ public class Session {
     private final User user;
     private final UUID token;
     private final UUID userId;
+    private final Connection connection;
     private volatile Instant lastActivity;
 
-    public Session(User user) {
+    public Session(User user, Connection connection) {
         this.token = UUID.randomUUID();
         this.user = user;
         this.userId = user.getUserId();
+        this.connection = connection;
         this.lastActivity = Instant.now();
     }
 
@@ -27,8 +29,9 @@ public class Session {
         this.lastActivity = Instant.now();
     }
 
-    public UUID getToken() { return token; }
-    public UUID getUserId() { return userId; }
-    public User getUser() { return user; }
-    public Instant getLastActivity() { return lastActivity; }
+    public UUID getToken()            { return token; }
+    public UUID getUserId()           { return userId; }
+    public User getUser()             { return user; }
+    public Connection getConnection() { return connection; }
+    public Instant getLastActivity()  { return lastActivity; }
 }
