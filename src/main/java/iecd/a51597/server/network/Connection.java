@@ -100,6 +100,7 @@ public class Connection implements Runnable {
     public void closeConnection() {
         if (clientSocket.isClosed()) return;
         server.removeConnection(this);
+        server.getSessionManager().invalidateByConnection(this);
         try {
             clientSocket.close();
         } catch (IOException e) {

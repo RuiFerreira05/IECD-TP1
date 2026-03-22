@@ -68,6 +68,13 @@ public class SessionManager {
         }
     }
 
+    public void invalidateByConnection(Connection connection) {
+        userSessions.values().stream()
+                .filter(s -> s.getConnection() == connection)
+                .findFirst()
+                .ifPresent(s -> invalidate(s.getToken()));
+    }
+
     public Optional<Session> getSessionByUserId(UUID userId) {
         return Optional.ofNullable(userSessions.get(userId));
     }
