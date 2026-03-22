@@ -70,16 +70,16 @@ public class MessageHandler {
             case GAME_MOVE -> gameHandler.gameMove(message, connection);
             case GAME_OVER -> gameHandler.gameOver(message, connection);
             case UNKNOWN -> connection.sendMessage(messageBuilder.error(
-                    message.messageId(),
-                    message.actionType(),
-                    ErrorCodeType.UNEXPECTED_MESSAGE_ACTION,
-                    "Action not expected by server"
+                message.messageId(),
+                message.actionType(),
+                ErrorCodeType.UNEXPECTED_MESSAGE_ACTION,
+                "Action not expected by server"
             ));
             default -> connection.sendMessage(messageBuilder.error(
-                    message.messageId(),
-                    message.actionType(),
-                    ErrorCodeType.UNKNOWN_ACTION,
-                    "Unknown action type"
+                message.messageId(),
+                message.actionType(),
+                ErrorCodeType.UNKNOWN_ACTION,
+                "Unknown action type"
             ));
         }
     }
