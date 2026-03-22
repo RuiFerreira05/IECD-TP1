@@ -9,6 +9,7 @@ import iecd.a51597.server.protocol.types.ActionType;
 import iecd.a51597.server.protocol.types.MessageType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -108,21 +109,29 @@ public class XMLParser implements CommParser {
             case SEARCH_USERS -> new MessageBody.SearchUsers(require(body, "query"));
             case GAME_INVITE -> new MessageBody.GameInvite(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponse(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
-            case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), serializeElement(requireElement(body, "move")));
+            case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), serializeElementContent(requireElement(body, "move")));
             case GAME_OVER -> new MessageBody.GameOver(null, null, null); // not supposed to happen
             case UNKNOWN -> new MessageBody.Unknown();
         };
     }
 
-    private String serializeElement(Element element) throws MalformedMessageException {
+    private String serializeElementContent(Element element) throws MalformedMessageException {
+        if (element.getChildNodes().getLength() == 1
+                && element.getFirstChild().getNodeType() == Node.TEXT_NODE) {
+            return element.getTextContent();
+        }
         try {
+            StringBuilder sb = new StringBuilder();
             Transformer t = TransformerFactory.newInstance().newTransformer();
             t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter w = new StringWriter();
-            t.transform(new DOMSource(element), new StreamResult(w));
-            return w.toString();
+            for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+                StringWriter w = new StringWriter();
+                t.transform(new DOMSource(element.getChildNodes().item(i)), new StreamResult(w));
+                sb.append(w);
+            }
+            return sb.toString();
         } catch (TransformerException e) {
-            throw new MalformedMessageException("Failed to serialize <move> element", e);
+            throw new MalformedMessageException("Failed to serialize <move> content", e);
         }
     }
 
