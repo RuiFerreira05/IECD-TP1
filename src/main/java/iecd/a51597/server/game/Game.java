@@ -8,5 +8,5 @@ public interface Game {
     UUID getGameId();
     User getPlayer1();
     User getPlayer2();
-    MoveResult applyMove(User player, String movePayload);
+    MoveResult applyMove(User player, Move move);
 }

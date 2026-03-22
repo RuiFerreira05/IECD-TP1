@@ -16,11 +16,17 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.UUID;
 
 public class XMLParser implements CommParser {
@@ -102,10 +108,22 @@ public class XMLParser implements CommParser {
             case SEARCH_USERS -> new MessageBody.SearchUsers(require(body, "query"));
             case GAME_INVITE -> new MessageBody.GameInvite(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponse(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
-            case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move"));
+            case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), serializeElement(requireElement(body, "move")));
             case GAME_OVER -> new MessageBody.GameOver(requireUUID(body, "game-id"), requireUUID(body, "winner-id"), require(body, "winner-username"));
             case UNKNOWN -> new MessageBody.Unknown();
         };
+    }
+
+    private String serializeElement(Element element) throws MalformedMessageException {
+        try {
+            Transformer t = TransformerFactory.newInstance().newTransformer();
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter w = new StringWriter();
+            t.transform(new DOMSource(element), new StreamResult(w));
+            return w.toString();
+        } catch (TransformerException e) {
+            throw new MalformedMessageException("Failed to serialize <move> element", e);
+        }
     }
 
     private String require(Element parent, String tag) throws MalformedMessageException {

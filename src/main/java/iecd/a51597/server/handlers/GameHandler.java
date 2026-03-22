@@ -1,7 +1,9 @@
 package iecd.a51597.server.handlers;
 
+import iecd.a51597.server.game.Move;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.game.GameManager;
+import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.server.game.Game;
@@ -105,8 +107,9 @@ public class GameHandler extends BaseHandler {
     public void gameMove(Message message, Connection connection) {
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
+        Session  session = sessionOpt.get();
 
-        User player = sessionOpt.get().getUser();
+        User player = session.getUser();
         MessageBody.GameMove body = (MessageBody.GameMove) message.body();
 
         Optional<Game> gameOpt = gameManager.getGame(body.gameId());
@@ -116,14 +119,24 @@ public class GameHandler extends BaseHandler {
         }
 
         Game game = gameOpt.get();
-        String movePayload = body.move().getTextContent();
 
-        switch (game.applyMove(player, movePayload)) {
+        Move move;
+        try {
+            move = gameManager.getDeserializer().deserialize(body.rawMove());
+        } catch (MalformedMessageException e) {
+            sendError(message, connection, ErrorCodeType.MALFORMED_REQUEST, "Invalid move payload");
+            return;
+        }
+
+        switch (game.applyMove(player, move)) {
             case MoveResult.Accepted() -> {
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
-                User opponent = game.getPlayer1().getUserId().equals(player.getUserId()) ? game.getPlayer2() : game.getPlayer1();
+                User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
+                        ? game.getPlayer2() : game.getPlayer1();
                 sessionManager.getSessionByUserId(opponent.getUserId()).ifPresent(s ->
-                        s.getConnection().sendMessage(messageBuilder.gameMovePush(game.getGameId(), movePayload))
+                        s.getConnection().sendMessage(
+                                messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
+                        )
                 );
             }
             case MoveResult.Rejected(String reason) ->

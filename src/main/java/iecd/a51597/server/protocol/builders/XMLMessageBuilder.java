@@ -15,7 +15,9 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -212,13 +214,13 @@ public class XMLMessageBuilder implements MessageBuilder {
     }
 
     @Override
-    public byte[] gameMovePush(UUID gameId, String movePayload) {
+    public byte[] gameMovePush(UUID gameId, String rawMove) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_MOVE);
         Document doc = s.document();
         Element body = s.body();
 
         body.appendChild(textElement(doc, "game-id", gameId.toString()));
-        body.appendChild(textElement(doc, "move",    movePayload));
+        body.appendChild(textElement(doc, "move", rawMove));
 
         return serialize(doc);
     }

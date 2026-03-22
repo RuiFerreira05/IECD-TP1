@@ -31,7 +31,7 @@ public interface MessageBuilder {
 
     byte[] gameInviteDeclinedPush(UUID gameId);
 
-    byte[] gameMovePush(UUID gameId, String movePayload);
+    byte[] gameMovePush(UUID gameId, String rawMove);
 
     byte[] gameOverPush(UUID gameId, User winner);
 }

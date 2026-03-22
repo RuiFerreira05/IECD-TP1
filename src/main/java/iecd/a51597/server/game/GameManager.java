@@ -14,9 +14,11 @@ public class GameManager {
     // UserId -> GameId
     private final Map<UUID, UUID> playerGameIndex = new ConcurrentHashMap<>(); // userId -> gameId
     private GameFactory factory;
+    private MoveDeserializer deserializer;
 
     public void registerFactory(GameFactory factory) {
         this.factory = factory;
+        this.deserializer = factory.getMoveDeserializer();
     }
 
     public boolean hasFactory() {
@@ -50,5 +52,9 @@ public class GameManager {
             playerGameIndex.remove(game.getPlayer1().getUserId());
             playerGameIndex.remove(game.getPlayer2().getUserId());
         }
+    }
+
+    public MoveDeserializer getDeserializer() {
+        return deserializer;
     }
 }
