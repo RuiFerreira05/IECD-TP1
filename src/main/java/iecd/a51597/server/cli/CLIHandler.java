@@ -270,7 +270,7 @@ public class CLIHandler {
     private void help(String[] args) {
         commands.forEach((name, cmd) -> {
             String usage = cmd.usage() != null ? " " + cmd.usage() : "";
-            System.out.printf("  %-10s %-10s  %s%n", name, usage, cmd.description());
+            System.out.printf("  %-15s %-15s  %s%n", name, usage, cmd.description());
         });
     }
 
