@@ -6,6 +6,7 @@ import iecd.a51597.server.store.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,6 +74,10 @@ public class SessionManager {
                 .filter(s -> s.getConnection() == connection)
                 .findFirst()
                 .ifPresent(s -> invalidate(s.getToken()));
+    }
+
+    public Collection<Session> getAllSessions() {
+        return sessions.values();
     }
 
     public Optional<Session> getSessionByUserId(UUID userId) {

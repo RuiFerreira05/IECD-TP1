@@ -72,6 +72,7 @@ public class Server {
     public CommParser getCommParser() { return commParser; }
     public SessionManager getSessionManager() { return sessionManager; }
     public UserStore getUserStore() { return userStore; }
+    public GameManager getGameManager() { return gameManager; }
 
     public static Server getInstance() {
         if (instance == null) {

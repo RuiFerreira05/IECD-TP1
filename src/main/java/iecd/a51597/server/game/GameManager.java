@@ -2,6 +2,7 @@ package iecd.a51597.server.game;
 
 import iecd.a51597.server.store.User;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +53,14 @@ public class GameManager {
 
     public Optional<Game> getPendingGame(UUID gameId) {
         return Optional.ofNullable(pendingGames.get(gameId));
+    }
+
+    public Collection<Game> getAllActiveGames() {
+        return activeGames.values();
+    }
+
+    public Collection<Game> getAllPendingGames() {
+        return pendingGames.values();
     }
 
     public Optional<Game> getGame(UUID gameId) {

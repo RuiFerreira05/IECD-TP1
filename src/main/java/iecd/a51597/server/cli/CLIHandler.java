@@ -34,11 +34,11 @@ public class CLIHandler {
 
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help", new Command(this::help, "Show this help message"));
-        commands.put("status", new Command(this::status, "Print server status header"));
-        commands.put("start", new Command(this::start, "Start the server"));
-        commands.put("stop", new Command(this::stop, "Stop the server"));
-        commands.put("exit", new Command(this::exit, "Shutdown the server"));
+        commands.put("help", new Command(this::help, null, "Show this help message"));
+        commands.put("status", new Command(this::status, null, "Print server status header"));
+        commands.put("start", new Command(this::start, "[PORT]", "Start the server"));
+        commands.put("stop", new Command(this::stop, null, "Stop the server"));
+        commands.put("exit", new Command(this::exit, null, "Shutdown the server"));
     }
 
     public void loop() {
@@ -134,9 +134,10 @@ public class CLIHandler {
     }
 
     private void help(String[] args) {
-        commands.forEach((name, cmd) ->
-                System.out.printf("%-10s -> %s\n", name, cmd.description())
-        );
+        commands.forEach((name, cmd) -> {
+            String usage = cmd.usage() != null ? " " + cmd.usage() : "";
+            System.out.printf("  %-10s %-10s  %s%n", name, usage, cmd.description());
+        });
     }
 
     private void status(String[] args) {
@@ -182,7 +183,7 @@ public class CLIHandler {
         server.shutdown();
     }
 
-    private record Command(Consumer<String[]> action, String description) {
+    private record Command(Consumer<String[]> action, String usage, String description) {
         void execute(String[] args) { action.accept(args); }
     }
 }
