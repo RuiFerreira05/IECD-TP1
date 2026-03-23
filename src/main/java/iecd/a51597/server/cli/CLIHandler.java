@@ -2,6 +2,7 @@ package iecd.a51597.server.cli;
 
 import iecd.a51597.server.Server;
 import iecd.a51597.server.config.ServerConfiguration;
+import iecd.a51597.server.session.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CLIHandler {
@@ -34,11 +36,17 @@ public class CLIHandler {
 
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help", new Command(this::help, null, "Show this help message"));
-        commands.put("status", new Command(this::status, null, "Print server status header"));
-        commands.put("start", new Command(this::start, "[PORT]", "Start the server"));
-        commands.put("stop", new Command(this::stop, null, "Stop the server"));
-        commands.put("exit", new Command(this::exit, null, "Shutdown the server"));
+        commands.put("help",        new Command(this::help,        null,           "Show this help message"));
+        commands.put("status",      new Command(this::status,      null,           "Print server status"));
+        commands.put("start",       new Command(this::start,       "[port]",       "Start the server on the given port (default: configured port)"));
+        commands.put("stop",        new Command(this::stop,        null,           "Stop the server from accepting new connections"));
+        commands.put("exit",        new Command(this::exit,        null,           "Shutdown the server and exit"));
+        commands.put("sessions",    new Command(this::sessions,    null,           "List all active sessions"));
+        commands.put("users",       new Command(this::users,       null,           "List all registered users"));
+        commands.put("games",       new Command(this::games,       null,           "List all pending and active games"));
+        commands.put("connections", new Command(this::connections, null,           "List all open connections"));
+        commands.put("kick",        new Command(this::kick,        "<username>",   "Close a user's connection and invalidate their session"));
+        commands.put("endgame",     new Command(this::endgame,     "<game-id>",    "Force-end an active game (player1 recorded as winner)"));
     }
 
     public void loop() {
@@ -56,6 +64,132 @@ public class CLIHandler {
                 logger.error("CLI read error: {}", e.getMessage());
             }
         }
+    }
+
+    private void sessions(String[] args) {
+        var sessions = server.getSessionManager().getAllSessions();
+        System.out.printf("Active sessions: %d%n", sessions.size());
+        if (sessions.isEmpty()) return;
+        System.out.printf("  %-10s  %-16s  %-10s  %s%n", "TOKEN", "USERNAME", "LAST ACTIVE", "EXPIRES IN");
+        for (var s : sessions) {
+            System.out.printf("  %-10s  %-16s  %-10s  %s%n",
+                    shortId(s.getToken()),
+                    s.getUser().getUsername(),
+                    TIME_FMT.format(s.getLastActivity()),
+                    formatExpiry(s)
+            );
+        }
+    }
+
+    private void users(String[] args) {
+        var users = server.getUserStore().getAllUsers();
+        System.out.printf("Registered users: %d%n", users.size());
+        if (users.isEmpty()) return;
+        System.out.printf("  %-10s  %-16s  %s%n", "ID", "USERNAME", "STATUS");
+        for (var u : users) {
+            boolean online = server.getSessionManager().getSessionByUserId(u.getUserId()).isPresent();
+            System.out.printf("  %-10s  %-16s  %s%n",
+                    shortId(u.getUserId()),
+                    u.getUsername(),
+                    online ? "● online" : "○ offline"
+            );
+        }
+    }
+
+    private void games(String[] args) {
+        var active  = server.getGameManager().getAllActiveGames();
+        var pending = server.getGameManager().getAllPendingGames();
+        System.out.printf("Active games: %d  |  Pending games: %d%n", active.size(), pending.size());
+        if (active.isEmpty() && pending.isEmpty()) return;
+        System.out.printf("  %-8s  %-10s  %-16s  %s%n", "STATE", "GAME ID", "PLAYER 1", "PLAYER 2");
+        for (var g : active) {
+            System.out.printf("  %-8s  %-10s  %-16s  %s%n",
+                    "ACTIVE", shortId(g.getGameId()),
+                    g.getPlayer1().getUsername(), g.getPlayer2().getUsername());
+        }
+        for (var g : pending) {
+            System.out.printf("  %-8s  %-10s  %-16s  %s%n",
+                    "PENDING", shortId(g.getGameId()),
+                    g.getPlayer1().getUsername(), g.getPlayer2().getUsername());
+        }
+    }
+
+    private void connections(String[] args) {
+        var cons = server.getConnections();
+        System.out.printf("Open connections: %d%n", cons.size());
+        if (cons.isEmpty()) return;
+        System.out.printf("  %-26s  %-13s  %s%n", "REMOTE ADDRESS", "AUTHENTICATED", "USER");
+        for (var c : cons) {
+            String remote = c.getClientSocket().getRemoteSocketAddress().toString();
+            var sessionOpt = server.getSessionManager().getAllSessions().stream()
+                    .filter(s -> s.getConnection() == c)
+                    .findFirst();
+            System.out.printf("  %-26s  %-13s  %s%n",
+                    remote,
+                    sessionOpt.isPresent() ? "yes" : "no",
+                    sessionOpt.map(s -> s.getUser().getUsername()).orElse("—")
+            );
+        }
+    }
+
+    private void kick(String[] args) {
+        if (args.length == 0) { System.out.println("Usage: kick <username>"); return; }
+        String username = args[0];
+
+        server.getUserStore().findByUsername(username).ifPresentOrElse(
+                user -> server.getSessionManager().getSessionByUserId(user.getUserId()).ifPresentOrElse(
+                        session -> {
+                            session.getConnection().closeConnection(); // invalidates session as a side effect
+                            System.out.println("Kicked " + username);
+                            logger.info("Admin kicked user: {}", username);
+                        },
+                        () -> System.out.println(username + " is not online")
+                ),
+                () -> System.out.println("No user found with username: " + username)
+        );
+    }
+
+    private void endgame(String[] args) {
+        if (args.length == 0) { System.out.println("Usage: endgame <game-id>"); return; }
+        String prefix = args[0].toLowerCase();
+
+        var matches = server.getGameManager().getAllActiveGames().stream()
+                .filter(g -> g.getGameId().toString().toLowerCase().startsWith(prefix))
+                .toList();
+
+        if (matches.isEmpty()) {
+            System.out.println("No active game found matching: " + prefix);
+            return;
+        }
+        if (matches.size() > 1) {
+            System.out.println("Ambiguous prefix — " + matches.size() + " games match. Be more specific.");
+            return;
+        }
+
+        var game   = matches.getFirst();
+        var winner = game.getPlayer1(); // nominal winner for protocol compliance
+
+        byte[] payload = server.getMessageBuilder().gameOverPush(game.getGameId(), winner);
+        server.getSessionManager().getSessionByUserId(game.getPlayer1().getUserId())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
+        server.getSessionManager().getSessionByUserId(game.getPlayer2().getUserId())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
+
+        server.getGameManager().endGame(game.getGameId());
+        System.out.printf("Ended game %s (winner recorded as %s)%n",
+                shortId(game.getGameId()), winner.getUsername());
+        logger.info("Admin force-ended game {}", game.getGameId());
+    }
+
+    private static String shortId(UUID id) {
+        return id.toString().substring(0, 8) + "…";
+    }
+
+    private static String formatExpiry(Session session) {
+        long elapsed   = Duration.between(session.getLastActivity(), Instant.now()).getSeconds();
+        long remaining = ServerConfiguration.SESSION_TIMEOUT_SECONDS - elapsed;
+        if (remaining <= 0) return "expired";
+        return String.format("%dm %02ds", remaining / 60, remaining % 60);
     }
 
     public void printStatusHeader() {
