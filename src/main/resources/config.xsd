@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:element name="config">
         <xs:complexType>
-            <xs:sequence>
+            <xs:all>
                 <xs:element name="defaultPort" type="xs:positiveInteger" minOccurs="0"/>
                 <xs:element name="maxFrameSize" type="xs:positiveInteger" minOccurs="0"/>
                 <xs:element name="sessionTimeoutSeconds" type="xs:positiveInteger" minOccurs="0"/>
@@ -10,7 +10,7 @@
                 <xs:element name="leaderboardStore" type="xs:string" minOccurs="0"/>
                 <xs:element name="protocolVersion" type="xs:string" minOccurs="0"/>
                 <xs:element name="statusBoxWidth" type="xs:positiveInteger" minOccurs="0"/>
-            </xs:sequence>
+            </xs:all>
         </xs:complexType>
     </xs:element>
 </xs:schema>
