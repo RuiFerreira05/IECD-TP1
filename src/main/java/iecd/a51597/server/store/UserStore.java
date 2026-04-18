@@ -2,6 +2,9 @@ package iecd.a51597.server.store;
 
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,8 +17,9 @@ public class UserStore {
     private final ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
 
     // REGISTER
-    public User register(String username, String passwordHash) throws UsernameAlreadyTakenException {
+    public User register(String username, String password) throws UsernameAlreadyTakenException {
         UUID userId = UUID.randomUUID();
+        String passwordHash = hash(password);
         User user = new User(userId, username, passwordHash, null);
 
         if (usernameIndex.putIfAbsent(username, user) != null) {
@@ -26,9 +30,22 @@ public class UserStore {
         return user;
     }
 
+    private static String hash(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 unavailable", e);
+        }
+    }
+
     // LOOKUP
-    public Optional<User> findByCredentials(String username, String passwordHash) {
+    public Optional<User> findByCredentials(String username, String password) {
         User user = usernameIndex.get(username);
+        String passwordHash = hash(password);
         if (user != null && user.getPasswordHash().equals(passwordHash)) {
             return Optional.of(user);
         }
