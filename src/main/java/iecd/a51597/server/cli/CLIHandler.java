@@ -36,17 +36,18 @@ public class CLIHandler {
 
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help",        new Command(this::help,        null,           "Show this help message"));
-        commands.put("status",      new Command(this::status,      null,           "Print server status"));
-        commands.put("start",       new Command(this::start,       "[port]",       "Start the server on the given port (default: configured port)"));
-        commands.put("stop",        new Command(this::stop,        null,           "Stop the server from accepting new connections"));
-        commands.put("exit",        new Command(this::exit,        null,           "Shutdown the server and exit"));
-        commands.put("sessions",    new Command(this::sessions,    null,           "List all active sessions"));
-        commands.put("users",       new Command(this::users,       null,           "List all registered users"));
-        commands.put("games",       new Command(this::games,       null,           "List all pending and active games"));
-        commands.put("connections", new Command(this::connections, null,           "List all open connections"));
-        commands.put("kick",        new Command(this::kick,        "<username>",   "Close a user's connection and invalidate their session"));
-        commands.put("endgame",     new Command(this::endgame,     "<game-id>",    "Force-end an active game (player1 recorded as winner)"));
+        commands.put("help",            new Command(this::help,         null,            "Show this help message"));
+        commands.put("status",          new Command(this::status,       null,            "Print server status"));
+        commands.put("start",           new Command(this::start,        "[port]",        "Start the server on the given port (default: configured port)"));
+        commands.put("stop",            new Command(this::stop,         null,            "Stop the server from accepting new connections"));
+        commands.put("exit",            new Command(this::exit,         null,            "Shutdown the server and exit"));
+        commands.put("sessions",        new Command(this::sessions,     null,            "List all active sessions"));
+        commands.put("users",           new Command(this::users,        null,            "List all registered users"));
+        commands.put("games",           new Command(this::games,        null,            "List all pending and active games"));
+        commands.put("connections",     new Command(this::connections,  null,            "List all open connections"));
+        commands.put("kick",            new Command(this::kick,         "<username>",    "Close a user's connection and invalidate their session"));
+        commands.put("endgame",         new Command(this::endgame,      "<game-id>",     "Force-end an active game (player1 recorded as winner)"));
+        commands.put("leaderboard",     new Command(this::leaderboard,  "[limit]",       "Show the player leaderboard"));
     }
 
     public void loop() {
@@ -129,6 +130,24 @@ public class CLIHandler {
                     sessionOpt.isPresent() ? "yes" : "no",
                     sessionOpt.map(s -> s.getUser().getUsername()).orElse("—")
             );
+        }
+    }
+
+    private void leaderboard(String[] args) {
+        int limit = 10;
+        if (args.length > 0) {
+            try { limit = Integer.parseInt(args[0]); }
+            catch (NumberFormatException e) { System.out.println("Invalid limit"); return; }
+        }
+
+        var entries = server.getLeaderboard().getTopPlayers(limit);
+        if (entries.isEmpty()) { System.out.println("No players yet."); return; }
+
+        System.out.printf("  %-4s  %-16s  %-6s  %-6s  %s%n", "RANK", "USERNAME", "WON", "LOST", "TOTAL TIME");
+        for (int i = 0; i < entries.size(); i++) {
+            var e = entries.get(i);
+            System.out.printf("  %-4d  %-16s  %-6d  %-6d  %.1fs%n",
+                    i + 1, e.username(), e.gamesWon(), e.gamesLost(), e.totalPlayTimeSecs());
         }
     }
 

@@ -13,6 +13,7 @@ import iecd.a51597.server.protocol.builders.XMLMessageBuilder;
 import iecd.a51597.server.protocol.parsers.CommParser;
 import iecd.a51597.server.protocol.parsers.XMLParser;
 import iecd.a51597.server.session.SessionManager;
+import iecd.a51597.server.store.Leaderboard;
 import iecd.a51597.server.store.UserStore;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -32,6 +33,7 @@ public class Server {
     private final MessageHandler messageHandler;
     private final GameManager gameManager = new GameManager();
     private final UserStore userStore;
+    private final Leaderboard leaderboard;
     private final PersistenceManager persistenceManager;
 
     private final CLIHandler cliHandler;
@@ -48,6 +50,7 @@ public class Server {
         this.messageBuilder = new XMLMessageBuilder();
         this.commParser = new XMLParser();
         this.userStore = new UserStore();
+        this.leaderboard = new Leaderboard(userStore);
         this.persistenceManager = new PersistenceManager(userStore);
 
         persistenceManager.load();
@@ -83,12 +86,6 @@ public class Server {
             }
         }
         return instance;
-    }
-
-    public static void main(String[] args) {
-        Server server = Server.getInstance();
-        server.handleCLIParams(args);
-        server.loop();
     }
 
     public List<Connection> getConnections() {
@@ -157,4 +154,14 @@ public class Server {
     }
 
     public int getStartupPort() { return this.port; }
+
+    public Leaderboard getLeaderboard() {
+        return leaderboard;
+    }
+
+    public static void main(String[] args) {
+        Server server = Server.getInstance();
+        server.handleCLIParams(args);
+        server.loop();
+    }
 }

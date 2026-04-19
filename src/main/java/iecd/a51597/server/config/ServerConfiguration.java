@@ -27,7 +27,6 @@ public final class ServerConfiguration {
     public static int MAX_FRAME_SIZE = 1024 * 1024;
     public static long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
     public static String USER_STORE = "data/users.xml";
-    public static String LEADERBOARD_STORE = "data/leaderboard.xml";
     public static int STATUS_BOX_WIDTH = 42;
     public static String PROTOCOL_VERSION = "1.0";
 
@@ -54,7 +53,6 @@ public final class ServerConfiguration {
             MAX_FRAME_SIZE = parseInt(root, "maxFrameSize", MAX_FRAME_SIZE);
             SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeoutSeconds", SESSION_TIMEOUT_SECONDS);
             USER_STORE = parseString(root, "userStore", USER_STORE);
-            LEADERBOARD_STORE = parseString(root, "leaderboardStore", LEADERBOARD_STORE);
             STATUS_BOX_WIDTH = parseInt(root, "statusBoxWidth", STATUS_BOX_WIDTH);
             PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
 
