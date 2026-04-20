@@ -15,7 +15,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
 /**
- * Global server configuration loaded from {@code config.xml}.
+ * Global client configuration loaded from {@code client_config.xml}.
  */
 public final class ClientConfiguration {
 
@@ -26,11 +26,17 @@ public final class ClientConfiguration {
 
     // CONSTS
 
-    public static String SERVER_URL = "http://localhost:5555";
+    /** Public facing server IP */
+    public static String SERVER_IP = "127.0.0.1";
+
+    /** Public facing server port */
+    public static int SERVER_PORT = 5555;
+
+    /** Default prompt style for use in the cli (This value has no effect over screen that override their own prompt) */
     public static String DEFAULT_PROMPT = ">> ";
 
     /**
-     * Loads configuration overrides from {@code config.xml} when present and valid.
+     * Loads configuration overrides from {@code client_config.xml} when present and valid.
      */
     public static void load() {
         File file = new File(CONFIG_FILE);
@@ -51,7 +57,8 @@ public final class ClientConfiguration {
 
             Element root = doc.getDocumentElement();
 
-            SERVER_URL = parseString(root, "serverUrl", SERVER_URL);
+            SERVER_IP = parseString(root, "serverIP", SERVER_IP);
+            SERVER_PORT = parseInt(root, "serverPort", SERVER_PORT);
             DEFAULT_PROMPT = parseString(root, "defaultPrompt", DEFAULT_PROMPT) + " ";
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);

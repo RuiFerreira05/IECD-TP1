@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-    <serverUrl>http://localhost:5555</serverUrl>
-    <defaultPrompt>>> </defaultPrompt>
+    <serverIP>127.0.0.1</serverIP>
+    <serverPort>5555</serverPort>
+    <defaultPrompt>>></defaultPrompt>
 </config>

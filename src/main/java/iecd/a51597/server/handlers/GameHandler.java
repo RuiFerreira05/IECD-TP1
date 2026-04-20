@@ -50,7 +50,7 @@ public class GameHandler extends BaseHandler {
             return;
         }
 
-        MessageBody.GameInvite body = (MessageBody.GameInvite) message.body();
+        MessageBody.GameInviteRequest body = (MessageBody.GameInviteRequest) message.body();
 
         if (body.targetUserId().equals(sender.getUserId())) {
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Cannot invite yourself to a game");
@@ -99,7 +99,7 @@ public class GameHandler extends BaseHandler {
 
         User responder = session.getUser();
 
-        MessageBody.GameInviteResponse body = (MessageBody.GameInviteResponse) message.body();
+        MessageBody.GameInviteResponseRequest body = (MessageBody.GameInviteResponseRequest) message.body();
 
         Optional<Game> gameOpt = gameManager.getPendingGame(body.gameId());
         if (gameOpt.isEmpty()) {

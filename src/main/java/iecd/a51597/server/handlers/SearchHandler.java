@@ -26,7 +26,7 @@ public class SearchHandler {
      * Executes a username search and returns matching users.
      */
     public void searchUsers(Message message, Connection connection) {
-        MessageBody.SearchUsers body = (MessageBody.SearchUsers) message.body();
+        MessageBody.SearchUsersRequest body = (MessageBody.SearchUsersRequest) message.body();
         connection.sendMessage(messageBuilder.searchUsersSuccess(
                 message.messageId(),
                 userStore.searchByUsername(body.query())

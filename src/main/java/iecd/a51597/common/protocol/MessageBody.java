@@ -1,91 +1,130 @@
 package iecd.a51597.common.protocol;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
  * Marker interface for all supported protocol payload bodies.
  */
 public sealed interface MessageBody {
-    /**
-     * Registration payload.
-     *
-     * @param username desired username
-     * @param password plaintext password to be hashed by the server
-     */
-    record Register(String username, String password) implements MessageBody {
-    }
 
     /**
-     * Login payload.
-     *
-     * @param username existing username
-     * @param password plaintext password
+     * Common user information DTO used in responses and pushes.
      */
-    record Login(String username, String password) implements MessageBody {
-    }
+    record UserSummary(UUID id, String username, String photo, String nationality, String dob, List<UserMatch> stats) {}
+
+    /**
+     * User match summary included in user stats collections.
+     */
+    record UserMatch(String result, double playtime, UUID opponentId, String opponentUsername) {}
+
+    /**
+     * Error payload included in failed responses.
+     */
+    record ErrorDetail(String code, String message) {}
+
+    /**
+     * Generic response payload used when the action is unknown.
+     */
+    record GenericResponse(String status, ErrorDetail error) implements MessageBody {}
+
+    /**
+     * Registration payload.
+     */
+    record Register(String username, String password) implements MessageBody {}
+
+    /**
+     * Registration response payload.
+     */
+    record RegisterResponse(String status, ErrorDetail error) implements MessageBody {}
+
+    /**
+     * Login request payload.
+     */
+    record LoginRequest(String username, String password) implements MessageBody {}
+
+    /**
+     * Login response payload.
+     */
+    record LoginResponse(String status, UUID session, UserSummary user, ErrorDetail error) implements MessageBody {}
 
     /**
      * Logout payload.
      */
-    record Logout() implements MessageBody {
-    }
+    record Logout() implements MessageBody {}
+
+    /**
+     * Logout response payload.
+     */
+    record LogoutResponse(String status, ErrorDetail error) implements MessageBody {}
 
     /**
      * Profile update payload.
-     *
-     * @param username optional new username
-     * @param password optional new plaintext password
-     * @param photo optional profile photo reference
      */
-    record UpdateProfile(String username, String password, String photo) implements MessageBody {
-    }
+    record UpdateProfile(String username, String password, String photo) implements MessageBody {}
 
     /**
-     * User search payload.
-     *
-     * @param query search text applied to usernames
+     * Profile update response payload.
      */
-    record SearchUsers(String query) implements MessageBody {
-    }
+    record UpdateProfileResponse(String status, ErrorDetail error) implements MessageBody {}
 
     /**
-     * Game invitation payload.
-     *
-     * @param targetUserId invited user's identifier
+     * User search request.
      */
-    record GameInvite(UUID targetUserId) implements MessageBody {
-    }
+    record SearchUsersRequest(String query) implements MessageBody {}
 
     /**
-     * Invitation response payload.
-     *
-     * @param gameId pending game identifier
-     * @param accept whether the invite is accepted
+     * User search response.
      */
-    record GameInviteResponse(UUID gameId, boolean accept) implements MessageBody {
-    }
+    record SearchUsersResponse(String status, List<UserSummary> results, ErrorDetail error) implements MessageBody {}
 
     /**
-     * Game move payload.
-     *
-     * @param gameId active game identifier
-     * @param rawMove serialized move payload understood by the configured game codec
+     * Game invitation request (Client -> Server).
      */
-    record GameMove(UUID gameId, String rawMove) implements MessageBody {
-    }
+    record GameInviteRequest(UUID targetUserId) implements MessageBody {}
+
+    /**
+     * Game invitation response (Server -> Inviter).
+     */
+    record GameInviteResponse(String status, UUID gameId, ErrorDetail error) implements MessageBody {}
+
+    /**
+     * Game invitation push (Server -> Target Client).
+     */
+    record GameInvitePush(UUID fromUserId, String fromUsername, UUID gameId) implements MessageBody {}
+
+    /**
+     * Invitation response request (Client -> Server).
+     */
+    record GameInviteResponseRequest(UUID gameId, boolean accept) implements MessageBody {}
+
+    /**
+     * Invitation response acknowledgment (Server -> Invitee).
+     */
+    record GameInviteResponseResult(String status, ErrorDetail error) implements MessageBody {}
+
+    /**
+     * Invitation response push (Server -> Original Inviter).
+     */
+    record GameInviteResponsePush(UUID gameId, boolean accepted, String opponentUsername) implements MessageBody {}
+
+    /**
+     * Game move payload (Bidirectional).
+     */
+    record GameMove(UUID gameId, String rawMove) implements MessageBody {}
+
+    /**
+     * Game move response acknowledgment (Server -> Move sender).
+     */
+    record GameMoveResponse(String status, ErrorDetail error) implements MessageBody {}
 
     /**
      * Server-initiated game over payload.
-     *
-     * @param gameId game identifier
-     * @param winnerId winning player's identifier
-     * @param winnerUsername winning player's username
      */
     record GameOver(UUID gameId, UUID winnerId, String winnerUsername) implements MessageBody {}
 
     /**
      * Fallback payload for unknown/unmapped actions.
      */
-    record Unknown() implements MessageBody {
-    }
+    record Unknown() implements MessageBody {}
 }

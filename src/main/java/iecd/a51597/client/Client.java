@@ -10,11 +10,9 @@ public class Client {
 
     private final ClientCliHandler cliHandler;
     private static volatile Client instance;
-    public String serverUrl;
 
     private Client() {
         ClientConfiguration.load();
-        serverUrl = ClientConfiguration.SERVER_URL;
         cliHandler = new ClientCliHandler(this);
     }
 

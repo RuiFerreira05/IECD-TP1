@@ -43,7 +43,7 @@ public class AuthHandler extends BaseHandler {
      * Handles user login requests.
      */
     public void login(Message message, Connection connection) {
-        MessageBody.Login body = (MessageBody.Login) message.body();
+        MessageBody.LoginRequest body = (MessageBody.LoginRequest) message.body();
 
         userStore.findByCredentials(body.username(), body.password()).ifPresentOrElse(
                 user -> {

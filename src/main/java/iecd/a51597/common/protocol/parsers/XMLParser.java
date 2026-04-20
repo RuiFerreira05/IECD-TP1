@@ -106,25 +106,168 @@ public class XMLParser implements CommParser {
         String sessionTokenRaw = getField(header, "session");
         UUID sessionToken = sessionTokenRaw != null ? UUID.fromString(sessionTokenRaw) : null;
 
-        return new Message(messageId, type, version, action, sessionToken, parseBody(action, body));
+        return new Message(messageId, type, version, action, sessionToken, parseBody(type, action, body));
     }
 
     /**
      * Parses action-specific payload fields from the body element.
      */
-    private MessageBody parseBody(ActionType action, Element body) throws MalformedMessageException {
+    private MessageBody parseBody(MessageType type, ActionType action, Element body) throws MalformedMessageException {
+        return switch (type) {
+            case REQUEST -> parseRequestBody(action, body);
+            case RESPONSE -> parseResponseBody(action, body);
+            case PUSH -> parsePushBody(action, body);
+        };
+    }
+
+    private MessageBody parseRequestBody(ActionType action, Element body) throws MalformedMessageException {
         return switch (action) {
             case REGISTER -> new MessageBody.Register(require(body, "username"), require(body, "password"));
-            case LOGIN -> new MessageBody.Login(require(body, "username"), require(body, "password"));
+            case LOGIN -> new MessageBody.LoginRequest(require(body, "username"), require(body, "password"));
             case LOGOUT -> new MessageBody.Logout();
-            case UPDATE_PROFILE -> new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getField(body, "photo"));
-            case SEARCH_USERS -> new MessageBody.SearchUsers(require(body, "query"));
-            case GAME_INVITE -> new MessageBody.GameInvite(requireUUID(body, "target-user-id"));
-            case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponse(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
-            case GAME_MOVE -> new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
-            case GAME_OVER -> new MessageBody.GameOver(null, null, null); // not supposed to happen
-            case UNKNOWN -> new MessageBody.Unknown();
+            case UPDATE_PROFILE ->
+                    new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getField(body, "photo"));
+            case SEARCH_USERS -> new MessageBody.SearchUsersRequest(require(body, "query"));
+            case GAME_INVITE -> new MessageBody.GameInviteRequest(requireUUID(body, "target-user-id"));
+            case GAME_INVITE_RESPONSE ->
+                    new MessageBody.GameInviteResponseRequest(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
+            case GAME_MOVE ->
+                    new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
+            case GAME_OVER, UNKNOWN -> new MessageBody.Unknown();
         };
+    }
+
+    private MessageBody parseResponseBody(ActionType action, Element body) throws MalformedMessageException {
+        String status = require(body, "status");
+        MessageBody.ErrorDetail error = parseError(body);
+
+        return switch (action) {
+            case REGISTER -> new MessageBody.RegisterResponse(status, error);
+            case LOGIN -> "OK".equals(status)
+                    ? new MessageBody.LoginResponse(
+                    status,
+                    requireUUID(body, "session"),
+                    parseUserSummary(requireElement(body, "user")),
+                    null
+            )
+                    : new MessageBody.LoginResponse(status, null, null, error);
+            case LOGOUT -> new MessageBody.LogoutResponse(status, error);
+            case UPDATE_PROFILE -> new MessageBody.UpdateProfileResponse(status, error);
+            case SEARCH_USERS -> "OK".equals(status)
+                    ? new MessageBody.SearchUsersResponse(status, parseUserResults(body), null)
+                    : new MessageBody.SearchUsersResponse(status, null, error);
+            case GAME_INVITE -> "OK".equals(status)
+                    ? new MessageBody.GameInviteResponse(status, requireUUID(body, "game-id"), null)
+                    : new MessageBody.GameInviteResponse(status, null, error);
+            case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponseResult(status, error);
+            case GAME_MOVE -> new MessageBody.GameMoveResponse(status, error);
+            case UNKNOWN -> new MessageBody.GenericResponse(status, error);
+            case GAME_OVER -> new MessageBody.Unknown();
+        };
+    }
+
+    private MessageBody parsePushBody(ActionType action, Element body) throws MalformedMessageException {
+        return switch (action) {
+            case GAME_INVITE -> new MessageBody.GameInvitePush(
+                    requireUUID(body, "from-user-id"),
+                    require(body, "from-username"),
+                    requireUUID(body, "game-id")
+            );
+            case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponsePush(
+                    requireUUID(body, "game-id"),
+                    Boolean.parseBoolean(require(body, "accepted")),
+                    getField(body, "opponent-username")
+            );
+            case GAME_MOVE ->
+                    new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
+            case GAME_OVER -> new MessageBody.GameOver(
+                    requireUUID(body, "game-id"),
+                    requireUUID(body, "winner-id"),
+                    require(body, "winner-username")
+            );
+            case REGISTER, LOGIN, LOGOUT, UPDATE_PROFILE, SEARCH_USERS, UNKNOWN -> new MessageBody.Unknown();
+        };
+    }
+
+    private MessageBody.UserSummary parseUserSummary(Element userEl) throws MalformedMessageException {
+        return new MessageBody.UserSummary(
+                requireUUID(userEl, "id"),
+                require(userEl, "username"),
+                getField(userEl, "photo"),
+                getField(userEl, "nationality"),
+                getField(userEl, "dob"),
+                parseUserStats(userEl)
+        );
+    }
+
+    private java.util.List<MessageBody.UserMatch> parseUserStats(Element userEl) throws MalformedMessageException {
+        java.util.List<MessageBody.UserMatch> stats = new java.util.ArrayList<>();
+        Element statsEl = getElement(userEl, "stats");
+        if (statsEl == null) return stats;
+
+        NodeList matches = statsEl.getElementsByTagName("match");
+        for (int i = 0; i < matches.getLength(); i++) {
+            Element matchEl = (Element) matches.item(i);
+            stats.add(new MessageBody.UserMatch(
+                    requireAttribute(matchEl, "result"),
+                    requireDoubleAttribute(matchEl, "playtime"),
+                    parseUuidAttribute(matchEl, "opponent-id"),
+                    requireAttribute(matchEl, "opponent-username")
+            ));
+        }
+
+        return stats;
+    }
+
+    private java.util.List<MessageBody.UserSummary> parseUserResults(Element body) throws MalformedMessageException {
+        java.util.List<MessageBody.UserSummary> results = new java.util.ArrayList<>();
+        Element resultsEl = getElement(body, "results");
+        if (resultsEl != null) {
+            NodeList nodes = resultsEl.getElementsByTagName("user");
+            for (int i = 0; i < nodes.getLength(); i++) {
+                results.add(parseUserSummary((Element) nodes.item(i)));
+            }
+        }
+        return results;
+    }
+
+    private MessageBody.ErrorDetail parseError(Element body) {
+        Element errorEl = getElement(body, "error");
+        if (errorEl == null) return null;
+
+        String code = errorEl.getAttribute("code");
+        String message = errorEl.getTextContent() == null ? null : errorEl.getTextContent().trim();
+        return new MessageBody.ErrorDetail(code, message);
+    }
+
+    private String requireAttribute(Element element, String attr) throws MalformedMessageException {
+        String value = element.getAttribute(attr);
+        if (value == null || value.isBlank()) {
+            throw new MalformedMessageException("Missing required attribute: @" + attr);
+        }
+        return value;
+    }
+
+    private UUID parseUuidAttribute(Element element, String attr) throws MalformedMessageException {
+        try {
+            return UUID.fromString(requireAttribute(element, attr));
+        } catch (IllegalArgumentException e) {
+            throw new MalformedMessageException("Invalid UUID in attribute @" + attr, e);
+        }
+    }
+
+    private double requireDoubleAttribute(Element element, String attr) throws MalformedMessageException {
+        try {
+            return Double.parseDouble(requireAttribute(element, attr));
+        } catch (NumberFormatException e) {
+            throw new MalformedMessageException("Invalid decimal in attribute @" + attr, e);
+        }
+    }
+
+    private Element getElement(Element parent, String tag) {
+        NodeList nodes = parent.getElementsByTagName(tag);
+        if (nodes.getLength() == 0) return null;
+        return (Element) nodes.item(0);
     }
 
     /**

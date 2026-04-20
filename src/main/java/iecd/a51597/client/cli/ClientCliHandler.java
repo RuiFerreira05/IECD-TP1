@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Interactive administrative command-line interface for runtime server control.
+ * Handles the main CLI loop, delegating display and input handling to the current screen in the state machine.
  */
 public class ClientCliHandler {
 

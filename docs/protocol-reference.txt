@@ -64,6 +64,11 @@ ENVELOPE STRUCTURE (every message)
             <id>uuid</id>
             <username>alice</username>
             <photo>base64_or_url</photo>
+            <nationality>PT</nationality>
+            <dob>2005-04-11</dob>
+            <stats>
+                <match result="WON" playtime="120.5" opponent-id="uuid" opponent-username="bob"/>
+            </stats>
         </user>
     </body>
 
@@ -159,11 +164,11 @@ ENVELOPE STRUCTURE (every message)
                 <id>uuid</id>
                 <username>alice</username>
                 <photo>base64_or_url</photo>
-            </user>
-            <user>
-                <id>uuid</id>
-                <username>alistar</username>
-                <photo>base64_or_url</photo>
+                <nationality>PT</nationality>
+                <dob>2005-04-11</dob>
+                <stats>
+                    <match result="WON" playtime="45.0" opponent-id="uuid" opponent-username="charles"/>
+                </stats>
             </user>
         </results>
     </body>
