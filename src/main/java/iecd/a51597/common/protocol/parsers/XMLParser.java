@@ -1,15 +1,14 @@
-package iecd.a51597.server.protocol.parsers;
+package iecd.a51597.common.protocol.parsers;
 
-import iecd.a51597.server.protocol.Message;
-import iecd.a51597.server.protocol.MessageBody;
-import iecd.a51597.server.protocol.exceptions.CommException;
-import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
-import iecd.a51597.server.protocol.exceptions.MessageParseException;
-import iecd.a51597.server.protocol.types.ActionType;
-import iecd.a51597.server.protocol.types.MessageType;
+import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.MessageBody;
+import iecd.a51597.common.protocol.exceptions.CommException;
+import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.common.protocol.exceptions.MessageParseException;
+import iecd.a51597.common.protocol.types.ActionType;
+import iecd.a51597.common.protocol.types.MessageType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -17,17 +16,11 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.UUID;
 
 public class XMLParser implements CommParser {

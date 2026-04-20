@@ -1,4 +1,4 @@
-package iecd.a51597.server.protocol.exceptions;
+package iecd.a51597.common.protocol.exceptions;
 
 public class MalformedMessageException extends CommException {
 

@@ -30,7 +30,8 @@ public class UserStore {
         return user;
     }
 
-    private static String hash(String password) {
+    // Package-private to allow controlled password hashing
+    static String hash(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
@@ -71,7 +72,7 @@ public class UserStore {
         return users;
     }
 
-    // UPDATE
+     // UPDATE
     public void updateUsername(User user, String newUsername) throws UsernameAlreadyTakenException {
         if (usernameIndex.putIfAbsent(newUsername, user) != null) {
             throw new UsernameAlreadyTakenException(newUsername);
@@ -80,8 +81,13 @@ public class UserStore {
         user.setUsername(newUsername);
     }
 
-    public void updatePassword(User user, String newPasswordHash) {
-        user.setPasswordHash(newPasswordHash);
+    /**
+     * Updates a user's password. The provided password will be hashed internally.
+     * @param user The user to update
+     * @param newPlaintextPassword The new plaintext password (will be hashed)
+     */
+    public void updatePassword(User user, String newPlaintextPassword) {
+        user.setPasswordHash(hash(newPlaintextPassword));
     }
 
     public void updatePhoto(User user, String photo) {

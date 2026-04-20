@@ -1,4 +1,4 @@
-package iecd.a51597.server.protocol;
+package iecd.a51597.common.protocol;
 
 import java.util.UUID;
 

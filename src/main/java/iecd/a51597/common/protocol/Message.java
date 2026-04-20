@@ -1,7 +1,7 @@
-package iecd.a51597.server.protocol;
+package iecd.a51597.common.protocol;
 
-import iecd.a51597.server.protocol.types.ActionType;
-import iecd.a51597.server.protocol.types.MessageType;
+import iecd.a51597.common.protocol.types.ActionType;
+import iecd.a51597.common.protocol.types.MessageType;
 
 import java.util.UUID;
 

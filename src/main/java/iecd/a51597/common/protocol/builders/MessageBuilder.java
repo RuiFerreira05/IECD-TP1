@@ -1,8 +1,8 @@
-package iecd.a51597.server.protocol.builders;
+package iecd.a51597.common.protocol.builders;
 
 import iecd.a51597.server.store.User;
-import iecd.a51597.server.protocol.types.ActionType;
-import iecd.a51597.server.protocol.types.ErrorCodeType;
+import iecd.a51597.common.protocol.types.ActionType;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 
 import java.util.List;
 import java.util.UUID;

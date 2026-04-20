@@ -1,9 +1,9 @@
 package iecd.a51597.server.handlers;
 
 import iecd.a51597.server.network.Connection;
-import iecd.a51597.server.protocol.Message;
-import iecd.a51597.server.protocol.MessageBody;
-import iecd.a51597.server.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.MessageBody;
+import iecd.a51597.common.protocol.builders.MessageBuilder;
 import iecd.a51597.server.store.UserStore;
 
 public class SearchHandler {

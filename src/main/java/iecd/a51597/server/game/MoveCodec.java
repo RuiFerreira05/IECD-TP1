@@ -1,6 +1,6 @@
 package iecd.a51597.server.game;
 
-import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 
 public interface MoveCodec {
     String serialize(Move move);

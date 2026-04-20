@@ -2,14 +2,14 @@ package iecd.a51597.server.handlers;
 
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.network.Connection;
-import iecd.a51597.server.protocol.Message;
-import iecd.a51597.server.protocol.builders.MessageBuilder;
-import iecd.a51597.server.protocol.exceptions.CommException;
-import iecd.a51597.server.protocol.exceptions.MalformedMessageException;
-import iecd.a51597.server.protocol.exceptions.MessageParseException;
-import iecd.a51597.server.protocol.parsers.CommParser;
-import iecd.a51597.server.protocol.types.ErrorCodeType;
-import iecd.a51597.server.protocol.types.MessageType;
+import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.exceptions.CommException;
+import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.common.protocol.exceptions.MessageParseException;
+import iecd.a51597.common.protocol.parsers.CommParser;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
+import iecd.a51597.common.protocol.types.MessageType;
 
 import java.io.ByteArrayInputStream;
 

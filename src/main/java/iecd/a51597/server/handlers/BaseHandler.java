@@ -3,9 +3,9 @@ package iecd.a51597.server.handlers;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
-import iecd.a51597.server.protocol.Message;
-import iecd.a51597.server.protocol.builders.MessageBuilder;
-import iecd.a51597.server.protocol.types.ErrorCodeType;
+import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 
 import java.util.Optional;
 

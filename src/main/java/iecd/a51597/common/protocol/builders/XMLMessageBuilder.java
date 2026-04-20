@@ -1,11 +1,12 @@
-package iecd.a51597.server.protocol.builders;
+package iecd.a51597.common.protocol.builders;
 
 import iecd.a51597.server.config.ServerConfiguration;
+import iecd.a51597.server.store.PlayerStats;
 import iecd.a51597.server.store.User;
-import iecd.a51597.server.protocol.ProtocolConstants;
-import iecd.a51597.server.protocol.types.ActionType;
-import iecd.a51597.server.protocol.types.ErrorCodeType;
-import iecd.a51597.server.protocol.types.MessageType;
+import iecd.a51597.common.protocol.ProtocolConstants;
+import iecd.a51597.common.protocol.types.ActionType;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
+import iecd.a51597.common.protocol.types.MessageType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -93,7 +94,29 @@ public class XMLMessageBuilder implements MessageBuilder {
         if (user.getPhoto() != null) {
             userEl.appendChild(textElement(doc, "photo", user.getPhoto()));
         }
+        if (user.getNationality() != null) {
+            userEl.appendChild(textElement(doc, "nationality", user.getNationality()));
+        }
+        if (user.getDob() != null) {
+            userEl.appendChild(textElement(doc, "dob", user.getDob().toString()));
+        }
+        userEl.appendChild(playerStatsElement(doc, user.getStats()));
+
         return userEl;
+    }
+
+    private Element playerStatsElement(Document doc, PlayerStats stats) {
+        Element statsEl = doc.createElement("stats");
+        for (PlayerStats.MatchRecord match : stats.matches()) {
+            Element matchEl = doc.createElement("match");
+            matchEl.setAttribute("result", match.won() ? "WON" : "LOST");
+            matchEl.setAttribute("playtime", String.valueOf(match.playtimeSecs()));
+            matchEl.setAttribute("opponent-id", match.opponentId().toString());
+            matchEl.setAttribute("opponent-username", match.opponentUsername());
+            statsEl.appendChild(matchEl);
+        }
+
+        return statsEl;
     }
 
     // ====== GENERIC ======
