@@ -1,5 +1,5 @@
 /**
- * XML persistence loading and saving.
+ * Persistence loading and saving.
  */
 package iecd.a51597.server.persistence;
 
