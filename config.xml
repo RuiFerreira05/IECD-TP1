@@ -6,4 +6,5 @@
     <userStore>data/users.xml</userStore>
     <statusBoxWidth>42</statusBoxWidth>
     <protocolVersion>1.0</protocolVersion>
+    <persistenceType>xml</persistenceType>
 </config>

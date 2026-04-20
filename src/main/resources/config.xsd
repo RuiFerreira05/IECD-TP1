@@ -9,6 +9,7 @@
                 <xs:element name="userStore" type="xs:string" minOccurs="0"/>
                 <xs:element name="protocolVersion" type="xs:string" minOccurs="0"/>
                 <xs:element name="statusBoxWidth" type="xs:positiveInteger" minOccurs="0"/>
+                <xs:element name="persistenceType" type="xs:string" minOccurs="0"/>
             </xs:all>
         </xs:complexType>
     </xs:element>

@@ -38,6 +38,8 @@ public final class ServerConfiguration {
     public static int STATUS_BOX_WIDTH = 42;
     /** Supported protocol version string. */
     public static String PROTOCOL_VERSION = "1.0";
+    /** Which way to store data */
+    public static String PERSISTENCE_TYPE = "xml";
 
     /**
      * Loads configuration overrides from {@code config.xml} when present and valid.
@@ -67,6 +69,7 @@ public final class ServerConfiguration {
             USER_STORE = parseString(root, "userStore", USER_STORE);
             STATUS_BOX_WIDTH = parseInt(root, "statusBoxWidth", STATUS_BOX_WIDTH);
             PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
+            PERSISTENCE_TYPE = parseString(root, "persistenceType", PERSISTENCE_TYPE);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {
