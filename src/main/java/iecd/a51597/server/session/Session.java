@@ -38,7 +38,8 @@ public class Session {
      * @return {@code true} when expired
      */
     public boolean isExpired(long timeoutSeconds) {
-        return Instant.now().isAfter(lastActivity.plusSeconds(timeoutSeconds));
+        Instant expiresAt = lastActivity.plusSeconds(timeoutSeconds);
+        return !Instant.now().isBefore(expiresAt);
     }
 
     /**

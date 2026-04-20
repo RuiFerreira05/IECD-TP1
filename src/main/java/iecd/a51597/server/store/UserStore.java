@@ -47,7 +47,7 @@ public class UserStore {
      * @param password plaintext password
      * @return hex-encoded hash
      */
-    static String hash(String password) {
+    public static String hash(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
