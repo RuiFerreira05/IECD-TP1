@@ -15,7 +15,7 @@ import java.io.InputStreamReader;
 public class ClientCliHandler {
 
     private final Client client;
-    public Boolean running;
+    public volatile Boolean running;
     private final StateMachine stateMachine;
 
     private final Logger logger = LogManager.getLogger(ClientCliHandler.class);

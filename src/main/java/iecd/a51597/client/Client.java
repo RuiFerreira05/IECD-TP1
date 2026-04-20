@@ -1,6 +1,7 @@
 package iecd.a51597.client;
 
 import iecd.a51597.client.cli.ClientCliHandler;
+import iecd.a51597.client.config.ClientConfiguration;
 
 /**
  * Client-side entry point.
@@ -8,13 +9,16 @@ import iecd.a51597.client.cli.ClientCliHandler;
 public class Client {
 
     private final ClientCliHandler cliHandler;
-    private volatile Client instance;
+    private static volatile Client instance;
+    public String serverUrl;
 
     private Client() {
+        ClientConfiguration.load();
+        serverUrl = ClientConfiguration.SERVER_URL;
         cliHandler = new ClientCliHandler(this);
     }
 
-    public Client getInstance() {
+    public static Client getInstance() {
         if (instance == null) {
             synchronized (Client.class) {
                 if (instance == null) {
@@ -28,11 +32,10 @@ public class Client {
     public void exit() {
         cliHandler.running = false;
         // TODO: rest of the shutdown procedure
-        System.exit(0);
     }
 
-    static void main() {
-        Client client = new Client().getInstance();
+    public static void main(String[] args) {
+        Client client = Client.getInstance();
         client.cliHandler.loop();
     }
 }

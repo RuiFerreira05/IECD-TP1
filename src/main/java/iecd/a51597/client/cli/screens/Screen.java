@@ -2,6 +2,7 @@ package iecd.a51597.client.cli.screens;
 
 import iecd.a51597.client.Client;
 import iecd.a51597.client.cli.StateMachine;
+import iecd.a51597.client.config.ClientConfiguration;
 
 public abstract class Screen {
 
@@ -12,7 +13,7 @@ public abstract class Screen {
     protected Screen(StateMachine sm, Client client){
         this.sm = sm;
         this.client = client;
-        this.prompt = ">> ";
+        this.prompt = ClientConfiguration.DEFAULT_PROMPT;
     }
 
     abstract public void display();

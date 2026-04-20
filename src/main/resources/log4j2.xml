@@ -42,7 +42,10 @@
         <Logger name="iecd.a51597.server.persistence.PersistenceManager" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.client.cli.ClientCliHandler" level="ALL" additivity="false">
+        <Logger name="iecd.a51597.client" level="ALL" additivity="false">
+            <AppenderRef ref="CLIENT-LOG"/>
+        </Logger>
+        <Logger name="iecd.a51597.client.config.ClientConfiguration" level="ALL" additivity="false">
             <AppenderRef ref="CLIENT-LOG"/>
         </Logger>
     </Loggers>

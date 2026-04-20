@@ -30,7 +30,8 @@ public class StateMachine {
             currentScreen = screens.get(identifier);
             currentScreen.onEnter();
         } else {
-            throw new IllegalArgumentException("Screen not found: " + identifier);
+            logger.warn("Attempted to transition to unregistered screen: {}", identifier);
+            System.out.println("Error: Screen not found: " + identifier);
         }
     }
 
