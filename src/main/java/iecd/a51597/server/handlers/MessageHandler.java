@@ -13,6 +13,9 @@ import iecd.a51597.common.protocol.types.MessageType;
 
 import java.io.ByteArrayInputStream;
 
+/**
+ * Parses incoming frames and dispatches protocol actions to specialized handlers.
+ */
 public class MessageHandler {
 
     private final CommParser commParser;
@@ -22,6 +25,9 @@ public class MessageHandler {
     private final SearchHandler searchHandler;
     private final GameHandler gameHandler;
 
+    /**
+     * Creates a dispatcher with all action handlers.
+     */
     public MessageHandler(CommParser commParser, MessageBuilder messageBuilder,
                           AuthHandler authHandler, ProfileHandler profileHandler,
                           SearchHandler searchHandler, GameHandler gameHandler) {
@@ -33,6 +39,12 @@ public class MessageHandler {
         this.gameHandler = gameHandler;
     }
 
+    /**
+     * Handles one inbound frame.
+     *
+     * @param frameBytes raw framed payload bytes
+     * @param connection source connection
+     */
     public void handle(byte[] frameBytes, Connection connection) {
         try {
             Message message = commParser.parseMessage(new ByteArrayInputStream(frameBytes));

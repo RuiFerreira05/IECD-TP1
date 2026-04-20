@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Interactive administrative command-line interface for runtime server control.
+ */
 public class CLIHandler {
 
     private static final DateTimeFormatter TIME_FMT =
@@ -34,6 +37,11 @@ public class CLIHandler {
 
     private final Map<String, Command> commands = new HashMap<>();
 
+    /**
+     * Creates a CLI handler and registers supported commands.
+     *
+     * @param server server instance controlled by this CLI
+     */
     public CLIHandler(Server server) {
         this.server = server;
         commands.put("help",            new Command(this::help,         null,            "Show this help message"));
@@ -50,6 +58,9 @@ public class CLIHandler {
         commands.put("leaderboard",     new Command(this::leaderboard,  "[limit]",       "Show the player leaderboard"));
     }
 
+    /**
+     * Starts the command-processing loop.
+     */
     public void loop() {
         running = true;
         printStatusHeader();
@@ -211,6 +222,9 @@ public class CLIHandler {
         return String.format("%dm %02ds", remaining / 60, remaining % 60);
     }
 
+    /**
+     * Prints a boxed high-level status summary.
+     */
     public void printStatusHeader() {
         final int W = ServerConfiguration.STATUS_BOX_WIDTH;
 

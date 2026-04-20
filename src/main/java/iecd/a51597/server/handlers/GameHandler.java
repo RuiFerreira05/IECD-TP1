@@ -17,17 +17,26 @@ import iecd.a51597.server.store.UserStore;
 
 import java.util.Optional;
 
+/**
+ * Handles multiplayer game invitation and move lifecycle actions.
+ */
 public class GameHandler extends BaseHandler {
 
     private final UserStore userStore;
     private final GameManager gameManager;
 
+    /**
+     * Creates a game handler.
+     */
     public GameHandler(MessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, GameManager gameManager) {
         super(messageBuilder, sessionManager);
         this.userStore = userStore;
         this.gameManager = gameManager;
     }
 
+    /**
+     * Handles game invitation requests.
+     */
     public void gameInvite(Message message, Connection connection) {
         if (!requireConfiguredGame(message, connection)) return;
         Optional<Session> sessionOpt = requireSession(message, connection);
@@ -75,6 +84,9 @@ public class GameHandler extends BaseHandler {
         );
     }
 
+    /**
+     * Handles invitation acceptance/decline responses.
+     */
     public void gameInviteResponse(Message message, Connection connection) {
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
@@ -128,6 +140,9 @@ public class GameHandler extends BaseHandler {
         );
     }
 
+    /**
+     * Handles game move requests for active games.
+     */
     public void gameMove(Message message, Connection connection) {
         if (!requireConfiguredGame(message, connection)) return;
         Optional<Session> sessionOpt = requireSession(message, connection);
@@ -189,6 +204,9 @@ public class GameHandler extends BaseHandler {
         }
     }
 
+    /**
+     * Rejects client-originated game-over requests.
+     */
     public void gameOver(Message message, Connection connection) {
         // GAME_OVER is server-initiated (PUSH only), client should never send this
         sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "GAME_OVER is server-initiated only");

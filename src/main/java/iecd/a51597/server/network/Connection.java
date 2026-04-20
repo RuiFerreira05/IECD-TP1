@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
+/**
+ * Stateful TCP connection wrapper responsible for framed I/O and dispatch.
+ */
 public class Connection implements Runnable {
 
     private final Socket clientSocket;
@@ -24,6 +27,13 @@ public class Connection implements Runnable {
 
     private final MessageHandler messageHandler;
 
+    /**
+     * Creates a connection wrapper and initializes data streams.
+     *
+     * @param client accepted socket
+     * @param server owning server instance
+     * @param messageHandler frame handler
+     */
     public Connection(Socket client, Server server, MessageHandler messageHandler) {
         this.clientSocket   = client;
         this.server         = server;
@@ -41,6 +51,9 @@ public class Connection implements Runnable {
         }
     }
 
+    /**
+     * Blocking read loop for framed inbound messages.
+     */
     @Override
     public void run() {
         try {
@@ -80,6 +93,11 @@ public class Connection implements Runnable {
         }
     }
 
+    /**
+     * Sends one framed payload to the client.
+     *
+     * @param payload serialized protocol payload bytes
+     */
     public void sendMessage(byte[] payload) {
         if (payload == null) {return;}
         try {
@@ -93,10 +111,16 @@ public class Connection implements Runnable {
         }
     }
 
+    /**
+     * @return underlying client socket
+     */
     public Socket getClientSocket() {
         return clientSocket;
     }
 
+    /**
+     * Closes this connection and performs related cleanup.
+     */
     public void closeConnection() {
         if (clientSocket.isClosed()) return;
         server.removeConnection(this);

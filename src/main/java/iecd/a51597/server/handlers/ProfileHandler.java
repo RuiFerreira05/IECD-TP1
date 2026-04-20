@@ -13,15 +13,24 @@ import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
 import java.util.Optional;
 
+/**
+ * Handles user profile updates for authenticated sessions.
+ */
 public class ProfileHandler extends BaseHandler {
 
     private final UserStore userStore;
 
+    /**
+     * Creates a profile handler.
+     */
     public ProfileHandler(MessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore) {
         super(messageBuilder, sessionManager);
         this.userStore = userStore;
     }
 
+    /**
+     * Applies profile changes from an update request.
+     */
     public void updateProfile(Message message, Connection connection) {
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;

@@ -1,5 +1,8 @@
 package iecd.a51597.common.protocol.types;
 
+/**
+ * Canonical error codes returned by the server protocol.
+ */
 public enum ErrorCodeType {
     AUTH_FAILED,
     USERNAME_TAKEN,
@@ -17,6 +20,12 @@ public enum ErrorCodeType {
     UNEXPECTED_MESSAGE_ACTION,
     OUTDATED_PROTOCOL, GAME_NOT_FOUND;
 
+    /**
+     * Parses an error code string while accepting hyphen or underscore naming.
+     *
+     * @param string raw error code text
+     * @return parsed enum value, or {@code null} when unknown
+     */
     public static ErrorCodeType fromString(String string) {
         String normalized = string.replace("-", "_").toUpperCase();
         try { return ErrorCodeType.valueOf(normalized); }

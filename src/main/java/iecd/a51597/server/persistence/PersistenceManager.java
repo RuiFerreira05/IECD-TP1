@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Handles XML persistence of server state (currently user repository).
+ */
 public class PersistenceManager {
 
     private static final Logger logger = LogManager.getLogger(PersistenceManager.class);
@@ -37,6 +40,11 @@ public class PersistenceManager {
     private final TransformerFactory tf;
     private final Schema userSchema;
 
+    /**
+     * Creates a persistence manager for a user store.
+     *
+     * @param userStore target user store
+     */
     public PersistenceManager(UserStore userStore) {
         this.userStore = userStore;
         this.dbf = DocumentBuilderFactory.newInstance();
@@ -56,6 +64,9 @@ public class PersistenceManager {
 
     // ====== LOAD ======
 
+    /**
+     * Loads all persisted data into memory.
+     */
     public void load() {
         loadUsers();
         // TODO: loadLeaderboard();
@@ -132,6 +143,9 @@ public class PersistenceManager {
 
     // ====== SAVE ======
 
+    /**
+     * Saves in-memory state to persistence files.
+     */
     public void save() {
         saveUsers();
         // TODO: saveLeaderboard();

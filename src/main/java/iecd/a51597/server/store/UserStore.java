@@ -8,6 +8,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * In-memory user repository with username and id indexes.
+ */
 public class UserStore {
 
     // UUID -> User
@@ -16,7 +19,14 @@ public class UserStore {
     //Username -> User
     private final ConcurrentHashMap<String, User> usernameIndex = new ConcurrentHashMap<>();
 
-    // REGISTER
+    /**
+     * Registers a new user with a hashed password.
+     *
+     * @param username unique username
+     * @param password plaintext password
+     * @return created user
+     * @throws UsernameAlreadyTakenException when username already exists
+     */
     public User register(String username, String password) throws UsernameAlreadyTakenException {
         UUID userId = UUID.randomUUID();
         String passwordHash = hash(password);
@@ -31,6 +41,12 @@ public class UserStore {
     }
 
     // Package-private to allow controlled password hashing
+    /**
+     * Hashes a plaintext password using SHA-256.
+     *
+     * @param password plaintext password
+     * @return hex-encoded hash
+     */
     static String hash(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -43,7 +59,13 @@ public class UserStore {
         }
     }
 
-    // LOOKUP
+    /**
+     * Looks up a user by username and plaintext password.
+     *
+     * @param username username
+     * @param password plaintext password
+     * @return matching user when credentials are valid
+     */
     public Optional<User> findByCredentials(String username, String password) {
         User user = usernameIndex.get(username);
         String passwordHash = hash(password);
@@ -53,14 +75,28 @@ public class UserStore {
         return Optional.empty();
     }
 
+    /**
+     * @param userId user id
+     * @return user when present
+     */
     public Optional<User> findById(UUID userId) {
         return Optional.ofNullable(userMap.get(userId));
     }
 
+    /**
+     * @param username username
+     * @return user when present
+     */
     public Optional<User> findByUsername(String username) {
         return Optional.ofNullable(usernameIndex.get(username));
     }
 
+    /**
+     * Performs case-insensitive username substring search.
+     *
+     * @param query search text
+     * @return matching users
+     */
     public List<User> searchByUsername(String query) {
         List<User> users = new ArrayList<>();
         query = query.toLowerCase();
@@ -72,7 +108,13 @@ public class UserStore {
         return users;
     }
 
-     // UPDATE
+    /**
+     * Renames a user.
+     *
+     * @param user target user
+     * @param newUsername new unique username
+     * @throws UsernameAlreadyTakenException when target username is already taken
+     */
     public void updateUsername(User user, String newUsername) throws UsernameAlreadyTakenException {
         if (usernameIndex.putIfAbsent(newUsername, user) != null) {
             throw new UsernameAlreadyTakenException(newUsername);
@@ -90,22 +132,39 @@ public class UserStore {
         user.setPasswordHash(hash(newPlaintextPassword));
     }
 
+    /**
+     * Updates user photo metadata.
+     *
+     * @param user target user
+     * @param photo new photo value
+     */
     public void updatePhoto(User user, String photo) {
         user.setPhoto(photo);
     }
 
-    // DELETION
+    /**
+     * Deletes a user from all indexes.
+     *
+     * @param user target user
+     */
     public void delete(User user) {
         userMap.remove(user.getUserId());
         usernameIndex.remove(user.getUsername());
     }
 
-    // PERSISTENCE
+    /**
+     * Loads a user from persistence into the in-memory indexes.
+     *
+     * @param user user to add
+     */
     public void loadUser(User user) {
         userMap.put(user.getUserId(), user);
         usernameIndex.put(user.getUsername(), user);
     }
 
+    /**
+     * @return live collection of all stored users
+     */
     public Collection<User> getAllUsers() {
         return userMap.values();
     }

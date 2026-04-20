@@ -10,15 +10,24 @@ import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.server.store.UserStore;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
+/**
+ * Handles registration/login/logout protocol actions.
+ */
 public class AuthHandler extends BaseHandler {
 
     private final UserStore userStore;
 
+    /**
+     * Creates an auth handler.
+     */
     public AuthHandler(MessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore) {
         super(messageBuilder, sessionManager);
         this.userStore = userStore;
     }
 
+    /**
+     * Handles user registration requests.
+     */
     public void register(Message message, Connection connection) {
         MessageBody.Register body = (MessageBody.Register) message.body();
 
@@ -30,6 +39,9 @@ public class AuthHandler extends BaseHandler {
         }
     }
 
+    /**
+     * Handles user login requests.
+     */
     public void login(Message message, Connection connection) {
         MessageBody.Login body = (MessageBody.Login) message.body();
 
@@ -46,6 +58,9 @@ public class AuthHandler extends BaseHandler {
         );
     }
 
+    /**
+     * Handles logout requests by invalidating the current session.
+     */
     public void logout(Message message, Connection connection) {
         if (requireSession(message, connection).isEmpty()) return;
 

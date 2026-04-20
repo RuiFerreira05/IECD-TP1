@@ -22,11 +22,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * DOM-based {@link MessageBuilder} implementation that emits XML protocol payloads.
+ */
 public class XMLMessageBuilder implements MessageBuilder {
 
     private final DocumentBuilderFactory dbf;
     private final TransformerFactory tf;
 
+    /**
+     * Creates a builder with JAXP factories configured for namespace-aware documents.
+     */
     public XMLMessageBuilder() {
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(false);
@@ -121,11 +127,17 @@ public class XMLMessageBuilder implements MessageBuilder {
 
     // ====== GENERIC ======
 
+    /**
+     * Creates a generic error payload for malformed frames with no parsed id.
+     */
     @Override
     public byte[] errorNoId(ErrorCodeType errorCode, String description) {
         return error(ProtocolConstants.ERROR_NO_ID, ActionType.UNKNOWN, errorCode, description);
     }
 
+    /**
+     * Creates a correlated error response payload.
+     */
     @Override
     public byte[] error(UUID messageId, ActionType actionType, ErrorCodeType errorCode, String description) {
         MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, actionType);
@@ -142,6 +154,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a correlated success response payload.
+     */
     @Override
     public byte[] ok(UUID messageId, ActionType actionType) {
         MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, actionType);
@@ -151,6 +166,9 @@ public class XMLMessageBuilder implements MessageBuilder {
 
     // ====== AUTH ======
 
+    /**
+     * Creates a successful login response payload containing session and user profile data.
+     */
     @Override
     public byte[] loginSuccess(UUID messageId, UUID sessionToken, User user) {
         MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, ActionType.LOGIN);
@@ -166,6 +184,9 @@ public class XMLMessageBuilder implements MessageBuilder {
 
     // ====== SEARCH ======
 
+    /**
+     * Creates a successful search response payload with all matching users.
+     */
     @Override
     public byte[] searchUsersSuccess(UUID messageId, List<User> results) {
         MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, ActionType.SEARCH_USERS);
@@ -185,6 +206,9 @@ public class XMLMessageBuilder implements MessageBuilder {
 
     // ====== GAME ======
 
+    /**
+     * Creates an invitation acknowledgement for the inviter.
+     */
     @Override
     public byte[] gameInviteResponse(UUID messageId, UUID gameId) {
         MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, ActionType.GAME_INVITE);
@@ -197,6 +221,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a push payload for the invited user.
+     */
     @Override
     public byte[] gameInvitePush(UUID gameId, User fromUser) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_INVITE);
@@ -210,6 +237,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a push payload indicating that an invitation was accepted.
+     */
     @Override
     public byte[] gameInviteAcceptedPush(UUID gameId, User opponent) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_INVITE_RESPONSE);
@@ -223,6 +253,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a push payload indicating that an invitation was declined.
+     */
     @Override
     public byte[] gameInviteDeclinedPush(UUID gameId) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_INVITE_RESPONSE);
@@ -235,6 +268,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a push payload propagating an accepted move.
+     */
     @Override
     public byte[] gameMovePush(UUID gameId, String rawMove) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_MOVE);
@@ -250,6 +286,9 @@ public class XMLMessageBuilder implements MessageBuilder {
         return serialize(doc);
     }
 
+    /**
+     * Creates a game-over push payload.
+     */
     @Override
     public byte[] gameOverPush(UUID gameId, User winner) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_OVER);

@@ -23,11 +23,17 @@ import javax.xml.validation.Validator;
 import java.io.InputStream;
 import java.util.UUID;
 
+/**
+ * XML implementation of {@link CommParser} backed by {@code protocol.xsd} validation.
+ */
 public class XMLParser implements CommParser {
 
     private final Schema schema;
     private final DocumentBuilderFactory dbf;
 
+    /**
+     * Creates a parser and loads protocol schema resources from the classpath.
+     */
     public XMLParser() {
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -54,6 +60,13 @@ public class XMLParser implements CommParser {
         return schema.newValidator();
     }
 
+    /**
+     * Parses and validates a single XML protocol message.
+     *
+     * @param input input stream with XML payload bytes
+     * @return parsed immutable message
+     * @throws CommException when parsing or schema validation fails
+     */
     @Override
     public Message parseMessage(InputStream input) throws CommException {
 
@@ -73,6 +86,9 @@ public class XMLParser implements CommParser {
         return createMessage(doc);
     }
 
+    /**
+     * Materializes a protocol message instance from a validated XML document.
+     */
     private Message createMessage(Document doc) throws MalformedMessageException {
         Element root = doc.getDocumentElement();
 
@@ -93,6 +109,9 @@ public class XMLParser implements CommParser {
         return new Message(messageId, type, version, action, sessionToken, parseBody(action, body));
     }
 
+    /**
+     * Parses action-specific payload fields from the body element.
+     */
     private MessageBody parseBody(ActionType action, Element body) throws MalformedMessageException {
         return switch (action) {
             case REGISTER -> new MessageBody.Register(require(body, "username"), require(body, "password"));
@@ -108,6 +127,9 @@ public class XMLParser implements CommParser {
         };
     }
 
+    /**
+     * Reads a required textual field.
+     */
     private String require(Element parent, String tag) throws MalformedMessageException {
         String value = getField(parent, tag);
         if (value == null)
@@ -115,6 +137,9 @@ public class XMLParser implements CommParser {
         return value;
     }
 
+    /**
+     * Reads a required UUID field.
+     */
     private UUID requireUUID(Element parent, String tag) throws MalformedMessageException {
         try {
             return UUID.fromString(require(parent, tag));
@@ -123,6 +148,9 @@ public class XMLParser implements CommParser {
         }
     }
 
+    /**
+     * Reads a required child element.
+     */
     private Element requireElement(Element parent, String tag) throws MalformedMessageException {
         var nodes = parent.getElementsByTagName(tag);
         if (nodes.getLength() == 0)
@@ -130,12 +158,18 @@ public class XMLParser implements CommParser {
         return (Element) nodes.item(0);
     }
 
+    /**
+     * Reads the first matching child tag text, or {@code null} when absent.
+     */
     private String getField(Element rootElement, String tag) {
         NodeList nodes = rootElement.getElementsByTagName(tag);
         if (nodes.getLength() == 0) return null;
         return nodes.item(0).getTextContent().trim();
     }
 
+    /**
+     * Validates an XML document against the protocol schema.
+     */
     private void validateMessage(Document document, Validator validator) throws MalformedMessageException {
         try {
             validator.validate(new DOMSource(document));

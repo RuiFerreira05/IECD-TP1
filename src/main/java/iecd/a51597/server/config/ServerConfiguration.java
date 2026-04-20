@@ -14,6 +14,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.File;
 
+/**
+ * Global server configuration loaded from {@code config.xml}.
+ */
 public final class ServerConfiguration {
 
     private static final String CONFIG_FILE = "config.xml";
@@ -23,13 +26,22 @@ public final class ServerConfiguration {
 
     // CONSTS
 
+    /** Default TCP listening port. */
     public static int DEFAULT_PORT = 5555;
+    /** Maximum accepted frame payload size in bytes. */
     public static int MAX_FRAME_SIZE = 1024 * 1024;
+    /** Session timeout in seconds. */
     public static long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
+    /** User persistence file path. */
     public static String USER_STORE = "data/users.xml";
+    /** Width used by CLI status box rendering. */
     public static int STATUS_BOX_WIDTH = 42;
+    /** Supported protocol version string. */
     public static String PROTOCOL_VERSION = "1.0";
 
+    /**
+     * Loads configuration overrides from {@code config.xml} when present and valid.
+     */
     public static void load() {
         File file = new File(CONFIG_FILE);
         if (!file.exists()) {

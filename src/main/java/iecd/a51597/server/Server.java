@@ -21,6 +21,9 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main server singleton composing networking, protocol handling, sessions, and persistence.
+ */
 public class Server {
 
     private static volatile Server instance;
@@ -65,18 +68,33 @@ public class Server {
         // registerGameFactory(GAME GOES HERE);
     }
 
+    /**
+     * Registers a pluggable game factory used for invite/move handling.
+     *
+     * @param factory game factory implementation
+     */
     public void registerGameFactory(GameFactory factory) {
         gameManager.registerFactory(factory);
     }
 
+    /** @return central frame/message handler */
     public MessageHandler getMessageHandler() { return messageHandler; }
+    /** @return listener thread or {@code null} when not started */
     public ListenerThread getListener() { return listener; }
+    /** @return message builder */
     public MessageBuilder getMessageBuilder() { return messageBuilder; }
+    /** @return communication parser */
     public CommParser getCommParser() { return commParser; }
+    /** @return session manager */
     public SessionManager getSessionManager() { return sessionManager; }
+    /** @return user store */
     public UserStore getUserStore() { return userStore; }
+    /** @return game manager */
     public GameManager getGameManager() { return gameManager; }
 
+    /**
+     * Returns the singleton server instance.
+     */
     public static Server getInstance() {
         if (instance == null) {
             synchronized (Server.class) {
@@ -88,14 +106,23 @@ public class Server {
         return instance;
     }
 
+    /**
+     * @return snapshot of currently tracked connections
+     */
     public List<Connection> getConnections() {
         synchronized (connections) { return List.copyOf(connections); }
     }
 
+    /**
+     * Adds a connection to server tracking.
+     */
     public void addConnection(Connection connection) {
         synchronized (connections) { connections.add(connection); }
     }
 
+    /**
+     * Removes a connection from server tracking.
+     */
     public void removeConnection(Connection connection) {
         synchronized (connections) { connections.remove(connection); }
     }
@@ -111,12 +138,18 @@ public class Server {
         }
     }
 
+    /**
+     * Starts listener and CLI loops.
+     */
     void loop() {
         Thread cliThread = new Thread(cliHandler::loop);
         this.startListener();
         cliThread.start();
     }
 
+    /**
+     * Starts listener on an explicit port.
+     */
     public void startListener(int port) {
         if (!this.isListening()) {
             listener = new ListenerThread(port, this);
@@ -125,11 +158,17 @@ public class Server {
         }
     }
 
+    /**
+     * Starts listener on configured startup port.
+     */
     public void startListener() {
         logger.info("Starting Listener thread with default port: {}", this.port);
         startListener(this.port);
     }
 
+    /**
+     * Stops accepting new connections.
+     */
     public void stopListener() {
         if (this.isListening()) {
             this.listener.stopListener();
@@ -137,10 +176,16 @@ public class Server {
         }
     }
 
+    /**
+     * @return {@code true} when listener thread is active
+     */
     public boolean isListening() {
         return this.listener != null && this.listener.isRunning();
     }
 
+    /**
+     * Gracefully shuts down listener, persists data, and closes active connections.
+     */
     public void shutdown() {
         stopListener();
         persistenceManager.save();
@@ -153,12 +198,17 @@ public class Server {
         logger.info("Server shutdown complete");
     }
 
+    /** @return default startup port */
     public int getStartupPort() { return this.port; }
 
+    /** @return leaderboard projection */
     public Leaderboard getLeaderboard() {
         return leaderboard;
     }
 
+    /**
+     * Application entry point.
+     */
     public static void main(String[] args) {
         Server server = Server.getInstance();
         server.handleCLIParams(args);
