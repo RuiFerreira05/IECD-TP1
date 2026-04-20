@@ -1,16 +1,13 @@
 package iecd.a51597.client.cli;
 
 import iecd.a51597.client.Client;
-import iecd.a51597.client.cli.screens.MainMenuScreen;
+import iecd.a51597.client.cli.screens.impl.MainMenuScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Interactive administrative command-line interface for runtime server control.
@@ -32,10 +29,11 @@ public class ClientCliHandler {
     public void loop() {
         running = true;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            stateMachine.transitionTo("main");
             while (running) {
                 System.out.println();
                 stateMachine.currentScreen.display();
-                System.out.print("\n"+stateMachine.currentScreen.carat);
+                System.out.print("\n"+stateMachine.currentScreen.prompt);
                 String input = reader.readLine();
                 if (input == null) {
                     break;
