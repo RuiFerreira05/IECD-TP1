@@ -13,6 +13,9 @@
         <File name="PROTOCOL" fileName="logs/protocol.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <File name="CLIENT-LOG" fileName="logs/client-log.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="WARN">
@@ -38,6 +41,9 @@
         </Logger>
         <Logger name="iecd.a51597.server.persistence.PersistenceManager" level="ALL" additivity="false">
             <AppenderRef ref="MAIN"/>
+        </Logger>
+        <Logger name="iecd.a51597.client.cli.ClientCliHandler" level="ALL" additivity="false">
+            <AppenderRef ref="CLIENT-LOG"/>
         </Logger>
     </Loggers>
 </Configuration>
