@@ -1,4 +1,4 @@
-package iecd.a51597.common.protocol.builders;
+package iecd.a51597.common.protocol.builders.server;
 
 import iecd.a51597.server.store.User;
 import iecd.a51597.common.protocol.types.ActionType;
@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * Builds framed protocol messages serialized as XML payload bytes.
  */
-public interface MessageBuilder {
+public interface ServerMessageBuilder {
 
     /**
      * Builds an error response for messages where no id could be parsed.

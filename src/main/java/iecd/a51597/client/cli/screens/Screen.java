@@ -2,6 +2,7 @@ package iecd.a51597.client.cli.screens;
 
 import iecd.a51597.client.Client;
 import iecd.a51597.client.cli.StateMachine;
+import iecd.a51597.client.cli.network.Push;
 import iecd.a51597.client.config.ClientConfiguration;
 
 public abstract class Screen {
@@ -19,6 +20,8 @@ public abstract class Screen {
     abstract public void display();
 
     abstract public void handleInput(String input);
+
+    abstract public void handlePush(Push push);
 
     abstract public void onEnter();
 

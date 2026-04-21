@@ -3,7 +3,7 @@ package iecd.a51597.server.handlers;
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.common.protocol.Message;
-import iecd.a51597.common.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
 import iecd.a51597.common.protocol.exceptions.CommException;
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.common.protocol.exceptions.MessageParseException;
@@ -19,7 +19,7 @@ import java.io.ByteArrayInputStream;
 public class MessageHandler {
 
     private final CommParser commParser;
-    private final MessageBuilder messageBuilder;
+    private final ServerMessageBuilder messageBuilder;
     private final AuthHandler authHandler;
     private final ProfileHandler profileHandler;
     private final SearchHandler searchHandler;
@@ -28,7 +28,7 @@ public class MessageHandler {
     /**
      * Creates a dispatcher with all action handlers.
      */
-    public MessageHandler(CommParser commParser, MessageBuilder messageBuilder,
+    public MessageHandler(CommParser commParser, ServerMessageBuilder messageBuilder,
                           AuthHandler authHandler, ProfileHandler profileHandler,
                           SearchHandler searchHandler, GameHandler gameHandler) {
         this.commParser = commParser;

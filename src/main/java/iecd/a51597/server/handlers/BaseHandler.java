@@ -4,7 +4,7 @@ import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.protocol.Message;
-import iecd.a51597.common.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public abstract class BaseHandler {
 
-    protected final MessageBuilder messageBuilder;
+    protected final ServerMessageBuilder messageBuilder;
     protected final SessionManager sessionManager;
 
     /**
@@ -23,7 +23,7 @@ public abstract class BaseHandler {
      * @param messageBuilder response builder
      * @param sessionManager session manager
      */
-    protected BaseHandler(MessageBuilder messageBuilder, SessionManager sessionManager) {
+    protected BaseHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager) {
         this.messageBuilder = messageBuilder;
         this.sessionManager = sessionManager;
     }

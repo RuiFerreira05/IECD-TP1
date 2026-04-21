@@ -35,6 +35,9 @@ public final class ClientConfiguration {
     /** Default prompt style for use in the cli (This value has no effect over screen that override their own prompt) */
     public static String DEFAULT_PROMPT = ">> ";
 
+    /** Client current communication protocol version */
+    public static String PROTOCOL_VERSION = "1.0";
+
     /**
      * Loads configuration overrides from {@code client_config.xml} when present and valid.
      */
@@ -60,6 +63,7 @@ public final class ClientConfiguration {
             SERVER_IP = parseString(root, "serverIP", SERVER_IP);
             SERVER_PORT = parseInt(root, "serverPort", SERVER_PORT);
             DEFAULT_PROMPT = parseString(root, "defaultPrompt", DEFAULT_PROMPT) + " ";
+            PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {

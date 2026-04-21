@@ -10,7 +10,7 @@ import iecd.a51597.server.game.Game;
 import iecd.a51597.server.game.MoveResult;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
-import iecd.a51597.common.protocol.builders.MessageBuilder;
+import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.server.store.User;
 import iecd.a51597.server.store.UserStore;
@@ -28,7 +28,7 @@ public class GameHandler extends BaseHandler {
     /**
      * Creates a game handler.
      */
-    public GameHandler(MessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, GameManager gameManager) {
+    public GameHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, GameManager gameManager) {
         super(messageBuilder, sessionManager);
         this.userStore = userStore;
         this.gameManager = gameManager;

@@ -8,8 +8,8 @@ import iecd.a51597.server.handlers.*;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.network.ListenerThread;
 import iecd.a51597.server.persistence.PersistenceManager;
-import iecd.a51597.common.protocol.builders.MessageBuilder;
-import iecd.a51597.common.protocol.builders.XMLMessageBuilder;
+import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
+import iecd.a51597.common.protocol.builders.server.XMLServerMessageBuilder;
 import iecd.a51597.common.protocol.parsers.CommParser;
 import iecd.a51597.common.protocol.parsers.XMLParser;
 import iecd.a51597.server.session.SessionManager;
@@ -32,7 +32,7 @@ public class Server {
     private ListenerThread listener;
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
-    private final MessageBuilder messageBuilder;
+    private final ServerMessageBuilder messageBuilder;
     private final MessageHandler messageHandler;
     private final GameManager gameManager = new GameManager();
     private final UserStore userStore;
@@ -50,7 +50,7 @@ public class Server {
 
         this.port = ServerConfiguration.DEFAULT_PORT;
         this.cliHandler = new CLIHandler(this);
-        this.messageBuilder = new XMLMessageBuilder();
+        this.messageBuilder = new XMLServerMessageBuilder();
         this.commParser = new XMLParser();
         this.userStore = new UserStore();
         this.leaderboard = new Leaderboard(userStore);
@@ -82,7 +82,7 @@ public class Server {
     /** @return listener thread or {@code null} when not started */
     public ListenerThread getListener() { return listener; }
     /** @return message builder */
-    public MessageBuilder getMessageBuilder() { return messageBuilder; }
+    public ServerMessageBuilder getMessageBuilder() { return messageBuilder; }
     /** @return communication parser */
     public CommParser getCommParser() { return commParser; }
     /** @return session manager */

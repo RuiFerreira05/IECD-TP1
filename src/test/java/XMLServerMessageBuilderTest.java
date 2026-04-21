@@ -1,5 +1,5 @@
 import iecd.a51597.common.protocol.ProtocolConstants;
-import iecd.a51597.common.protocol.builders.XMLMessageBuilder;
+import iecd.a51597.common.protocol.builders.server.XMLServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.server.config.ServerConfiguration;
@@ -20,9 +20,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class XMLMessageBuilderTest {
+class XMLServerMessageBuilderTest {
 
-    private XMLMessageBuilder builder;
+    private XMLServerMessageBuilder builder;
     private static final UUID MSG_ID  = UUID.randomUUID();
     private static final UUID SES_ID  = UUID.randomUUID();
     private static final UUID GAME_ID = UUID.randomUUID();
@@ -30,7 +30,7 @@ class XMLMessageBuilderTest {
     @BeforeEach
     void setUp() {
         ServerConfiguration.PROTOCOL_VERSION = "1.0";
-        builder = new XMLMessageBuilder();
+        builder = new XMLServerMessageBuilder();
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────

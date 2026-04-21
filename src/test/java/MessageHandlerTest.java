@@ -1,4 +1,4 @@
-import iecd.a51597.common.protocol.builders.XMLMessageBuilder;
+import iecd.a51597.common.protocol.builders.server.XMLServerMessageBuilder;
 import iecd.a51597.common.protocol.parsers.XMLParser;
 import iecd.a51597.common.protocol.ProtocolConstants;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
@@ -44,7 +44,7 @@ class MessageHandlerTest {
     void setUp() {
         ServerConfiguration.PROTOCOL_VERSION = "1.0";
 
-        XMLMessageBuilder builder = new XMLMessageBuilder();
+        XMLServerMessageBuilder builder = new XMLServerMessageBuilder();
         parser = new XMLParser();
         UserStore userStore = new UserStore();
         SessionManager sessionManager = new SessionManager();

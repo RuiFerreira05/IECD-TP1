@@ -1,4 +1,4 @@
-package iecd.a51597.common.protocol.builders;
+package iecd.a51597.common.protocol.builders.server;
 
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.store.PlayerStats;
@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * DOM-based {@link MessageBuilder} implementation that emits XML protocol payloads.
+ * DOM-based {@link ServerMessageBuilder} implementation that emits XML protocol payloads.
  */
-public class XMLMessageBuilder implements MessageBuilder {
+public class XMLServerMessageBuilder implements ServerMessageBuilder {
 
     private final DocumentBuilderFactory dbf;
     private final TransformerFactory tf;
@@ -33,7 +33,7 @@ public class XMLMessageBuilder implements MessageBuilder {
     /**
      * Creates a builder with JAXP factories configured for namespace-aware documents.
      */
-    public XMLMessageBuilder() {
+    public XMLServerMessageBuilder() {
         dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(false);
         dbf.setIgnoringComments(true);
