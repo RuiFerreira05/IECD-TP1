@@ -44,7 +44,7 @@ public abstract class OptionScreen extends Screen {
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a number.");
         }
-    };
+    }
 
     protected void addOption(String description, Runnable action, BooleanSupplier condition) {
         options.add(new ScreenOption(description, action, condition));

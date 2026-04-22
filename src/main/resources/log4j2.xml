@@ -21,31 +21,24 @@
         <Root level="WARN">
             <AppenderRef ref="MAIN"/>
         </Root>
-        <Logger name="iecd.a51597.server.consoleLog" level="ALL" additivity="false">
-            <AppenderRef ref="CONSOLE_LOGGER"/>
-        </Logger>
-        <Logger name="iecd.a51597.server.Server" level="ALL" additivity="false">
+
+        <Logger name="consoleLogger" level="INFO" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.network.ListenerThread" level="ALL" additivity="false">
+
+        <Logger name="iecd.a51597.server" level="INFO" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
-        <Logger name="iecd.a51597.server.cli.CLIHandler" level="ALL" additivity="false">
-            <AppenderRef ref="MAIN"/>
-        </Logger>
-        <Logger name="iecd.a51597.server.network.Connection" level="ALL" additivity="false">
+
+        <Logger name="iecd.a51597.server.network" level="DEBUG" additivity="false">
             <AppenderRef ref="CLIENTS"/>
         </Logger>
-        <Logger name="iecd.a51597.server.protocol" level="ALL">
+
+        <Logger name="iecd.a51597.server.protocol" level="DEBUG" additivity="false">
             <AppenderRef ref="PROTOCOL"/>
         </Logger>
-        <Logger name="iecd.a51597.server.persistence.PersistenceManager" level="ALL" additivity="false">
-            <AppenderRef ref="MAIN"/>
-        </Logger>
-        <Logger name="iecd.a51597.client" level="ALL" additivity="false">
-            <AppenderRef ref="CLIENT-LOG"/>
-        </Logger>
-        <Logger name="iecd.a51597.client.config.ClientConfiguration" level="ALL" additivity="false">
+
+        <Logger name="iecd.a51597.client" level="INFO" additivity="false">
             <AppenderRef ref="CLIENT-LOG"/>
         </Logger>
     </Loggers>
