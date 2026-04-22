@@ -6,6 +6,8 @@ import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
@@ -16,6 +18,9 @@ public abstract class BaseHandler {
 
     protected final ServerMessageBuilder messageBuilder;
     protected final SessionManager sessionManager;
+
+    // Inherited by concrete handlers so logs are tagged with subclass type.
+    protected final Logger logger = LogManager.getLogger(getClass());
 
     /**
      * Creates a base handler.

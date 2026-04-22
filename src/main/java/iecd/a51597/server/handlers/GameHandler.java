@@ -44,21 +44,43 @@ public class GameHandler extends BaseHandler {
         Session session = sessionOpt.get();
 
         User sender = session.getUser();
+        MessageBody.GameInviteRequest body = (MessageBody.GameInviteRequest) message.body();
+
+        logger.debug(
+                "Processing game invite request: messageId={}, senderUserId={}, targetUserId={}",
+                message.messageId(),
+                sender.getUserId(),
+                body.targetUserId()
+        );
 
         if (gameManager.isInGame(sender.getUserId())) {
+            logger.warn(
+                    "Rejected game invite: sender already in game: messageId={}, senderUserId={}",
+                    message.messageId(),
+                    sender.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.ALREADY_IN_GAME, "You are already in a game");
             return;
         }
 
-        MessageBody.GameInviteRequest body = (MessageBody.GameInviteRequest) message.body();
-
         if (body.targetUserId().equals(sender.getUserId())) {
+            logger.warn(
+                    "Rejected game invite: sender attempted to invite self: messageId={}, senderUserId={}",
+                    message.messageId(),
+                    sender.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Cannot invite yourself to a game");
             return;
         }
 
         Optional<User> targetOpt = userStore.findById(body.targetUserId());
         if (targetOpt.isEmpty()) {
+            logger.warn(
+                    "Rejected game invite: target user not found: messageId={}, senderUserId={}, targetUserId={}",
+                    message.messageId(),
+                    sender.getUserId(),
+                    body.targetUserId()
+            );
             sendError(message, connection, ErrorCodeType.USER_NOT_FOUND, "Target user does not exist");
             return;
         }
@@ -66,17 +88,37 @@ public class GameHandler extends BaseHandler {
 
         Optional<Session> targetSessionOpt = sessionManager.getSessionByUserId(target.getUserId());
         if (targetSessionOpt.isEmpty()) {
+            logger.info(
+                    "Rejected game invite: target user offline: messageId={}, senderUserId={}, targetUserId={}",
+                    message.messageId(),
+                    sender.getUserId(),
+                    target.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.USER_NOT_ONLINE, "Target user is not online");
             return;
         }
         Session targetSession = targetSessionOpt.get();
 
         if (gameManager.isInGame(target.getUserId())) {
+            logger.info(
+                    "Rejected game invite: target already in game: messageId={}, senderUserId={}, targetUserId={}",
+                    message.messageId(),
+                    sender.getUserId(),
+                    target.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.ALREADY_IN_GAME, "Target user is already in a game");
             return;
         }
 
         Game game = gameManager.createPendingGame(sender, target);
+
+        logger.info(
+                "Created pending game invitation: messageId={}, gameId={}, inviterUserId={}, invitedUserId={}",
+                message.messageId(),
+                game.getGameId(),
+                sender.getUserId(),
+                target.getUserId()
+        );
 
         connection.sendMessage(messageBuilder.gameInviteResponse(message.messageId(), game.getGameId()));
         targetSession.getConnection().sendMessage(
@@ -91,18 +133,35 @@ public class GameHandler extends BaseHandler {
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
         Session session = sessionOpt.get();
+        User responder = session.getUser();
+        MessageBody.GameInviteResponseRequest body = (MessageBody.GameInviteResponseRequest) message.body();
+
+        logger.debug(
+                "Processing game invite response: messageId={}, responderUserId={}, gameId={}, accept={}",
+                message.messageId(),
+                responder.getUserId(),
+                body.gameId(),
+                body.accept()
+        );
 
         if (gameManager.isInGame(session.getUserId())) {
+            logger.warn(
+                    "Rejected game invite response: responder already in game: messageId={}, responderUserId={}",
+                    message.messageId(),
+                    responder.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.ALREADY_IN_GAME, "You are already in a game");
             return;
         }
 
-        User responder = session.getUser();
-
-        MessageBody.GameInviteResponseRequest body = (MessageBody.GameInviteResponseRequest) message.body();
-
         Optional<Game> gameOpt = gameManager.getPendingGame(body.gameId());
         if (gameOpt.isEmpty()) {
+            logger.warn(
+                    "Rejected game invite response: pending game not found: messageId={}, responderUserId={}, gameId={}",
+                    message.messageId(),
+                    responder.getUserId(),
+                    body.gameId()
+            );
             sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
             return;
         }
@@ -112,6 +171,13 @@ public class GameHandler extends BaseHandler {
 
         // Edge case just to prevent game invite high-jacking, not even sure if it would trigger but might as well
         if (!responder.getUserId().equals(game.getPlayer2().getUserId())) {
+            logger.warn(
+                    "Rejected game invite response: responder is not invited player: messageId={}, responderUserId={}, gameId={}, invitedUserId={}",
+                    message.messageId(),
+                    responder.getUserId(),
+                    game.getGameId(),
+                    game.getPlayer2().getUserId()
+            );
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not the invited player");
             return;
         }
@@ -120,12 +186,26 @@ public class GameHandler extends BaseHandler {
 
         if (inviterSessionOpt.isEmpty()) {
             gameManager.declineGame(game.getGameId());
+            logger.warn(
+                    "Declined pending game because inviter went offline: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
+                    message.messageId(),
+                    game.getGameId(),
+                    inviter.getUserId(),
+                    responder.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.USER_NOT_ONLINE, "The inviting player is no longer online");
             return;
         }
 
         if (!body.accept()) {
             gameManager.declineGame(game.getGameId());
+            logger.info(
+                    "Invite declined: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
+                    message.messageId(),
+                    game.getGameId(),
+                    inviter.getUserId(),
+                    responder.getUserId()
+            );
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
             inviterSessionOpt.ifPresent(s ->
                 s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId()))
@@ -134,6 +214,13 @@ public class GameHandler extends BaseHandler {
         }
 
         gameManager.acceptGame(game.getGameId());
+        logger.info(
+                "Invite accepted and game activated: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
+                message.messageId(),
+                game.getGameId(),
+                inviter.getUserId(),
+                responder.getUserId()
+        );
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
         inviterSessionOpt.ifPresent(s ->
                 s.getConnection().sendMessage(messageBuilder.gameInviteAcceptedPush(game.getGameId(), responder))
@@ -152,8 +239,22 @@ public class GameHandler extends BaseHandler {
         User player = session.getUser();
         MessageBody.GameMove body = (MessageBody.GameMove) message.body();
 
+        logger.debug(
+                "Processing game move request: messageId={}, gameId={}, playerUserId={}, rawMoveBytes={}",
+                message.messageId(),
+                body.gameId(),
+                player.getUserId(),
+                body.rawMove().length
+        );
+
         Optional<Game> gameOpt = gameManager.getGame(body.gameId());
         if (gameOpt.isEmpty()) {
+            logger.warn(
+                    "Rejected game move: game not found: messageId={}, gameId={}, playerUserId={}",
+                    message.messageId(),
+                    body.gameId(),
+                    player.getUserId()
+            );
             sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
             return;
         }
@@ -164,6 +265,14 @@ public class GameHandler extends BaseHandler {
         // I'm kinda overkill
         if (!player.getUserId().equals(game.getPlayer1().getUserId())
                 && !player.getUserId().equals(game.getPlayer2().getUserId())) {
+            logger.warn(
+                    "Rejected game move: player is not part of game: messageId={}, gameId={}, playerUserId={}, player1UserId={}, player2UserId={}",
+                    message.messageId(),
+                    game.getGameId(),
+                    player.getUserId(),
+                    game.getPlayer1().getUserId(),
+                    game.getPlayer2().getUserId()
+            );
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not a player in this game");
             return;
         }
@@ -172,12 +281,25 @@ public class GameHandler extends BaseHandler {
         try {
             move = gameManager.getCodec().deserialize(body.rawMove());
         } catch (MalformedMessageException e) {
+            logger.warn(
+                    "Rejected game move: malformed move payload: messageId={}, gameId={}, playerUserId={}, rawMoveBytes={}",
+                    message.messageId(),
+                    game.getGameId(),
+                    player.getUserId(),
+                    body.rawMove().length
+            );
             sendError(message, connection, ErrorCodeType.MALFORMED_REQUEST, "Invalid move payload");
             return;
         }
 
         switch (game.applyMove(player, move)) {
             case MoveResult.Accepted() -> {
+                logger.debug(
+                        "Accepted game move: messageId={}, gameId={}, playerUserId={}",
+                        message.messageId(),
+                        game.getGameId(),
+                        player.getUserId()
+                );
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
                 User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
                         ? game.getPlayer2() : game.getPlayer1();
@@ -187,9 +309,24 @@ public class GameHandler extends BaseHandler {
                         )
                 );
             }
-            case MoveResult.Rejected(String reason) ->
+            case MoveResult.Rejected(String reason) -> {
+                logger.info(
+                        "Rejected game move by game rules: messageId={}, gameId={}, playerUserId={}, reason={}",
+                        message.messageId(),
+                        game.getGameId(),
+                        player.getUserId(),
+                        reason
+                );
                     sendError(message, connection, ErrorCodeType.INVALID_MOVE, reason);
+            }
             case MoveResult.GameOver(User winner) -> {
+                logger.info(
+                        "Game over reached after move: messageId={}, gameId={}, playerUserId={}, winnerUserId={}",
+                        message.messageId(),
+                        game.getGameId(),
+                        player.getUserId(),
+                        winner.getUserId()
+                );
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
                 User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
                         ? game.getPlayer2() : game.getPlayer1();
@@ -200,6 +337,7 @@ public class GameHandler extends BaseHandler {
                 );
                 pushGameOver(game, winner);
                 gameManager.endGame(game.getGameId());
+                logger.info("Closed active game: gameId={}, winnerUserId={}", game.getGameId(), winner.getUserId());
             }
         }
     }
@@ -209,10 +347,22 @@ public class GameHandler extends BaseHandler {
      */
     public void gameOver(Message message, Connection connection) {
         // GAME_OVER is server-initiated (PUSH only), client should never send this
+        logger.warn(
+                "Rejected client-originated GAME_OVER request: messageId={}, sessionTokenPresent={}",
+                message.messageId(),
+                message.sessionToken() != null
+        );
         sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "GAME_OVER is server-initiated only");
     }
 
     private void pushGameOver(Game game, User winner) {
+        logger.info(
+                "Broadcasting game over event: gameId={}, winnerUserId={}, player1UserId={}, player2UserId={}",
+                game.getGameId(),
+                winner.getUserId(),
+                game.getPlayer1().getUserId(),
+                game.getPlayer2().getUserId()
+        );
         byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner);
         sessionManager.getSessionByUserId(game.getPlayer1().getUserId())
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
@@ -224,6 +374,11 @@ public class GameHandler extends BaseHandler {
         if (gameManager.hasFactory()) {
             return true;
         } else {
+            logger.error(
+                    "Rejected game action: no game factory configured: messageId={}, actionType={}",
+                    message.messageId(),
+                    message.actionType()
+            );
             sendError(message, connection, ErrorCodeType.INTERNAL_ERROR, "No game is configured on this server");
             return false;
         }
