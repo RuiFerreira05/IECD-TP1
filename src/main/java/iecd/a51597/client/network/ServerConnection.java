@@ -34,7 +34,7 @@ public class ServerConnection implements Runnable {
     private ClientMessageBuilder messageBuilder;
     private int reconnectAttempts;
 
-    private ClientSessionManager sessionManager;
+    private ClientSessionManager sessionManager = null;
 
     public final Logger logger = LogManager.getLogger(ServerConnection.class);
 
@@ -45,7 +45,6 @@ public class ServerConnection implements Runnable {
         this.messageBuilder = messageBuilder;
 
         this.pendingRequests = new ConcurrentHashMap<>();
-        this.sessionManager = new ClientSessionManager(this);
         this.reconnectAttempts = ClientConfiguration.RECONNECT_ATTEMPTS;
     }
 
@@ -147,10 +146,14 @@ public class ServerConnection implements Runnable {
     }
 
     private void persistSession() {
-        
+
     }
 
     public ClientSessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    public void setSessionManager(ClientSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
     }
 }

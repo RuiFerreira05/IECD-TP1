@@ -32,8 +32,8 @@ public class ClientCliHandler {
             stateMachine.transitionTo("main");
             while (running) {
                 System.out.println();
-                stateMachine.currentScreen.display();
-                System.out.print("\n"+stateMachine.currentScreen.prompt);
+                stateMachine.getCurrentScreen().display();
+                System.out.print("\n"+stateMachine.getCurrentScreen().prompt);
                 String input = reader.readLine();
                 if (input == null) {
                     break;
@@ -42,7 +42,7 @@ public class ClientCliHandler {
                 if (input.isEmpty()) {
                     continue;
                 }
-                stateMachine.currentScreen.handleInput(input);
+                stateMachine.getCurrentScreen().handleInput(input);
             }
         } catch (IOException e) {
             if (running) {

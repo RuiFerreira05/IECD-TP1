@@ -5,7 +5,7 @@ import iecd.a51597.client.cli.StateMachine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BooleanSupplier;
 
 public abstract class OptionScreen extends Screen {
 
@@ -19,37 +19,59 @@ public abstract class OptionScreen extends Screen {
     @Override
     public void display() {
         System.out.println("=== " + this.getClass().getSimpleName() + " ===");
-        for (int i = 0; i < options.size(); i++) {
-            System.out.println((i + 1) + ". " + options.get(i));
-        }
+        displayOptions();
     };
+
+    public void displayOptions() {
+        List<ScreenOption> visibleOptions = getVisibleOptions();
+        int counter = 1;
+        for (ScreenOption option : visibleOptions) {
+            System.out.println(counter + ". " + option);
+            counter++;
+        }
+    }
 
     @Override
     public void handleInput(String input) {
         try {
             int option = Integer.parseInt(input);
-            if (option < 1 || option > options.size()) {
-                System.out.println("Invalid option. Please enter a number between 1 and " + options.size() + ".");
+            List<ScreenOption> visibleOptions = getVisibleOptions();
+            if (option < 1 || option > visibleOptions.size()) {
+                System.out.println("Invalid option. Please enter a number between 1 and " + visibleOptions.size() + ".");
             } else {
-                options.get(option - 1).execute();
+                visibleOptions.get(option - 1).execute();
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter a number.");
         }
     };
 
-    protected void addOption(String description, Consumer<Void> action) {
-        options.add(new ScreenOption(description, action));
+    protected void addOption(String description, Runnable action, BooleanSupplier condition) {
+        options.add(new ScreenOption(description, action, condition));
     }
 
-    protected record ScreenOption(String description, Consumer<Void> action) {
+    protected void addOption(String description, Runnable action) {
+        addOption(description, action, () -> true);
+    }
+
+    private List<ScreenOption> getVisibleOptions() {
+        return options.stream()
+                .filter(ScreenOption::isVisible)
+                .toList();
+    }
+
+    protected record ScreenOption(String description, Runnable action, BooleanSupplier condition) {
+        private boolean isVisible() {
+            return condition.getAsBoolean();
+        }
+
         @Override
         public String toString() {
             return description;
         }
 
         public void execute() {
-            action.accept(null);
+            action.run();
         }
     }
 }

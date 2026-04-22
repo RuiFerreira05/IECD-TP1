@@ -3,6 +3,7 @@ package iecd.a51597.client;
 import iecd.a51597.client.cli.ClientCliHandler;
 import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.network.ServerConnection;
+import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.builders.client.XMLClientMessageBuilder;
 import iecd.a51597.common.protocol.parsers.XMLParser;
 
@@ -13,12 +14,12 @@ public class Client {
 
     private final ServerConnection serverConnection;
     private final ClientCliHandler cliHandler;
+    private final ClientSessionManager sessionManager;
     private static volatile Client instance;
 
 
     private Client() {
         ClientConfiguration.load();
-        cliHandler = new ClientCliHandler(this);
         serverConnection = new ServerConnection(
                 this,
                 ClientConfiguration.SERVER_IP,
@@ -26,6 +27,9 @@ public class Client {
                 new XMLParser(),
                 new XMLClientMessageBuilder()
         );
+        sessionManager = new ClientSessionManager(serverConnection);
+        serverConnection.setSessionManager(sessionManager);
+        cliHandler = new ClientCliHandler(this);
     }
 
     public static Client getInstance() {
@@ -46,6 +50,10 @@ public class Client {
 
     public ServerConnection getServerConnection() {
         return serverConnection;
+    }
+
+    public ClientSessionManager getSessionManager() {
+        return sessionManager;
     }
 
     public static void main(String[] args) {
