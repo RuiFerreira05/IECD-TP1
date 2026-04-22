@@ -1,5 +1,6 @@
 package iecd.a51597.server.store;
 
+import iecd.a51597.common.store.User;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 
 import java.nio.charset.StandardCharsets;

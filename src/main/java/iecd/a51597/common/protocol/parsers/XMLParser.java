@@ -209,7 +209,7 @@ public class XMLParser implements CommParser {
         for (int i = 0; i < matches.getLength(); i++) {
             Element matchEl = (Element) matches.item(i);
             stats.add(new MessageBody.UserMatch(
-                    requireAttribute(matchEl, "result"),
+                    requireAttribute(matchEl, "result").equals("WON"),
                     requireDoubleAttribute(matchEl, "playtime"),
                     parseUuidAttribute(matchEl, "opponent-id"),
                     requireAttribute(matchEl, "opponent-username")

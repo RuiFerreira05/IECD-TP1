@@ -1,6 +1,6 @@
 package iecd.a51597.server.game;
 
-import iecd.a51597.server.store.User;
+import iecd.a51597.common.store.User;
 
 /**
  * Outcome of applying a move in a game instance.

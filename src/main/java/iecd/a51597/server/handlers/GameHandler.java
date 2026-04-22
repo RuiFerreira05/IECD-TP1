@@ -12,7 +12,7 @@ import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
-import iecd.a51597.server.store.User;
+import iecd.a51597.common.store.User;
 import iecd.a51597.server.store.UserStore;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package iecd.a51597.server.store;
+package iecd.a51597.common.store;
 
 import java.util.ArrayList;
 import java.util.List;

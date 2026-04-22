@@ -1,9 +1,12 @@
 package iecd.a51597.common.protocol.builders.client;
 
 import iecd.a51597.client.config.ClientConfiguration;
-import iecd.a51597.server.config.ServerConfiguration;
+import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.MessageType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,6 +37,8 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
     private final DocumentBuilderFactory dbf;
     private final TransformerFactory tf;
 
+    private final Logger logger = LogManager.getLogger(XMLClientMessageBuilder.class);
+
     /**
      * Creates a builder with namespace-aware JAXP factories.
      */
@@ -43,6 +48,63 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         dbf.setIgnoringComments(true);
         dbf.setNamespaceAware(true);
         tf = TransformerFactory.newInstance();
+    }
+
+    @Override
+    public byte[] getMessageInBytes(Message message) {
+        if (message == null) {
+            logger.warn("Client message builder received null message");
+            return null;
+        }
+
+        if (message.messageType() != MessageType.REQUEST) {
+            logger.warn("Client message builder can only serialize REQUEST, got {}", message.messageType());
+            return null;
+        }
+
+        MessageBody body = message.body();
+        if (body == null) {
+            logger.warn("Client message builder received REQUEST with null body for action {}", message.actionType());
+            return null;
+        }
+
+        try {
+            UUID messageId = message.messageId();
+            switch (body) {
+                case MessageBody.Register(String username, String password) -> {
+                    return register(messageId, username, password);
+                }
+                case MessageBody.LoginRequest(String username, String password) -> {
+                    return login(messageId, username, password);
+                }
+                case MessageBody.Logout ignored -> {
+                    return logout(messageId, message.sessionToken());
+                }
+                case MessageBody.UpdateProfile(String username, String password, String photo) -> {
+                    return updateProfile(messageId, message.sessionToken(), username, password, photo);
+                }
+                case MessageBody.SearchUsersRequest(String query) -> {
+                    return searchUsers(messageId, query);
+                }
+                case MessageBody.GameInviteRequest(UUID targetUserId) -> {
+                    return gameInvite(messageId, message.sessionToken(), targetUserId);
+                }
+                case MessageBody.GameInviteResponseRequest(UUID gameId, boolean accept) -> {
+                    return gameInviteResponse(messageId, message.sessionToken(), gameId, accept);
+                }
+                case MessageBody.GameMove(UUID gameId, String rawMove) -> {
+                    return gameMove(messageId, message.sessionToken(), gameId, rawMove);
+                }
+                default -> {
+                    logger.warn("Unsupported client REQUEST body type {} for action {}",
+                            body.getClass().getSimpleName(), message.actionType());
+                    return null;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to build XML for action {}: {}", message.actionType(), e.getMessage());
+            return null;
+        }
     }
 
     // ====== PRIVATE HELPERS ======
@@ -58,14 +120,14 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      * @param sessionToken optional session token; {@code null} to omit
      * @return skeleton holding references to the document, header, and body elements
      */
-    private MessageSkeleton getSkeleton(ActionType actionType, UUID sessionToken) {
+    private MessageSkeleton getSkeleton(ActionType actionType, UUID sessionToken, UUID messageId) {
         try {
             Document doc = dbf.newDocumentBuilder().newDocument();
             doc.setXmlStandalone(true);
 
             Element root = doc.createElement("message");
             root.setAttribute("type",    MessageType.REQUEST.name());
-            root.setAttribute("id",      UUID.randomUUID().toString());
+            root.setAttribute("id",      messageId.toString());
             root.setAttribute("version", ClientConfiguration.PROTOCOL_VERSION);
             doc.appendChild(root);
 
@@ -125,7 +187,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      */
     @Override
     public byte[] register(String username, String password) {
-        MessageSkeleton s = getSkeleton(ActionType.REGISTER, null);
+        return register(UUID.randomUUID(), username, password);
+    }
+
+    private byte[] register(UUID messageId, String username, String password) {
+        MessageSkeleton s = getSkeleton(ActionType.REGISTER, null, messageId);
         Document doc = s.document();
         Element body = s.body();
 
@@ -142,7 +208,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      */
     @Override
     public byte[] login(String username, String password) {
-        MessageSkeleton s = getSkeleton(ActionType.LOGIN, null);
+        return login(UUID.randomUUID(), username, password);
+    }
+
+    private byte[] login(UUID messageId, String username, String password) {
+        MessageSkeleton s = getSkeleton(ActionType.LOGIN, null, messageId);
         Document doc = s.document();
         Element body = s.body();
 
@@ -155,8 +225,12 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
     /** {@inheritDoc} */
     @Override
     public byte[] logout(UUID sessionToken) {
+        return logout(UUID.randomUUID(), sessionToken);
+    }
+
+    private byte[] logout(UUID messageId, UUID sessionToken) {
         // Body is intentionally empty for LOGOUT
-        return serialize(getSkeleton(ActionType.LOGOUT, sessionToken).document());
+        return serialize(getSkeleton(ActionType.LOGOUT, sessionToken, messageId).document());
     }
 
     // ====== PROFILE ======
@@ -169,7 +243,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      */
     @Override
     public byte[] updateProfile(UUID sessionToken, String username, String password, String photo) {
-        MessageSkeleton s = getSkeleton(ActionType.UPDATE_PROFILE, sessionToken);
+        return updateProfile(UUID.randomUUID(), sessionToken, username, password, photo);
+    }
+
+    private byte[] updateProfile(UUID messageId, UUID sessionToken, String username, String password, String photo) {
+        MessageSkeleton s = getSkeleton(ActionType.UPDATE_PROFILE, sessionToken, messageId);
         Document doc = s.document();
         Element body = s.body();
 
@@ -193,7 +271,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      */
     @Override
     public byte[] searchUsers(String query) {
-        MessageSkeleton s = getSkeleton(ActionType.SEARCH_USERS, null);
+        return searchUsers(UUID.randomUUID(), query);
+    }
+
+    private byte[] searchUsers(UUID messageId, String query) {
+        MessageSkeleton s = getSkeleton(ActionType.SEARCH_USERS, null, messageId);
         s.body().appendChild(textElement(s.document(), "query", query));
         return serialize(s.document());
     }
@@ -203,7 +285,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
     /** {@inheritDoc} */
     @Override
     public byte[] gameInvite(UUID sessionToken, UUID targetUserId) {
-        MessageSkeleton s = getSkeleton(ActionType.GAME_INVITE, sessionToken);
+        return gameInvite(UUID.randomUUID(), sessionToken, targetUserId);
+    }
+
+    private byte[] gameInvite(UUID messageId, UUID sessionToken, UUID targetUserId) {
+        MessageSkeleton s = getSkeleton(ActionType.GAME_INVITE, sessionToken, messageId);
         s.body().appendChild(textElement(s.document(), "target-user-id", targetUserId.toString()));
         return serialize(s.document());
     }
@@ -211,7 +297,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
     /** {@inheritDoc} */
     @Override
     public byte[] gameInviteResponse(UUID sessionToken, UUID gameId, boolean accept) {
-        MessageSkeleton s = getSkeleton(ActionType.GAME_INVITE_RESPONSE, sessionToken);
+        return gameInviteResponse(UUID.randomUUID(), sessionToken, gameId, accept);
+    }
+
+    private byte[] gameInviteResponse(UUID messageId, UUID sessionToken, UUID gameId, boolean accept) {
+        MessageSkeleton s = getSkeleton(ActionType.GAME_INVITE_RESPONSE, sessionToken, messageId);
         Document doc = s.document();
         Element body = s.body();
 
@@ -231,7 +321,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      */
     @Override
     public byte[] gameMove(UUID sessionToken, UUID gameId, String rawMove) {
-        MessageSkeleton s = getSkeleton(ActionType.GAME_MOVE, sessionToken);
+        return gameMove(UUID.randomUUID(), sessionToken, gameId, rawMove);
+    }
+
+    private byte[] gameMove(UUID messageId, UUID sessionToken, UUID gameId, String rawMove) {
+        MessageSkeleton s = getSkeleton(ActionType.GAME_MOVE, sessionToken, messageId);
         Document doc = s.document();
         Element body = s.body();
 

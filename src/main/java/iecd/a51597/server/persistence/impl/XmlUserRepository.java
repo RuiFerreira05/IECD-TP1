@@ -2,8 +2,8 @@ package iecd.a51597.server.persistence.impl;
 
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.persistence.UserRepository;
-import iecd.a51597.server.store.PlayerStats;
-import iecd.a51597.server.store.User;
+import iecd.a51597.common.store.PlayerStats;
+import iecd.a51597.common.store.User;
 import iecd.a51597.server.store.UserStore;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;

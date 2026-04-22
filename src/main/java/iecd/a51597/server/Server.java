@@ -33,7 +33,7 @@ public class Server {
     private final SessionManager sessionManager = new SessionManager();
     private final CommParser commParser;
     private final ServerMessageBuilder messageBuilder;
-    private final MessageHandler messageHandler;
+    private final MessageDispatcher messageDispatcher;
     private final GameManager gameManager = new GameManager();
     private final UserStore userStore;
     private final Leaderboard leaderboard;
@@ -63,7 +63,7 @@ public class Server {
         SearchHandler searchHandler = new SearchHandler(messageBuilder, userStore);
         GameHandler gameHandler = new GameHandler(messageBuilder, sessionManager, userStore, gameManager);
 
-        this.messageHandler = new MessageHandler(commParser, messageBuilder, authHandler, profileHandler, searchHandler, gameHandler);
+        this.messageDispatcher = new MessageDispatcher(commParser, messageBuilder, authHandler, profileHandler, searchHandler, gameHandler);
 
         // registerGameFactory(GAME GOES HERE);
     }
@@ -78,7 +78,7 @@ public class Server {
     }
 
     /** @return central frame/message handler */
-    public MessageHandler getMessageHandler() { return messageHandler; }
+    public MessageDispatcher getMessageHandler() { return messageDispatcher; }
     /** @return listener thread or {@code null} when not started */
     public ListenerThread getListener() { return listener; }
     /** @return message builder */

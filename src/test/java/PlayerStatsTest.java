@@ -1,4 +1,4 @@
-import iecd.a51597.server.store.PlayerStats;
+import iecd.a51597.common.store.PlayerStats;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

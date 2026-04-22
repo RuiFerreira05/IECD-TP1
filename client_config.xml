@@ -4,4 +4,5 @@
     <serverPort>5555</serverPort>
     <defaultPrompt>>></defaultPrompt>
     <protocolVersion>1.0</protocolVersion>
+    <reconnectAttempts>3</reconnectAttempts>
 </config>

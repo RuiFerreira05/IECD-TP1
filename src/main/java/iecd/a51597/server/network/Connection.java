@@ -2,7 +2,7 @@ package iecd.a51597.server.network;
 
 import iecd.a51597.server.Server;
 import iecd.a51597.server.config.ServerConfiguration;
-import iecd.a51597.server.handlers.MessageHandler;
+import iecd.a51597.server.handlers.MessageDispatcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,19 +25,19 @@ public class Connection implements Runnable {
     private DataInputStream  inputStream;
     private DataOutputStream outputStream;
 
-    private final MessageHandler messageHandler;
+    private final MessageDispatcher messageDispatcher;
 
     /**
      * Creates a connection wrapper and initializes data streams.
      *
      * @param client accepted socket
      * @param server owning server instance
-     * @param messageHandler frame handler
+     * @param messageDispatcher frame handler
      */
-    public Connection(Socket client, Server server, MessageHandler messageHandler) {
+    public Connection(Socket client, Server server, MessageDispatcher messageDispatcher) {
         this.clientSocket   = client;
         this.server         = server;
-        this.messageHandler = messageHandler;
+        this.messageDispatcher = messageDispatcher;
         initStreams();
     }
 
@@ -77,7 +77,7 @@ public class Connection implements Runnable {
 
             byte[] frameBytes = new byte[length];
             inputStream.readFully(frameBytes);
-            messageHandler.handle(frameBytes, this);
+            messageDispatcher.handle(frameBytes, this);
 
         } catch (EOFException | SocketException e) {
             // Client closed the connection cleanly (EOF) or the socket was

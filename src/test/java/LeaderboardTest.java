@@ -1,6 +1,6 @@
 import iecd.a51597.server.store.Leaderboard;
-import iecd.a51597.server.store.PlayerStats;
-import iecd.a51597.server.store.User;
+import iecd.a51597.common.store.PlayerStats;
+import iecd.a51597.common.store.User;
 import iecd.a51597.server.store.UserStore;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 import org.junit.jupiter.api.BeforeEach;

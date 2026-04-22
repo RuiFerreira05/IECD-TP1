@@ -306,7 +306,7 @@ public void updatePassword(User user, String newPasswordHash) {
 
 **Fix Required:**
 ```java
-// In ProfileHandler.updateProfile() - line 34
+// In ClientProfileHandler.updateProfile() - line 34
 if (body.password() != null && !body.password().isBlank()) {
     String hashedPassword = hash(body.password());  // Hash it!
     userStore.updatePassword(user, hashedPassword);
@@ -369,7 +369,7 @@ private void readIncomingMessage() {
         
         byte[] frameBytes = new byte[length];
         inputStream.readFully(frameBytes);
-        messageHandler.handle(frameBytes, this);
+        messageDispatcher.handle(frameBytes, this);
     } catch (EOFException | SocketException e) {
         // Clean shutdown
         logger.info("Connection closed by {}", clientSocket.getInetAddress());

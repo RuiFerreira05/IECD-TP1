@@ -1,4 +1,4 @@
-package iecd.a51597.server.store;
+package iecd.a51597.common.store;
 
 import java.time.LocalDate;
 import java.util.UUID;

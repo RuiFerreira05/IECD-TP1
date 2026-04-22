@@ -16,7 +16,7 @@ public sealed interface MessageBody {
     /**
      * User match summary included in user stats collections.
      */
-    record UserMatch(String result, double playtime, UUID opponentId, String opponentUsername) {}
+    record UserMatch(boolean result, double playtime, UUID opponentId, String opponentUsername) {}
 
     /**
      * Error payload included in failed responses.

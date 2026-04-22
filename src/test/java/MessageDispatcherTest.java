@@ -24,15 +24,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Tests MessageHandler.dispatch() routing and pre-dispatch guards
+ * Tests MessageDispatcher.dispatch() routing and pre-dispatch guards
  * (message type check, protocol version check).
  *
  * The Connection is mocked so that sendMessage() calls can be
  * captured and the resulting XML inspected.
  */
-class MessageHandlerTest {
+class MessageDispatcherTest {
 
-    private MessageHandler handler;
+    private MessageDispatcher handler;
     private Connection conn;
     private XMLParser parser;
 
@@ -55,7 +55,7 @@ class MessageHandlerTest {
         SearchHandler  search  = new SearchHandler(builder, userStore);
         GameHandler    game    = new GameHandler(builder, sessionManager, userStore, gameManager);
 
-        handler = new MessageHandler(parser, builder, auth, profile, search, game);
+        handler = new MessageDispatcher(parser, builder, auth, profile, search, game);
         conn = mock(Connection.class);
     }
 
@@ -135,7 +135,7 @@ class MessageHandlerTest {
 
     @Test
     void handle_responseType_sendsUnexpectedMessageTypeError() throws Exception {
-        // Keep body parse-valid so MessageHandler reaches the message-type guard.
+        // Keep body parse-valid so MessageDispatcher reaches the message-type guard.
         byte[] bytes = requestBytes("RESPONSE", MSG_ID, "1.0", "GAME_OVER", "", "<status>OK</status>");
         handler.handle(bytes, conn);
 
@@ -157,7 +157,7 @@ class MessageHandlerTest {
 
     @Test
     void handle_wrongVersion_sendsOutdatedProtocolError() throws Exception {
-        // Keep body parse-valid so MessageHandler reaches the protocol-version guard.
+        // Keep body parse-valid so MessageDispatcher reaches the protocol-version guard.
         byte[] bytes = requestBytes("REQUEST", MSG_ID, "9.9", "LOGIN", "",
                 "<username>alice</username><password>secret</password>");
         handler.handle(bytes, conn);

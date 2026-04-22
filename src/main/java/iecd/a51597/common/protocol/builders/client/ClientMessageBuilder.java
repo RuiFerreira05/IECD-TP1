@@ -1,5 +1,7 @@
 package iecd.a51597.common.protocol.builders.client;
 
+import iecd.a51597.common.protocol.Message;
+
 import java.util.UUID;
 
 /**
@@ -107,4 +109,6 @@ public interface ClientMessageBuilder {
      * @return serialized REQUEST payload
      */
     byte[] gameMove(UUID sessionToken, UUID gameId, String rawMove);
+
+    byte[] getMessageInBytes(Message message);
 }

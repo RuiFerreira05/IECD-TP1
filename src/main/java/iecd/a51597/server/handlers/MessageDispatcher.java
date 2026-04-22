@@ -16,7 +16,7 @@ import java.io.ByteArrayInputStream;
 /**
  * Parses incoming frames and dispatches protocol actions to specialized handlers.
  */
-public class MessageHandler {
+public class MessageDispatcher {
 
     private final CommParser commParser;
     private final ServerMessageBuilder messageBuilder;
@@ -28,9 +28,9 @@ public class MessageHandler {
     /**
      * Creates a dispatcher with all action handlers.
      */
-    public MessageHandler(CommParser commParser, ServerMessageBuilder messageBuilder,
-                          AuthHandler authHandler, ProfileHandler profileHandler,
-                          SearchHandler searchHandler, GameHandler gameHandler) {
+    public MessageDispatcher(CommParser commParser, ServerMessageBuilder messageBuilder,
+                             AuthHandler authHandler, ProfileHandler profileHandler,
+                             SearchHandler searchHandler, GameHandler gameHandler) {
         this.commParser = commParser;
         this.messageBuilder = messageBuilder;
         this.authHandler = authHandler;

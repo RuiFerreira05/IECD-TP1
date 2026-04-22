@@ -1,6 +1,5 @@
 package iecd.a51597.client.config;
 
-import iecd.a51597.server.config.ServerConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -38,6 +37,8 @@ public final class ClientConfiguration {
     /** Client current communication protocol version */
     public static String PROTOCOL_VERSION = "1.0";
 
+    public static int RECONNECT_ATTEMPTS = 3;
+
     /**
      * Loads configuration overrides from {@code client_config.xml} when present and valid.
      */
@@ -53,7 +54,7 @@ public final class ClientConfiguration {
             Document doc = builder.parse(file);
 
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(ServerConfiguration.class.getResource("/client_config.xsd"));
+            Schema schema = sf.newSchema(ClientConfiguration.class.getResource("/client_config.xsd"));
             schema.newValidator().validate(new DOMSource(doc));
 
             doc.getDocumentElement().normalize();
@@ -64,6 +65,7 @@ public final class ClientConfiguration {
             SERVER_PORT = parseInt(root, "serverPort", SERVER_PORT);
             DEFAULT_PROMPT = parseString(root, "defaultPrompt", DEFAULT_PROMPT) + " ";
             PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
+            RECONNECT_ATTEMPTS = parseInt(root, "reconnectAttempts", RECONNECT_ATTEMPTS);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {

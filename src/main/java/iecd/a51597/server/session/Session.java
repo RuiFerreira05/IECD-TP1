@@ -1,7 +1,7 @@
 package iecd.a51597.server.session;
 
 import iecd.a51597.server.network.Connection;
-import iecd.a51597.server.store.User;
+import iecd.a51597.common.store.User;
 
 import java.time.Instant;
 import java.util.UUID;
