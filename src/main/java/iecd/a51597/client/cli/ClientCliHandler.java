@@ -18,7 +18,7 @@ public class ClientCliHandler {
     public volatile Boolean running;
     private final StateMachine stateMachine;
 
-    private final Logger logger = LogManager.getLogger(ClientCliHandler.class);
+    private static final Logger logger = LogManager.getLogger(ClientCliHandler.class);
 
     public ClientCliHandler(Client client) {
         this.client = client;

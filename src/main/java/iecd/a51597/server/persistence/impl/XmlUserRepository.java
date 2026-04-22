@@ -34,7 +34,7 @@ public class XmlUserRepository implements UserRepository {
     private final TransformerFactory tf;
     private final Schema userSchema;
 
-    private final Logger logger;
+    private static final Logger logger;
 
     public XmlUserRepository(Logger logger) {
         this.dbf = DocumentBuilderFactory.newInstance();

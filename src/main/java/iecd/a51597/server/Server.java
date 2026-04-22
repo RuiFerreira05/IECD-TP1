@@ -40,7 +40,7 @@ public class Server {
     private final PersistenceManager persistenceManager;
 
     private final CLIHandler cliHandler;
-    private final Logger logger = LogManager.getLogger(Server.class);
+    private static final Logger logger = LogManager.getLogger(Server.class);
 
     private final List<Connection> connections = new ArrayList<>();
 

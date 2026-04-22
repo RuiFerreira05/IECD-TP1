@@ -37,7 +37,7 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
     private final DocumentBuilderFactory dbf;
     private final TransformerFactory tf;
 
-    private final Logger logger = LogManager.getLogger(XMLClientMessageBuilder.class);
+    private static final Logger logger = LogManager.getLogger(XMLClientMessageBuilder.class);
 
     /**
      * Creates a builder with namespace-aware JAXP factories.

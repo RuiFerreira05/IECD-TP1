@@ -15,7 +15,7 @@ public class ListenerThread extends Thread {
     private volatile boolean running = true;
     private final int port;
     private final Server server;
-    private final Logger logger = LogManager.getLogger(ListenerThread.class);
+    private static final Logger logger = LogManager.getLogger(ListenerThread.class);
     private volatile ServerSocket serverSocket;
 
     /**

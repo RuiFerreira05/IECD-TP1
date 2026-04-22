@@ -15,7 +15,7 @@ public class StateMachine {
     private final Stack<Screen> history;
     private final ClientCliHandler cliHandler;
 
-    private final Logger logger = LogManager.getLogger(StateMachine.class);
+    private static final Logger logger = LogManager.getLogger(StateMachine.class);
 
     public StateMachine(ClientCliHandler cliHandler) {
         this.cliHandler = cliHandler;

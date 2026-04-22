@@ -33,7 +33,7 @@ public class CLIHandler {
     private final Instant startedAt = Instant.now();
     private boolean running = false;
 
-    private final Logger logger = LogManager.getLogger(CLIHandler.class);
+    private static final Logger logger = LogManager.getLogger(CLIHandler.class);
 
     private final Map<String, Command> commands = new HashMap<>();
 

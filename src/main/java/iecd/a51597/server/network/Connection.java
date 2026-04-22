@@ -20,7 +20,7 @@ public class Connection implements Runnable {
 
     private final Socket clientSocket;
     private final Server server;
-    private final Logger logger = LogManager.getLogger(Connection.class);
+    private static final Logger logger = LogManager.getLogger(Connection.class);
 
     private DataInputStream  inputStream;
     private DataOutputStream outputStream;
