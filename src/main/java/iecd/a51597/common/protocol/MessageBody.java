@@ -1,5 +1,7 @@
 package iecd.a51597.common.protocol;
 
+import iecd.a51597.common.store.UserDTO;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -7,11 +9,6 @@ import java.util.UUID;
  * Marker interface for all supported protocol payload bodies.
  */
 public sealed interface MessageBody {
-
-    /**
-     * Common user information DTO used in responses and pushes.
-     */
-    record UserSummary(UUID id, String username, String photo, String nationality, String dob, List<UserMatch> stats) {}
 
     /**
      * User match summary included in user stats collections.
@@ -46,7 +43,7 @@ public sealed interface MessageBody {
     /**
      * Login response payload.
      */
-    record LoginResponse(String status, UUID session, UserSummary user, ErrorDetail error) implements MessageBody {}
+    record LoginResponse(String status, UUID session, UserDTO user, ErrorDetail error) implements MessageBody {}
 
     /**
      * Logout payload.
@@ -76,7 +73,7 @@ public sealed interface MessageBody {
     /**
      * User search response.
      */
-    record SearchUsersResponse(String status, List<UserSummary> results, ErrorDetail error) implements MessageBody {}
+    record SearchUsersResponse(String status, List<UserDTO> results, ErrorDetail error) implements MessageBody {}
 
     /**
      * Game invitation request (Client -> Server).

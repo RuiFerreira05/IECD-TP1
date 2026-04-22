@@ -124,8 +124,8 @@ class MessageDispatcherTest {
     // ── malformed frame ───────────────────────────────────────────────────────
 
     @Test
-    void handle_notXML_sendsNoIdMalformedError() throws Exception {
-        handler.handle("garbage bytes".getBytes(), conn);
+    void handle_Bytes_notXML_sendsNoIdMalformedError() throws Exception {
+        handler.handleBytes("garbage bytes".getBytes(), conn);
 
         Document doc = capturedDoc();
         assertError(doc, ProtocolConstants.ERROR_NO_ID, "UNKNOWN", ErrorCodeType.MALFORMED_REQUEST);
@@ -134,20 +134,20 @@ class MessageDispatcherTest {
     // ── message type guard ────────────────────────────────────────────────────
 
     @Test
-    void handle_responseType_sendsUnexpectedMessageTypeError() throws Exception {
+    void handle_Bytes_responseType_sendsUnexpectedMessageTypeError() throws Exception {
         // Keep body parse-valid so MessageDispatcher reaches the message-type guard.
         byte[] bytes = requestBytes("RESPONSE", MSG_ID, "1.0", "GAME_OVER", "", "<status>OK</status>");
-        handler.handle(bytes, conn);
+        handler.handleBytes(bytes, conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "GAME_OVER", ErrorCodeType.UNEXPECTED_MESSAGE_TYPE);
     }
 
     @Test
-    void handle_pushType_sendsUnexpectedMessageTypeError() throws Exception {
+    void handle_Bytes_pushType_sendsUnexpectedMessageTypeError() throws Exception {
         // PUSH + REGISTER → parsePushBody returns Unknown() without needing body fields
         byte[] bytes = requestBytes("PUSH", MSG_ID, "1.0", "REGISTER", "", "");
-        handler.handle(bytes, conn);
+        handler.handleBytes(bytes, conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "REGISTER", ErrorCodeType.UNEXPECTED_MESSAGE_TYPE);
@@ -156,11 +156,11 @@ class MessageDispatcherTest {
     // ── protocol version guard ────────────────────────────────────────────────
 
     @Test
-    void handle_wrongVersion_sendsOutdatedProtocolError() throws Exception {
+    void handle_Bytes_wrongVersion_sendsOutdatedProtocolError() throws Exception {
         // Keep body parse-valid so MessageDispatcher reaches the protocol-version guard.
         byte[] bytes = requestBytes("REQUEST", MSG_ID, "9.9", "LOGIN", "",
                 "<username>alice</username><password>secret</password>");
-        handler.handle(bytes, conn);
+        handler.handleBytes(bytes, conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "LOGIN", ErrorCodeType.OUTDATED_PROTOCOL);
@@ -169,8 +169,8 @@ class MessageDispatcherTest {
     // ── UNKNOWN action ────────────────────────────────────────────────────────
 
     @Test
-    void handle_unknownAction_sendsUnexpectedMessageActionError() throws Exception {
-        handler.handle(request("UNKNOWN", ""), conn);
+    void handle_Bytes_unknownAction_sendsUnexpectedMessageActionError() throws Exception {
+        handler.handleBytes(request("UNKNOWN", ""), conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "UNKNOWN", ErrorCodeType.UNEXPECTED_MESSAGE_ACTION);
@@ -179,8 +179,8 @@ class MessageDispatcherTest {
     // ── REGISTER routing ──────────────────────────────────────────────────────
 
     @Test
-    void handle_registerNewUser_sendsOkResponse() throws Exception {
-        handler.handle(request("REGISTER",
+    void handle_Bytes_registerNewUser_sendsOkResponse() throws Exception {
+        handler.handleBytes(request("REGISTER",
                 "<username>newuser</username><password>pass</password>"), conn);
 
         Document doc = capturedDoc();
@@ -191,13 +191,13 @@ class MessageDispatcherTest {
     }
 
     @Test
-    void handle_registerDuplicateUser_sendsUsernameTakenError() throws Exception {
+    void handle_Bytes_registerDuplicateUser_sendsUsernameTakenError() throws Exception {
         byte[] reg = request("REGISTER",
                 "<username>alice</username><password>pass</password>");
 
-        handler.handle(reg, conn);                // first registration → OK
+        handler.handleBytes(reg, conn);                // first registration → OK
         reset(conn);
-        handler.handle(reg, conn);                // duplicate → error
+        handler.handleBytes(reg, conn);                // duplicate → error
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "REGISTER", ErrorCodeType.USERNAME_TAKEN);
@@ -206,8 +206,8 @@ class MessageDispatcherTest {
     // ── LOGIN routing ─────────────────────────────────────────────────────────
 
     @Test
-    void handle_loginUnknownUser_sendsAuthFailedError() throws Exception {
-        handler.handle(request("LOGIN",
+    void handle_Bytes_loginUnknownUser_sendsAuthFailedError() throws Exception {
+        handler.handleBytes(request("LOGIN",
                 "<username>nobody</username><password>pass</password>"), conn);
 
         Document doc = capturedDoc();
@@ -215,14 +215,14 @@ class MessageDispatcherTest {
     }
 
     @Test
-    void handle_loginCorrectCredentials_sendsLoginSuccess() throws Exception {
+    void handle_Bytes_loginCorrectCredentials_sendsLoginSuccess() throws Exception {
         // Register first
-        handler.handle(request("REGISTER",
+        handler.handleBytes(request("REGISTER",
                 "<username>alice</username><password>secret</password>"), conn);
         reset(conn);
 
         // Login with correct password
-        handler.handle(request("LOGIN",
+        handler.handleBytes(request("LOGIN",
                 "<username>alice</username><password>secret</password>"), conn);
 
         Document doc = capturedDoc();
@@ -235,8 +235,8 @@ class MessageDispatcherTest {
     // ── SEARCH_USERS routing ──────────────────────────────────────────────────
 
     @Test
-    void handle_searchUsers_sendsResults() throws Exception {
-        handler.handle(request("SEARCH_USERS", "<query>nobody</query>"), conn);
+    void handle_Bytes_searchUsers_sendsResults() throws Exception {
+        handler.handleBytes(request("SEARCH_USERS", "<query>nobody</query>"), conn);
 
         Document doc = capturedDoc();
         assertEquals("SEARCH_USERS", text(doc, "action"));
@@ -247,8 +247,8 @@ class MessageDispatcherTest {
     // ── GAME_OVER rejection ───────────────────────────────────────────────────
 
     @Test
-    void handle_gameOverFromClient_sendsUnexpectedActionError() throws Exception {
-        handler.handle(requestWithSession("GAME_OVER", ""), conn);
+    void handle_Bytes_gameOverFromClient_sendsUnexpectedActionError() throws Exception {
+        handler.handleBytes(requestWithSession("GAME_OVER", ""), conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "GAME_OVER", ErrorCodeType.UNEXPECTED_MESSAGE_ACTION);
@@ -257,8 +257,8 @@ class MessageDispatcherTest {
     // ── LOGOUT without session ────────────────────────────────────────────────
 
     @Test
-    void handle_logoutWithoutSession_sendsNotAuthenticatedError() throws Exception {
-        handler.handle(request("LOGOUT", ""), conn);
+    void handle_Bytes_logoutWithoutSession_sendsNotAuthenticatedError() throws Exception {
+        handler.handleBytes(request("LOGOUT", ""), conn);
 
         Document doc = capturedDoc();
         assertError(doc, MSG_ID, "LOGOUT", ErrorCodeType.NOT_AUTHENTICATED);

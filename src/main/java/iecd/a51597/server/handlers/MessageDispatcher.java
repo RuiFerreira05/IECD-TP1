@@ -45,7 +45,7 @@ public class MessageDispatcher {
      * @param frameBytes raw framed payload bytes
      * @param connection source connection
      */
-    public void handle(byte[] frameBytes, Connection connection) {
+    public void handleBytes(byte[] frameBytes, Connection connection) {
         try {
             Message message = commParser.parseMessage(new ByteArrayInputStream(frameBytes));
             dispatch(message, connection);

@@ -142,7 +142,12 @@ public class ServerConnection implements Runnable {
 
     public void shutdown() {
         logger.info("Shutting down server connection");
+        persistSession();
         connected = false;
+    }
+
+    private void persistSession() {
+        
     }
 
     public ClientSessionManager getSessionManager() {

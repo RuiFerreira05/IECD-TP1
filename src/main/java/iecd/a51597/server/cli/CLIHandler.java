@@ -44,18 +44,18 @@ public class CLIHandler {
      */
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help",            new Command(this::help,         null,            "Show this help message"));
-        commands.put("status",          new Command(this::status,       null,            "Print server status"));
-        commands.put("start",           new Command(this::start,        "[port]",        "Start the server on the given port (default: configured port)"));
-        commands.put("stop",            new Command(this::stop,         null,            "Stop the server from accepting new connections"));
-        commands.put("exit",            new Command(this::exit,         null,            "Shutdown the server and exit"));
-        commands.put("sessions",        new Command(this::sessions,     null,            "List all active sessions"));
-        commands.put("users",           new Command(this::users,        null,            "List all registered users"));
-        commands.put("games",           new Command(this::games,        null,            "List all pending and active games"));
-        commands.put("connections",     new Command(this::connections,  null,            "List all open connections"));
-        commands.put("kick",            new Command(this::kick,         "<username>",    "Close a user's connection and invalidate their session"));
-        commands.put("endgame",         new Command(this::endgame,      "<game-id>",     "Force-end an active game (player1 recorded as winner)"));
-        commands.put("leaderboard",     new Command(this::leaderboard,  "[limit]",       "Show the player leaderboard"));
+        commands.put("help",            new Command(this::help, null, "Show this help message"));
+        commands.put("status",          new Command(this::status, null, "Print server status"));
+        commands.put("start",           new Command(this::start, "[port]", "Start the server on the given port (default: configured port)"));
+        commands.put("stop",            new Command(this::stop, null, "Stop the server from accepting new connections"));
+        commands.put("exit",            new Command(this::exit, null, "Shutdown the server and exit"));
+        commands.put("sessions",        new Command(this::sessions, null, "List all active sessions"));
+        commands.put("users",           new Command(this::users, null, "List all registered users"));
+        commands.put("games",           new Command(this::games, null, "List all pending and active games"));
+        commands.put("connections",     new Command(this::connections, null, "List all open connections"));
+        commands.put("kick",            new Command(this::kick, "<username>", "Close a user's connection and invalidate their session"));
+        commands.put("endgame",         new Command(this::endgame, "<game-id>", "Force-end an active game (player1 recorded as winner)"));
+        commands.put("leaderboard",     new Command(this::leaderboard, "[limit]", "Show the player leaderboard"));
     }
 
     /**
@@ -109,7 +109,7 @@ public class CLIHandler {
     }
 
     private void games(String[] args) {
-        var active  = server.getGameManager().getAllActiveGames();
+        var active = server.getGameManager().getAllActiveGames();
         var pending = server.getGameManager().getAllPendingGames();
         System.out.printf("Active games: %d  |  Pending games: %d%n", active.size(), pending.size());
         if (active.isEmpty() && pending.isEmpty()) return;
@@ -147,12 +147,19 @@ public class CLIHandler {
     private void leaderboard(String[] args) {
         int limit = 10;
         if (args.length > 0) {
-            try { limit = Integer.parseInt(args[0]); }
-            catch (NumberFormatException e) { System.out.println("Invalid limit"); return; }
+            try {
+                limit = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid limit");
+                return;
+            }
         }
 
         var entries = server.getLeaderboard().getTopPlayers(limit);
-        if (entries.isEmpty()) { System.out.println("No players yet."); return; }
+        if (entries.isEmpty()) {
+            System.out.println("No players yet.");
+            return;
+        }
 
         System.out.printf("  %-4s  %-16s  %-6s  %-6s  %s%n", "RANK", "USERNAME", "WON", "LOST", "TOTAL TIME");
         for (int i = 0; i < entries.size(); i++) {
@@ -163,7 +170,10 @@ public class CLIHandler {
     }
 
     private void kick(String[] args) {
-        if (args.length == 0) { System.out.println("Usage: kick <username>"); return; }
+        if (args.length == 0) {
+            System.out.println("Usage: kick <username>");
+            return;
+        }
         String username = args[0];
 
         server.getUserStore().findByUsername(username).ifPresentOrElse(
@@ -180,7 +190,10 @@ public class CLIHandler {
     }
 
     private void endgame(String[] args) {
-        if (args.length == 0) { System.out.println("Usage: endgame <game-id>"); return; }
+        if (args.length == 0) {
+            System.out.println("Usage: endgame <game-id>");
+            return;
+        }
         String prefix = args[0].toLowerCase();
 
         var matches = server.getGameManager().getAllActiveGames().stream()
@@ -196,7 +209,7 @@ public class CLIHandler {
             return;
         }
 
-        var game   = matches.getFirst();
+        var game = matches.getFirst();
         var winner = game.getPlayer1(); // nominal winner for protocol compliance
 
         byte[] payload = server.getMessageBuilder().gameOverPush(game.getGameId(), winner);
@@ -216,7 +229,7 @@ public class CLIHandler {
     }
 
     private static String formatExpiry(Session session) {
-        long elapsed   = Duration.between(session.getLastActivity(), Instant.now()).getSeconds();
+        long elapsed = Duration.between(session.getLastActivity(), Instant.now()).getSeconds();
         long remaining = ServerConfiguration.SESSION_TIMEOUT_SECONDS - elapsed;
         if (remaining <= 0) return "expired";
         return String.format("%dm %02ds", remaining / 60, remaining % 60);
@@ -265,8 +278,8 @@ public class CLIHandler {
 
     private static String centre(String text, int width) {
         int padding = width - text.length();
-        int left    = padding / 2;
-        int right   = padding - left;
+        int left = padding / 2;
+        int right = padding - left;
         return " ".repeat(left) + text + " ".repeat(right);
     }
 
@@ -282,8 +295,8 @@ public class CLIHandler {
 
     private void handleCommand(String input) {
         String[] parts = input.trim().split("\\s+");
-        String   name  = parts[0].toLowerCase();
-        String[] args  = Arrays.copyOfRange(parts, 1, parts.length);
+        String name = parts[0].toLowerCase();
+        String[] args = Arrays.copyOfRange(parts, 1, parts.length);
 
         Command command = commands.get(name);
         if (command == null) {
@@ -338,7 +351,7 @@ public class CLIHandler {
             server.stopListener();
             System.out.println("Server stopped listening for connections");
             logger.info("Server stopped listening for connections");
-        } else  {
+        } else {
             System.out.println("Server is already not listening for connections");
         }
     }
@@ -351,6 +364,8 @@ public class CLIHandler {
     }
 
     private record Command(Consumer<String[]> action, String usage, String description) {
-        void execute(String[] args) { action.accept(args); }
+        void execute(String[] args) {
+            action.accept(args);
+        }
     }
 }

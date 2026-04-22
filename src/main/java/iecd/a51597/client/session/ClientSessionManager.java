@@ -5,6 +5,7 @@ import iecd.a51597.client.network.ServerConnection;
 import iecd.a51597.client.session.exceptions.UnexpectedResponse;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
+import iecd.a51597.common.protocol.MessageFactory;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.MessageType;
 import iecd.a51597.common.store.PlayerStats;
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 
 public class ClientSessionManager {
 
-    private ServerConnection serverConnection;
+    private final ServerConnection serverConnection;
     private UUID sessionUUID;
     private UserDTO user;
 
@@ -29,29 +30,19 @@ public class ClientSessionManager {
     }
 
     public UUID login(String username, String password) throws ExecutionException, InterruptedException, TimeoutException, UnexpectedResponse {
-        Message response = serverConnection.sendRequest(new Message(
-                UUID.randomUUID(),
-                MessageType.REQUEST,
+        Message request = MessageFactory.buildLoginRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
-                ActionType.LOGIN,
                 null,
-                new MessageBody.LoginRequest(username, password)
-        )).get(10, TimeUnit.SECONDS);
+                username,
+                password
+        );
+        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
 
         if (response.body() instanceof MessageBody.LoginResponse(
-                String status, UUID session, MessageBody.UserSummary userSummary, MessageBody.ErrorDetail error
+                String status, UUID session, UserDTO userDTO, MessageBody.ErrorDetail error
         )) {
             if (status.equals("OK")) {
-                PlayerStats playerStats = new PlayerStats();
-                userSummary.stats().forEach(s -> playerStats.withMatch(s.result(), s.playtime(), s.opponentId(), s.opponentUsername()));
-                this.user = new UserDTO(
-                        userSummary.id(),
-                        userSummary.username(),
-                        userSummary.photo(),
-                        userSummary.nationality(),
-                        LocalDate.parse(userSummary.dob()),
-                        playerStats
-                        );
+                this.user = userDTO;
                 this.sessionUUID = session;
                 return session;
             } else {
@@ -67,14 +58,12 @@ public class ClientSessionManager {
             return;
         }
 
-        Message response = serverConnection.sendRequest(new Message(
-                UUID.randomUUID(),
-                MessageType.REQUEST,
+        Message request = MessageFactory.buildLogoutRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
-                ActionType.LOGOUT,
-                sessionUUID,
-                new MessageBody.Logout()
-        )).get(10, TimeUnit.SECONDS);
+                null,
+                sessionUUID
+                );
+        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
 
         if (response.body() instanceof MessageBody.LogoutResponse(String status, MessageBody.ErrorDetail error)) {
             if (status.equals("OK")) {
@@ -89,14 +78,13 @@ public class ClientSessionManager {
     }
 
     public UUID register(String username, String password) throws ExecutionException, InterruptedException, TimeoutException, UnexpectedResponse {
-        Message response = serverConnection.sendRequest(new Message(
-                UUID.randomUUID(),
-                MessageType.REQUEST,
+        Message request = MessageFactory.buildRegisterRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
-                ActionType.REGISTER,
                 null,
-                new MessageBody.Register(username, password)
-        )).get(10, TimeUnit.SECONDS);
+                username,
+                password
+        );
+        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
 
         if (response.body() instanceof MessageBody.RegisterResponse(String status, MessageBody.ErrorDetail error)) {
             if (status.equals("OK")) {

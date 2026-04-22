@@ -77,7 +77,7 @@ public class Connection implements Runnable {
 
             byte[] frameBytes = new byte[length];
             inputStream.readFully(frameBytes);
-            messageDispatcher.handle(frameBytes, this);
+            messageDispatcher.handleBytes(frameBytes, this);
 
         } catch (EOFException | SocketException e) {
             // Client closed the connection cleanly (EOF) or the socket was

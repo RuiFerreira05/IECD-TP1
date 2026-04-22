@@ -7,6 +7,8 @@ import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.common.protocol.exceptions.MessageParseException;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.MessageType;
+import iecd.a51597.common.store.PlayerStats;
+import iecd.a51597.common.store.UserDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -21,6 +23,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -147,7 +150,7 @@ public class XMLParser implements CommParser {
                     ? new MessageBody.LoginResponse(
                     status,
                     requireUUID(body, "session"),
-                    parseUserSummary(requireElement(body, "user")),
+                    parseUserDTO(requireElement(body, "user")),
                     null
             )
                     : new MessageBody.LoginResponse(status, null, null, error);
@@ -189,43 +192,44 @@ public class XMLParser implements CommParser {
         };
     }
 
-    private MessageBody.UserSummary parseUserSummary(Element userEl) throws MalformedMessageException {
-        return new MessageBody.UserSummary(
+    private UserDTO parseUserDTO(Element userEl) throws MalformedMessageException {
+        LocalDate dob = getField(userEl, "dob") != null ? LocalDate.parse(getField(userEl, "dob")) : null;
+        return new UserDTO(
                 requireUUID(userEl, "id"),
                 require(userEl, "username"),
                 getField(userEl, "photo"),
                 getField(userEl, "nationality"),
-                getField(userEl, "dob"),
-                parseUserStats(userEl)
+                dob,
+                parsePlayerStats(userEl)
         );
     }
 
-    private java.util.List<MessageBody.UserMatch> parseUserStats(Element userEl) throws MalformedMessageException {
-        java.util.List<MessageBody.UserMatch> stats = new java.util.ArrayList<>();
+    private PlayerStats parsePlayerStats(Element userEl) throws MalformedMessageException {
+        PlayerStats stats = new PlayerStats();
         Element statsEl = getElement(userEl, "stats");
         if (statsEl == null) return stats;
 
         NodeList matches = statsEl.getElementsByTagName("match");
         for (int i = 0; i < matches.getLength(); i++) {
             Element matchEl = (Element) matches.item(i);
-            stats.add(new MessageBody.UserMatch(
+            stats.withMatch(
                     requireAttribute(matchEl, "result").equals("WON"),
                     requireDoubleAttribute(matchEl, "playtime"),
                     parseUuidAttribute(matchEl, "opponent-id"),
                     requireAttribute(matchEl, "opponent-username")
-            ));
+            );
         }
 
         return stats;
     }
 
-    private java.util.List<MessageBody.UserSummary> parseUserResults(Element body) throws MalformedMessageException {
-        java.util.List<MessageBody.UserSummary> results = new java.util.ArrayList<>();
+    private java.util.List<UserDTO> parseUserResults(Element body) throws MalformedMessageException {
+        java.util.List<UserDTO> results = new java.util.ArrayList<>();
         Element resultsEl = getElement(body, "results");
         if (resultsEl != null) {
             NodeList nodes = resultsEl.getElementsByTagName("user");
             for (int i = 0; i < nodes.getLength(); i++) {
-                results.add(parseUserSummary((Element) nodes.item(i)));
+                results.add(parseUserDTO((Element) nodes.item(i)));
             }
         }
         return results;
