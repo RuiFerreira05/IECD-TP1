@@ -225,6 +225,8 @@
             <xs:element name="username" type="xs:string" minOccurs="0"/>
             <xs:element name="password" type="xs:string" minOccurs="0"/>
             <xs:element name="photo" type="xs:string" minOccurs="0"/>
+            <xs:element name="nationality" type="xs:string" minOccurs="0"/>
+            <xs:element name="dob" type="xs:date" minOccurs="0"/>
 
             <!-- Generic response fields -->
             <xs:element name="status" type="StatusType" minOccurs="0"/>

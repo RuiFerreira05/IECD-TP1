@@ -14,12 +14,13 @@ public record PlayerStats(List<MatchRecord> matches) {
     /**
      * Immutable single match record.
      *
-     * @param won whether the match was won
-     * @param playtimeSecs match duration in seconds
-     * @param opponentId opponent user id
+     * @param won              whether the match was won
+     * @param playtimeSecs     match duration in seconds
+     * @param opponentId       opponent user id
      * @param opponentUsername opponent username at match time
      */
-    public record MatchRecord(boolean won, double playtimeSecs, UUID opponentId, String opponentUsername) {}
+    public record MatchRecord(boolean won, double playtimeSecs, UUID opponentId, String opponentUsername) {
+    }
 
     /**
      * Creates an empty stats set.
@@ -37,12 +38,35 @@ public record PlayerStats(List<MatchRecord> matches) {
         return new PlayerStats(newMatches);
     }
 
-    /** @return number of recorded games */
-    public int gamesPlayed()          { return matches.size(); }
-    /** @return number of wins */
-    public int gamesWon()             { return (int) matches.stream().filter(MatchRecord::won).count(); }
-    /** @return number of losses */
-    public int gamesLost()            { return (int) matches.stream().filter(m -> !m.won()).count(); }
-    /** @return total play time across all matches, in seconds */
-    public double totalPlayTimeSecs() { return matches.stream().mapToDouble(MatchRecord::playtimeSecs).sum(); }
+    /**
+     * @return number of recorded games
+     */
+    public int gamesPlayed() {
+        return matches.size();
+    }
+
+    /**
+     * @return number of wins
+     */
+    public int gamesWon() {
+        return (int) matches.stream().filter(MatchRecord::won).count();
+    }
+
+    /**
+     * @return number of losses
+     */
+    public int gamesLost() {
+        return (int) matches.stream().filter(m -> !m.won()).count();
+    }
+
+    public float winRate() {
+        return gamesPlayed() == 0 ? 0 : (float) gamesWon() / gamesPlayed();
+    }
+
+    /**
+     * @return total play time across all matches, in seconds
+     */
+    public double totalPlayTimeSecs() {
+        return matches.stream().mapToDouble(MatchRecord::playtimeSecs).sum();
+    }
 }

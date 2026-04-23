@@ -29,13 +29,16 @@ public class AuthHandler extends BaseHandler {
      * Handles user registration requests.
      */
     public void register(Message message, Connection connection) {
+        logger.info("Received registration request from connection");
         MessageBody.Register body = (MessageBody.Register) message.body();
 
         try {
             userStore.register(body.username(), body.password());
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+            logger.info("Successfully registered new user with username '{}'", body.username());
         } catch (UsernameAlreadyTakenException e) {
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
+            logger.warn("Failed to register user with username '{}': {}", body.username(), e.getMessage());
         }
     }
 
@@ -43,6 +46,7 @@ public class AuthHandler extends BaseHandler {
      * Handles user login requests.
      */
     public void login(Message message, Connection connection) {
+        logger.info("Received login request from connection");
         MessageBody.LoginRequest body = (MessageBody.LoginRequest) message.body();
 
         userStore.findByCredentials(body.username(), body.password()).ifPresentOrElse(
@@ -62,7 +66,11 @@ public class AuthHandler extends BaseHandler {
      * Handles logout requests by invalidating the current session.
      */
     public void logout(Message message, Connection connection) {
-        if (requireSession(message, connection).isEmpty()) return;
+        logger.info("Received logout request from connection");
+        if (requireSession(message, connection).isEmpty()) {
+            logger.warn("Logout request missing valid session token");
+            return;
+        };
 
         sessionManager.invalidate(message.sessionToken());
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));

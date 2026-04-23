@@ -3,6 +3,7 @@ package iecd.a51597.common.protocol;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.MessageType;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public class MessageFactory {
@@ -52,5 +53,15 @@ public class MessageFactory {
                 sessionToken,
                 new MessageBody.Logout()
         );
+    }
+
+    public static Message buildUpdateProfileRequest(String protocolVersion, UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.UPDATE_PROFILE,
+                sessionToken,
+                new MessageBody.UpdateProfile(username, password, photo, nationality, dob));
     }
 }

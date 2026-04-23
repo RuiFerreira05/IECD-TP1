@@ -130,7 +130,7 @@ public class XMLParser implements CommParser {
             case LOGIN -> new MessageBody.LoginRequest(require(body, "username"), require(body, "password"));
             case LOGOUT -> new MessageBody.Logout();
             case UPDATE_PROFILE ->
-                    new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getField(body, "photo"));
+                    new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getField(body, "photo"), getField(body, "nationality"), getLocalDate(body, "dob"));
             case SEARCH_USERS -> new MessageBody.SearchUsersRequest(require(body, "query"));
             case GAME_INVITE -> new MessageBody.GameInviteRequest(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE ->
@@ -139,6 +139,16 @@ public class XMLParser implements CommParser {
                     new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
             case GAME_OVER, UNKNOWN -> new MessageBody.Unknown();
         };
+    }
+
+    private LocalDate getLocalDate(Element body, String ld) throws MalformedMessageException {
+        String dobStr = getField(body, ld);
+        if (dobStr == null) return null;
+        try {
+            return LocalDate.parse(dobStr);
+        } catch (Exception e) {
+            throw new MalformedMessageException("Invalid date format in field <" + ld + ">: " + dobStr, e);
+        }
     }
 
     private MessageBody parseResponseBody(ActionType action, Element body) throws MalformedMessageException {

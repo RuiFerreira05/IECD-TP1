@@ -6,6 +6,7 @@ import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -168,5 +169,13 @@ public class UserStore {
      */
     public Collection<User> getAllUsers() {
         return userMap.values();
+    }
+
+    public void updateNationality(User user, String nationality) {
+        user.setNationality(nationality);
+    }
+
+    public void updateDob(User user, LocalDate dob) {
+        user.setDob(dob);
     }
 }

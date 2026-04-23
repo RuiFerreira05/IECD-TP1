@@ -84,11 +84,11 @@ public class LoginScreen extends Screen {
 
     @Override
     public void onEnter() {
-        sm.getLogger().info("Entered LoginScreen");
+        logger.info("Entered LoginScreen");
     }
 
     @Override
     public void onExit() {
-        sm.getLogger().info("Exited LoginScreen");
+        logger.info("Exited LoginScreen");
     }
 }

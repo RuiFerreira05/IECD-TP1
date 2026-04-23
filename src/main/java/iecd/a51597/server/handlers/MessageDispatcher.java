@@ -10,6 +10,8 @@ import iecd.a51597.common.protocol.exceptions.MessageParseException;
 import iecd.a51597.common.protocol.parsers.CommParser;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.protocol.types.MessageType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 
@@ -24,6 +26,8 @@ public class MessageDispatcher {
     private final ProfileHandler profileHandler;
     private final SearchHandler searchHandler;
     private final GameHandler gameHandler;
+
+    private static final Logger logger = LogManager.getLogger(MessageDispatcher.class);
 
     /**
      * Creates a dispatcher with all action handlers.
@@ -46,6 +50,7 @@ public class MessageDispatcher {
      * @param connection source connection
      */
     public void handleBytes(byte[] frameBytes, Connection connection) {
+        logger.info("Received frame of length {} from connection", frameBytes.length);
         try {
             Message message = commParser.parseMessage(new ByteArrayInputStream(frameBytes));
             dispatch(message, connection);
@@ -54,16 +59,19 @@ public class MessageDispatcher {
                     ErrorCodeType.MALFORMED_REQUEST,
                     "The message does not conform to protocol"
             ));
+            logger.warn("Message received was malformed: {}", e.getMessage());
         } catch (MessageParseException e) {
             connection.sendMessage(messageBuilder.errorNoId(
                     ErrorCodeType.MALFORMED_REQUEST,
                     "The message sent could not be parsed"
             ));
+            logger.warn("Failed to parse message from connection: {}", e.getMessage());
         } catch (CommException e) {
             connection.sendMessage(messageBuilder.errorNoId(
                 ErrorCodeType.INTERNAL_ERROR,
                 "An internal error occurred while processing the message"
             ));
+            logger.warn("Communication error while handling message from connection: {}", e.getMessage());
         }
     }
 
@@ -75,6 +83,7 @@ public class MessageDispatcher {
                     ErrorCodeType.UNEXPECTED_MESSAGE_TYPE,
                     "Server only accepts REQUEST messages"
             ));
+            logger.warn("Received message with invalid type {} from connection", message.messageType());
             return;
         }
 
@@ -85,6 +94,7 @@ public class MessageDispatcher {
                     ErrorCodeType.OUTDATED_PROTOCOL,
                     "Unsupported protocol version"
             ));
+            logger.warn("Received message with unsupported protocol version {} from connection", message.version());
             return;
         }
 

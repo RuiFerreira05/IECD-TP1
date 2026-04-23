@@ -30,7 +30,7 @@ public class MainMenuScreen extends OptionScreen {
     }
 
     private void viewProfile() {
-        sm.transitionTo("profile");
+        sm.transitionTo("view-profile");
     }
 
     private void searchForPlayer() {
@@ -62,7 +62,7 @@ public class MainMenuScreen extends OptionScreen {
 
     @Override
     public void onEnter() {
-        sm.getLogger().info("Entered MainMenuScreen");
+        logger.info("Entered MainMenuScreen");
         if (client.getSessionManager().isLoggedIn()) {
             prompt = client.getSessionManager().getUser().username() + "> ";
         }
@@ -70,6 +70,6 @@ public class MainMenuScreen extends OptionScreen {
 
     @Override
     public void onExit() {
-        sm.getLogger().info("Exited MainMenuScreen");
+        logger.info("Exited MainMenuScreen");
     }
 }

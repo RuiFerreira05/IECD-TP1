@@ -119,7 +119,7 @@ public class ServerConnection implements Runnable {
                         if (pendingRequests.containsKey(messageId)) {
                             pendingRequests.remove(messageId).complete(message);
                         } else {
-                            logger.warn("Received unsolicited message with id {}", messageId);
+                            logger.warn("Received unsolicited message with id {} and action {}", messageId, message.actionType());
                         }
                     } else {
                         logger.warn("Received invalid message from server");

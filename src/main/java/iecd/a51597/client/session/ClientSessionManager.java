@@ -8,6 +8,7 @@ import iecd.a51597.common.protocol.MessageFactory;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.store.UserDTO;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,52 @@ public class ClientSessionManager {
         this.serverConnection = serverConnection;
         this.sessionUUID = null;
         this.user = null;
+    }
+
+    public sealed interface EditProfileResult {
+        record Success() implements EditProfileResult {}
+        record UsernameTaken() implements EditProfileResult {}
+        record Error(String message) implements EditProfileResult {}
+    }
+
+    public EditProfileResult editProfile(String username, String password, String photo, String nationality, LocalDate dob) {
+        Message request = MessageFactory.buildUpdateProfileRequest(
+                ClientConfiguration.PROTOCOL_VERSION,
+                sessionUUID,
+                username,
+                password,
+                photo,
+                nationality,
+                dob
+        );
+
+        Message response = null;
+        try {
+            response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            return new EditProfileResult.Error(e.getMessage());
+        }
+
+        if (response.body() instanceof MessageBody.UpdateProfileResponse(String status, MessageBody.ErrorDetail error)) {
+            if (status.equals("OK")) {
+                user = new UserDTO(
+                        user.userId(),
+                        username != null ? username : user.username(),
+                        photo != null ? photo : user.photo(),
+                        nationality != null ? nationality : user.nationality(),
+                        dob != null ? dob : user.dob(),
+                        user.stats()
+                        );
+                return new EditProfileResult.Success();
+            } else {
+                if (error.code() == ErrorCodeType.USERNAME_TAKEN) {
+                    return new EditProfileResult.UsernameTaken();
+                }
+                return new EditProfileResult.Error("Profile update failed: " + error.message());
+            }
+        } else {
+            return new EditProfileResult.Error("Unexpected response type: " + response.body().getClass());
+        }
     }
 
     public sealed interface LoginResult {

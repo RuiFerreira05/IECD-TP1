@@ -91,11 +91,11 @@ public class RegisterScreen extends Screen {
 
     @Override
     public void onEnter() {
-        sm.getLogger().info("Entered RegisterScreen");
+        logger.info("Entered RegisterScreen");
     }
 
     @Override
     public void onExit() {
-        sm.getLogger().info("Exited RegisterScreen");
+        logger.info("Exited RegisterScreen");
     }
 }

@@ -43,6 +43,7 @@ public class Server {
     private static final Logger logger = LogManager.getLogger(Server.class);
 
     private final List<Connection> connections = new ArrayList<>();
+    private boolean shutdownCompleted = false;
 
     private Server() {
         logger.info("Initializing Server...");
@@ -60,11 +61,18 @@ public class Server {
 
         AuthHandler authHandler = new AuthHandler(messageBuilder, sessionManager, userStore);
         ProfileHandler profileHandler = new ProfileHandler(messageBuilder, sessionManager, userStore);
-        SearchHandler searchHandler = new SearchHandler(messageBuilder, userStore);
+        SearchHandler searchHandler = new SearchHandler(messageBuilder, sessionManager, userStore);
         GameHandler gameHandler = new GameHandler(messageBuilder, sessionManager, userStore, gameManager);
 
         this.messageDispatcher = new MessageDispatcher(commParser, messageBuilder, authHandler, profileHandler, searchHandler, gameHandler);
 
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!shutdownCompleted) {
+                logger.info("Shutdown signal received without previous graceful shutdown, initiating shutdown hook...");
+                shutdown();
+            }
+        }));
         // registerGameFactory(GAME GOES HERE);
     }
 
@@ -196,6 +204,7 @@ public class Server {
         synchronized (connections) { snapshot = List.copyOf(connections); }
         snapshot.forEach(Connection::closeConnection);
         logger.info("Server shutdown complete");
+        shutdownCompleted = true;
     }
 
     /** @return default startup port */

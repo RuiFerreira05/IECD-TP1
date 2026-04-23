@@ -19,6 +19,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -80,8 +81,10 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
                 case MessageBody.Logout ignored -> {
                     return logout(messageId, message.sessionToken());
                 }
-                case MessageBody.UpdateProfile(String username, String password, String photo) -> {
-                    return updateProfile(messageId, message.sessionToken(), username, password, photo);
+                case MessageBody.UpdateProfile(
+                        String username, String password, String photo, String nationality, LocalDate dob
+                ) -> {
+                    return updateProfile(messageId, message.sessionToken(), username, password, photo, nationality, dob);
                 }
                 case MessageBody.SearchUsersRequest(String query) -> {
                     return searchUsers(messageId, query);
@@ -126,8 +129,8 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
             doc.setXmlStandalone(true);
 
             Element root = doc.createElement("message");
-            root.setAttribute("type",    MessageType.REQUEST.name());
-            root.setAttribute("id",      messageId.toString());
+            root.setAttribute("type", MessageType.REQUEST.name());
+            root.setAttribute("id", messageId.toString());
             root.setAttribute("version", ClientConfiguration.PROTOCOL_VERSION);
             doc.appendChild(root);
 
@@ -157,7 +160,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         }
     }
 
-    /** Serializes a completed DOM document to a UTF-8 byte array. */
+    /**
+     * Serializes a completed DOM document to a UTF-8 byte array.
+     */
     private byte[] serialize(Document doc) {
         try {
             Transformer transformer = tf.newTransformer();
@@ -169,14 +174,17 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         }
     }
 
-    /** Creates a simple text-content element: {@code <tag>text</tag>}. */
+    /**
+     * Creates a simple text-content element: {@code <tag>text</tag>}.
+     */
     private Element textElement(Document doc, String tag, String text) {
         Element e = doc.createElement(tag);
         e.setTextContent(text);
         return e;
     }
 
-    private record MessageSkeleton(Document document, Element header, Element body) {}
+    private record MessageSkeleton(Document document, Element header, Element body) {
+    }
 
     // ====== AUTH ======
 
@@ -222,7 +230,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         return serialize(doc);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] logout(UUID sessionToken) {
         return logout(UUID.randomUUID(), sessionToken);
@@ -242,11 +252,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      * treats absent elements as "no change", consistent with the protocol spec.</p>
      */
     @Override
-    public byte[] updateProfile(UUID sessionToken, String username, String password, String photo) {
-        return updateProfile(UUID.randomUUID(), sessionToken, username, password, photo);
+    public byte[] updateProfile(UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
+        return updateProfile(UUID.randomUUID(), sessionToken, username, password, photo, nationality, dob);
     }
 
-    private byte[] updateProfile(UUID messageId, UUID sessionToken, String username, String password, String photo) {
+    private byte[] updateProfile(UUID messageId, UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
         MessageSkeleton s = getSkeleton(ActionType.UPDATE_PROFILE, sessionToken, messageId);
         Document doc = s.document();
         Element body = s.body();
@@ -257,6 +267,10 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
             body.appendChild(textElement(doc, "password", password));
         if (photo != null && !photo.isBlank())
             body.appendChild(textElement(doc, "photo", photo));
+        if (nationality != null && !nationality.isBlank())
+            body.appendChild(textElement(doc, "nationality", nationality));
+        if (dob != null && !dob.toString().isBlank())
+            body.appendChild(textElement(doc, "dob", dob.toString()));
 
         return serialize(doc);
     }
@@ -282,7 +296,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
 
     // ====== GAME ======
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] gameInvite(UUID sessionToken, UUID targetUserId) {
         return gameInvite(UUID.randomUUID(), sessionToken, targetUserId);
@@ -294,7 +310,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         return serialize(s.document());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public byte[] gameInviteResponse(UUID sessionToken, UUID gameId, boolean accept) {
         return gameInviteResponse(UUID.randomUUID(), sessionToken, gameId, accept);
@@ -306,7 +324,7 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         Element body = s.body();
 
         body.appendChild(textElement(doc, "game-id", gameId.toString()));
-        body.appendChild(textElement(doc, "accept",  String.valueOf(accept)));
+        body.appendChild(textElement(doc, "accept", String.valueOf(accept)));
 
         return serialize(doc);
     }

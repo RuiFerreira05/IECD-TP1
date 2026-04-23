@@ -2,6 +2,7 @@ package iecd.a51597.common.protocol.builders.client;
 
 import iecd.a51597.common.protocol.Message;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -63,7 +64,7 @@ public interface ClientMessageBuilder {
      * @param photo        new photo value, or {@code null}
      * @return serialized REQUEST payload
      */
-    byte[] updateProfile(UUID sessionToken, String username, String password, String photo);
+    byte[] updateProfile(UUID sessionToken, String username, String password, String photo, String Nationality, LocalDate dob);
 
     // ── Search ────────────────────────────────────────────────────────────────
 

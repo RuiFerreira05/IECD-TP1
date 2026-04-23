@@ -4,12 +4,13 @@ import iecd.a51597.server.network.Connection;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
+import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.server.store.UserStore;
 
 /**
  * Handles username search requests.
  */
-public class SearchHandler {
+public class SearchHandler extends BaseHandler {
 
     private final ServerMessageBuilder messageBuilder;
     private final UserStore userStore;
@@ -17,7 +18,8 @@ public class SearchHandler {
     /**
      * Creates a search handler.
      */
-    public SearchHandler(ServerMessageBuilder messageBuilder, UserStore userStore) {
+    public SearchHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore) {
+        super(messageBuilder, sessionManager);
         this.messageBuilder = messageBuilder;
         this.userStore = userStore;
     }
@@ -26,6 +28,8 @@ public class SearchHandler {
      * Executes a username search and returns matching users.
      */
     public void searchUsers(Message message, Connection connection) {
+        logger.info("Received search users request from connection");
+
         MessageBody.SearchUsersRequest body = (MessageBody.SearchUsersRequest) message.body();
         connection.sendMessage(messageBuilder.searchUsersSuccess(
                 message.messageId(),

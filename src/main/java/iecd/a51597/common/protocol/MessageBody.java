@@ -3,6 +3,7 @@ package iecd.a51597.common.protocol;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.store.UserDTO;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,7 +60,7 @@ public sealed interface MessageBody {
     /**
      * Profile update payload.
      */
-    record UpdateProfile(String username, String password, String photo) implements MessageBody {}
+    record UpdateProfile(String username, String password, String photo, String nationality, LocalDate dob) implements MessageBody {}
 
     /**
      * Profile update response payload.

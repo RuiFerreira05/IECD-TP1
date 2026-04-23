@@ -32,8 +32,12 @@ public class ProfileHandler extends BaseHandler {
      * Applies profile changes from an update request.
      */
     public void updateProfile(Message message, Connection connection) {
+        logger.info("Received profile update request from connection");
         Optional<Session> sessionOpt = requireSession(message, connection);
-        if (sessionOpt.isEmpty()) return;
+        if (sessionOpt.isEmpty()) {
+            logger.warn("Profile update request missing valid session token");
+            return;
+        };
 
         User user = sessionOpt.get().getUser();
         MessageBody.UpdateProfile body = (MessageBody.UpdateProfile) message.body();
@@ -42,7 +46,10 @@ public class ProfileHandler extends BaseHandler {
             if (body.username() != null && !body.username().isBlank()) userStore.updateUsername(user, body.username());
             if (body.password() != null && !body.password().isBlank()) userStore.updatePassword(user, body.password());
             if (body.photo() != null && !body.photo().isBlank()) userStore.updatePhoto(user, body.photo());
+            if (body.nationality() != null && !body.nationality().isBlank()) userStore.updateNationality(user, body.nationality());
+            if (body.dob() != null) userStore.updateDob(user, body.dob());
         } catch (UsernameAlreadyTakenException e) {
+            logger.error("Failed to update profile for user {}: {}", user.getUserId(), e.getMessage());
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
             return;
         }

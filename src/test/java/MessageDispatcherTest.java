@@ -52,7 +52,7 @@ class MessageDispatcherTest {
 
         AuthHandler    auth    = new AuthHandler(builder, sessionManager, userStore);
         ProfileHandler profile = new ProfileHandler(builder, sessionManager, userStore);
-        SearchHandler  search  = new SearchHandler(builder, userStore);
+        SearchHandler  search  = new SearchHandler(builder, sessionManager, userStore);
         GameHandler    game    = new GameHandler(builder, sessionManager, userStore, gameManager);
 
         handler = new MessageDispatcher(parser, builder, auth, profile, search, game);
