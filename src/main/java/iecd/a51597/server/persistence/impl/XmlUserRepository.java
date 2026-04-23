@@ -5,6 +5,7 @@ import iecd.a51597.server.persistence.UserRepository;
 import iecd.a51597.common.store.PlayerStats;
 import iecd.a51597.common.store.User;
 import iecd.a51597.server.store.UserStore;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,12 +35,11 @@ public class XmlUserRepository implements UserRepository {
     private final TransformerFactory tf;
     private final Schema userSchema;
 
-    private static final Logger logger;
+    private static final Logger logger = LogManager.getLogger(XmlUserRepository.class);
 
     public XmlUserRepository(Logger logger) {
         this.dbf = DocumentBuilderFactory.newInstance();
         this.tf = TransformerFactory.newInstance();
-        this.logger = logger;
 
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

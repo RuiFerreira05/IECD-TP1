@@ -1,7 +1,9 @@
 package iecd.a51597.client.cli;
 
 import iecd.a51597.client.Client;
+import iecd.a51597.client.cli.screens.impl.LoginScreen;
 import iecd.a51597.client.cli.screens.impl.MainMenuScreen;
+import iecd.a51597.client.cli.screens.impl.RegisterScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +26,8 @@ public class ClientCliHandler {
         this.client = client;
         this.stateMachine = new StateMachine(this);
         this.stateMachine.registerScreen("main", new MainMenuScreen(stateMachine, client));
+        this.stateMachine.registerScreen("login", new LoginScreen(stateMachine, client));
+        this.stateMachine.registerScreen("register", new RegisterScreen(stateMachine, client));
     }
 
     public void loop() {

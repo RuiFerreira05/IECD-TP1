@@ -244,7 +244,7 @@ public class GameHandler extends BaseHandler {
                 message.messageId(),
                 body.gameId(),
                 player.getUserId(),
-                body.rawMove().length
+                body.rawMove().length()
         );
 
         Optional<Game> gameOpt = gameManager.getGame(body.gameId());
@@ -286,7 +286,7 @@ public class GameHandler extends BaseHandler {
                     message.messageId(),
                     game.getGameId(),
                     player.getUserId(),
-                    body.rawMove().length
+                    body.rawMove().length()
             );
             sendError(message, connection, ErrorCodeType.MALFORMED_REQUEST, "Invalid move payload");
             return;

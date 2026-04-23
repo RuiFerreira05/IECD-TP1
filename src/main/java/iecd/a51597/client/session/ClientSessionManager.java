@@ -2,20 +2,15 @@ package iecd.a51597.client.session;
 
 import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.network.ServerConnection;
-import iecd.a51597.client.session.exceptions.UnexpectedResponse;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.MessageFactory;
-import iecd.a51597.common.protocol.types.ActionType;
-import iecd.a51597.common.protocol.types.MessageType;
-import iecd.a51597.common.store.PlayerStats;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.store.UserDTO;
 
-import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class ClientSessionManager {
 
@@ -29,14 +24,26 @@ public class ClientSessionManager {
         this.user = null;
     }
 
-    public UUID login(String username, String password) throws ExecutionException, InterruptedException, TimeoutException, UnexpectedResponse {
+    public sealed interface LoginResult {
+        record Success(UUID sessionToken) implements LoginResult {}
+        record InvalidCredentials() implements LoginResult {}
+        record Error(String message) implements LoginResult {}
+    }
+
+    public LoginResult login(String username, String password) {
         Message request = MessageFactory.buildLoginRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
                 null,
                 username,
                 password
         );
-        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+
+        Message response = null;
+        try {
+            response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            return new LoginResult.Error(e.getMessage());
+        }
 
         if (response.body() instanceof MessageBody.LoginResponse(
                 String status, UUID session, UserDTO userDTO, MessageBody.ErrorDetail error
@@ -44,18 +51,32 @@ public class ClientSessionManager {
             if (status.equals("OK")) {
                 this.user = userDTO;
                 this.sessionUUID = session;
-                return session;
+                return new LoginResult.Success(session);
             } else {
-                throw new RuntimeException("Login failed: " + error);
+                if (error.code() == ErrorCodeType.AUTH_FAILED) {
+                    return new LoginResult.InvalidCredentials();
+                }
             }
         } else {
-            throw new UnexpectedResponse("Expected LoginResponse, got " + response.body().getClass().getSimpleName());
+            return new LoginResult.Error("Unexpected response type: " + response.body().getClass());
         }
+
+        return new LoginResult.Error("Something went wrong");
     }
 
-    public void logout() throws ExecutionException, InterruptedException, TimeoutException, UnexpectedResponse {
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public sealed interface LogoutResult {
+        record Success() implements LogoutResult {}
+        record NotLoggedIn() implements LogoutResult {}
+        record Error(String message) implements LogoutResult {}
+    }
+
+    public LogoutResult logout() {
         if (sessionUUID == null) {
-            return;
+            return new LogoutResult.NotLoggedIn();
         }
 
         Message request = MessageFactory.buildLogoutRequest(
@@ -63,37 +84,59 @@ public class ClientSessionManager {
                 null,
                 sessionUUID
                 );
-        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+
+        Message response = null;
+        try {
+            response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            return new LogoutResult.Error(e.getMessage());
+        }
 
         if (response.body() instanceof MessageBody.LogoutResponse(String status, MessageBody.ErrorDetail error)) {
             if (status.equals("OK")) {
                 this.sessionUUID = null;
                 this.user = null;
-                return;
+                return new LogoutResult.Success();
             }
-            throw new RuntimeException("Logout failed: " + error);
+            return new LogoutResult.Error("Logout failed " + error.message());
         } else {
-            throw new UnexpectedResponse("Expected LogoutResponse, got " + response.body().getClass().getSimpleName());
+            return new LogoutResult.Error("Unexpected response type: " + response.body().getClass());
         }
     }
 
-    public UUID register(String username, String password) throws ExecutionException, InterruptedException, TimeoutException, UnexpectedResponse {
+    public sealed interface RegisterResult {
+        record Success() implements RegisterResult {}
+        record UsernameTaken() implements RegisterResult {}
+        record Error(String message) implements RegisterResult {}
+    }
+
+    public RegisterResult register(String username, String password) {
         Message request = MessageFactory.buildRegisterRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
                 null,
                 username,
                 password
         );
-        Message response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+
+        Message response = null;
+        try {
+            response = serverConnection.sendRequest(request).get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            return new RegisterResult.Error(e.getMessage());
+        }
 
         if (response.body() instanceof MessageBody.RegisterResponse(String status, MessageBody.ErrorDetail error)) {
             if (status.equals("OK")) {
-                return login(username, password);
+                return new RegisterResult.Success();
             } else {
-                throw new RuntimeException("Registration failed: " + error);
+                if (error.code() == ErrorCodeType.USERNAME_TAKEN) {
+                    return new RegisterResult.UsernameTaken();
+                } else {
+                    return new RegisterResult.Error("Registration failed: " + error.message());
+                }
             }
         } else {
-            throw new UnexpectedResponse("Expected RegisterResponse, got " + response.body().getClass().getSimpleName());
+            return new RegisterResult.Error("Unexpected response type: " + response.body().getClass());
         }
     }
 

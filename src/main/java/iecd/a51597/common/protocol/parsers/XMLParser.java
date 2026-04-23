@@ -6,6 +6,7 @@ import iecd.a51597.common.protocol.exceptions.CommException;
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.common.protocol.exceptions.MessageParseException;
 import iecd.a51597.common.protocol.types.ActionType;
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.protocol.types.MessageType;
 import iecd.a51597.common.store.PlayerStats;
 import iecd.a51597.common.store.UserDTO;
@@ -240,8 +241,9 @@ public class XMLParser implements CommParser {
         if (errorEl == null) return null;
 
         String code = errorEl.getAttribute("code");
+        ErrorCodeType errorCodeType = ErrorCodeType.valueOf(code);
         String message = errorEl.getTextContent() == null ? null : errorEl.getTextContent().trim();
-        return new MessageBody.ErrorDetail(code, message);
+        return new MessageBody.ErrorDetail(errorCodeType, message);
     }
 
     private String requireAttribute(Element element, String attr) throws MalformedMessageException {

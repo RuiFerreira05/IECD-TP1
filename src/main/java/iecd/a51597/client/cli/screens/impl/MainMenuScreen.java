@@ -3,12 +3,9 @@ package iecd.a51597.client.cli.screens.impl;
 import iecd.a51597.client.Client;
 import iecd.a51597.client.cli.StateMachine;
 import iecd.a51597.client.cli.screens.OptionScreen;
+import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.session.ClientSessionManager;
-import iecd.a51597.client.session.exceptions.UnexpectedResponse;
 import iecd.a51597.common.protocol.Message;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 public class MainMenuScreen extends OptionScreen {
 
@@ -16,9 +13,9 @@ public class MainMenuScreen extends OptionScreen {
         super(sm, client);
         addOption("Login", this::login, () -> !client.getSessionManager().isLoggedIn());
         addOption("Register", this::register, () -> !client.getSessionManager().isLoggedIn());
-        addOption("Logout", this::logout, () -> client.getSessionManager().isLoggedIn());
-        addOption("Search for another player", this::searchForPlayer);
         addOption("View profile", this::viewProfile, () -> client.getSessionManager().isLoggedIn());
+        addOption("Search for another player", this::searchForPlayer);
+        addOption("Logout", this::logout, () -> client.getSessionManager().isLoggedIn());
         addOption("Exit", this::exit);
     }
 
@@ -28,7 +25,7 @@ public class MainMenuScreen extends OptionScreen {
     }
 
     private void exit() {
-        System.out.println("Exit selected");
+        System.out.println("Goodbye!");
         client.exit();
     }
 
@@ -47,24 +44,16 @@ public class MainMenuScreen extends OptionScreen {
             return;
         }
 
-        try {
-            session.logout();
+        if (session.logout() instanceof ClientSessionManager.LogoutResult.Success) {
             System.out.println("Logged out successfully.");
-        } catch (UnexpectedResponse | ExecutionException | TimeoutException e) {
-            System.out.println("Logout failed: " + e.getMessage());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.out.println("Logout interrupted.");
+            prompt = ClientConfiguration.DEFAULT_PROMPT;
+        } else {
+            System.out.println("An error occurred while logging out. Please try again.");
         }
     }
 
     private void login() {
-//        sm.transitionTo("login");
-        try {
-            client.getSessionManager().login("test", "1234");
-        } catch (ExecutionException | UnexpectedResponse | TimeoutException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        sm.transitionTo("login");
     }
 
     private void register() {
@@ -74,6 +63,9 @@ public class MainMenuScreen extends OptionScreen {
     @Override
     public void onEnter() {
         sm.getLogger().info("Entered MainMenuScreen");
+        if (client.getSessionManager().isLoggedIn()) {
+            prompt = client.getSessionManager().getUser().username() + "> ";
+        }
     }
 
     @Override

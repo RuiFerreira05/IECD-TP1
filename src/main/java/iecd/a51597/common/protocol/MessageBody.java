@@ -1,5 +1,6 @@
 package iecd.a51597.common.protocol;
 
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.store.UserDTO;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public sealed interface MessageBody {
     /**
      * Error payload included in failed responses.
      */
-    record ErrorDetail(String code, String message) {}
+    record ErrorDetail(ErrorCodeType code, String message) {}
 
     /**
      * Generic response payload used when the action is unknown.
