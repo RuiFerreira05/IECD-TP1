@@ -142,7 +142,7 @@ public class Server {
                 logger.info("Server port assigned to: {}", this.port);
             }
         } catch (NumberFormatException e) {
-            logger.error("Invalid port number: {}", e.getMessage());
+            logger.error("Invalid port number", e);
         }
     }
 

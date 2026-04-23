@@ -392,7 +392,7 @@ public void sendMessage(byte[] payload) {
         outputStream.write(payload);
         outputStream.flush();
     } catch (IOException e) {
-        logger.error("Error sending message to {}: {}", clientSocket.getInetAddress(), e.getMessage());
+        logger.error("Error sending message to {}", clientSocket.getInetAddress(), e);
         closeConnection();
     }
 }

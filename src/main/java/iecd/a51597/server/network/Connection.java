@@ -46,7 +46,7 @@ public class Connection implements Runnable {
             this.inputStream  = new DataInputStream(clientSocket.getInputStream());
             this.outputStream = new DataOutputStream(clientSocket.getOutputStream());
         } catch (IOException e) {
-            logger.error("Error initializing streams for connection: {}", e.getMessage());
+            logger.error("Error initializing streams for connection", e);
             closeConnection();
         }
     }
@@ -128,7 +128,7 @@ public class Connection implements Runnable {
         try {
             clientSocket.close();
         } catch (IOException e) {
-            logger.error("Error closing connection: {}", e.getMessage());
+            logger.error("Error closing connection", e);
         }
     }
 }

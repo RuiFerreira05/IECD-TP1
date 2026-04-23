@@ -78,7 +78,7 @@ public class ServerConnection implements Runnable {
             outputStream.flush();
             return true;
         } catch (IOException e) {
-            logger.error("Error sending message to server: {}", e.getMessage());
+            logger.error("Error sending message to server", e);
             closeConnection();
             return false;
         }
@@ -89,7 +89,7 @@ public class ServerConnection implements Runnable {
         try {
             socket.close();
         } catch (IOException e) {
-            logger.error("Error closing connection: {}", e.getMessage());
+            logger.error("Error closing connection", e);
         }
     }
 
@@ -126,7 +126,7 @@ public class ServerConnection implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                logger.error("IO error in server connection: {}", e.getMessage());
+                logger.error("IO error in server connection", e);
                 if (reconnectAttempts == 0) {
                     shutdown();
                     return;
@@ -134,7 +134,7 @@ public class ServerConnection implements Runnable {
                 logger.warn("Attempting to reconnect... ({} attempts remaining)", reconnectAttempts);
                 reconnectAttempts--;
             } catch (CommException e) {
-                logger.error("Protocol error in server connection: {}", e.getMessage());
+                logger.error("Protocol error in server connection", e);
             }
         }
     }

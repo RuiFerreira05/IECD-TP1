@@ -38,7 +38,7 @@ public class AuthHandler extends BaseHandler {
             logger.info("Successfully registered new user with username '{}'", body.username());
         } catch (UsernameAlreadyTakenException e) {
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
-            logger.warn("Failed to register user with username '{}': {}", body.username(), e.getMessage());
+            logger.warn("Failed to register user with username '{}'", body.username(), e);
         }
     }
 

@@ -50,7 +50,7 @@ public class ClientCliHandler {
             }
         } catch (IOException e) {
             if (running) {
-                logger.error("CLI read error: {}", e.getMessage());
+                logger.error("CLI read error", e);
             }
         }
     }

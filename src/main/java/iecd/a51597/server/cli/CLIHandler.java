@@ -73,7 +73,7 @@ public class CLIHandler {
             }
         } catch (IOException e) {
             if (running) {
-                logger.error("CLI read error: {}", e.getMessage());
+                logger.error("CLI read error", e);
             }
         }
     }
@@ -308,7 +308,7 @@ public class CLIHandler {
                 command.execute(args);
             } catch (Exception e) {
                 System.out.println("Error executing command '" + name + "': " + e.getMessage());
-                logger.error("Error executing command '{}': {}", name, e.getMessage());
+                logger.error("Error executing command '{}'", name, e);
             }
         }
     }

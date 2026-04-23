@@ -105,7 +105,7 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to build XML for action {}: {}", message.actionType(), e.getMessage());
+            logger.error("Failed to build XML for action {}", message.actionType(), e);
             return null;
         }
     }

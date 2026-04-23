@@ -49,7 +49,7 @@ public class ListenerThread extends Thread {
             }
         } catch (IOException e) {
             if (running) {
-                logger.error("Error in ListenerThread: {}", e.getMessage());
+                logger.error("Error in ListenerThread", e);
             }
         } finally {
             running = false;
@@ -69,7 +69,7 @@ public class ListenerThread extends Thread {
     public void stopListener() {
         running = false;
         try { if (serverSocket != null) serverSocket.close(); }
-        catch (IOException e) { logger.error("Error closing socket: {}", e.getMessage()); }
+        catch (IOException e) { logger.error("Error closing socket", e); }
         logger.info("Stopping ListenerThread");
     }
 

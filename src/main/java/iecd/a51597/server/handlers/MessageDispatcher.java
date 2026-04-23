@@ -59,19 +59,19 @@ public class MessageDispatcher {
                     ErrorCodeType.MALFORMED_REQUEST,
                     "The message does not conform to protocol"
             ));
-            logger.warn("Message received was malformed: {}", e.getMessage());
+            logger.warn("Message received was malformed", e);
         } catch (MessageParseException e) {
             connection.sendMessage(messageBuilder.errorNoId(
                     ErrorCodeType.MALFORMED_REQUEST,
                     "The message sent could not be parsed"
             ));
-            logger.warn("Failed to parse message from connection: {}", e.getMessage());
+            logger.warn("Failed to parse message from connection");
         } catch (CommException e) {
             connection.sendMessage(messageBuilder.errorNoId(
                 ErrorCodeType.INTERNAL_ERROR,
                 "An internal error occurred while processing the message"
             ));
-            logger.warn("Communication error while handling message from connection: {}", e.getMessage());
+            logger.warn("Communication error while handling message from connection");
         }
     }
 

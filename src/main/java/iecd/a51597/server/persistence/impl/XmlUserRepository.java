@@ -121,13 +121,13 @@ public class XmlUserRepository implements UserRepository {
                     userStore.loadUser(user);
                     count++;
                 } catch (Exception e) {
-                    logger.warn("Skipping malformed user entry at index {}: {}", i, e.getMessage());
+                    logger.warn("Skipping malformed user entry at index {}", i, e);
                 }
             }
 
             logger.info("Loaded {} user(s) from '{}'", count, ServerConfiguration.USER_STORE);
         } catch (Exception e) {
-            logger.error("Failed to load users from '{}': {}", ServerConfiguration.USER_STORE, e.getMessage());
+            logger.error("Failed to load users from '{}'", ServerConfiguration.USER_STORE, e);
         }
     }
 
@@ -169,7 +169,7 @@ public class XmlUserRepository implements UserRepository {
             try {
                 newValidator().validate(new DOMSource(doc));
             } catch (SAXException e) {
-                logger.error("Generated users document failed schema validation — aborting save: {}", e.getMessage());
+                logger.error("Generated users document failed schema validation — aborting save", e);
                 return;
             }
 
@@ -179,7 +179,7 @@ public class XmlUserRepository implements UserRepository {
 
             logger.info("Saved {} user(s) to '{}'", userStore.getAllUsers().size(), ServerConfiguration.USER_STORE);
         } catch (Exception e) {
-            logger.error("Failed to save users to '{}': {}", ServerConfiguration.USER_STORE, e.getMessage());
+            logger.error("Failed to save users to '{}'", ServerConfiguration.USER_STORE, e);
         }
     }
 }

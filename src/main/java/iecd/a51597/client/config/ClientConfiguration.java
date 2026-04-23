@@ -69,7 +69,7 @@ public final class ClientConfiguration {
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {
-            logger.error("Failed to load config from '{}', using defaults: {}", CONFIG_FILE, e.getMessage());
+            logger.error("Failed to load config from '{}', using defaults", CONFIG_FILE, e);
         }
     }
 

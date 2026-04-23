@@ -49,7 +49,7 @@ public class ProfileHandler extends BaseHandler {
             if (body.nationality() != null && !body.nationality().isBlank()) userStore.updateNationality(user, body.nationality());
             if (body.dob() != null) userStore.updateDob(user, body.dob());
         } catch (UsernameAlreadyTakenException e) {
-            logger.error("Failed to update profile for user {}: {}", user.getUserId(), e.getMessage());
+            logger.error("Failed to update profile for user {}", user.getUserId(), e);
             sendError(message, connection, ErrorCodeType.USERNAME_TAKEN, "Username is already taken");
             return;
         }
