@@ -41,7 +41,7 @@ public class XMLParser implements CommParser {
     public XMLParser() {
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            schema = sf.newSchema(getClass().getResource("/protocol.xsd"));
+            schema = sf.newSchema(getClass().getResource("/schemas/protocol.xsd"));
         } catch (SAXException e) {
             throw new IllegalStateException("Failed to load protocol.xsd — ensure it is on the classpath", e);
         }

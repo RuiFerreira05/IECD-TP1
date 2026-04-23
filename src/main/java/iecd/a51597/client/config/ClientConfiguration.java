@@ -18,7 +18,7 @@ import java.io.File;
  */
 public final class ClientConfiguration {
 
-    private static final String CONFIG_FILE = "client_config.xml";
+    private static final String CONFIG_FILE = "config/client_config.xml";
     private static final Logger logger = LogManager.getLogger(ClientConfiguration.class);
 
     private ClientConfiguration() {}
@@ -54,7 +54,7 @@ public final class ClientConfiguration {
             Document doc = builder.parse(file);
 
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(ClientConfiguration.class.getResource("/client_config.xsd"));
+            Schema schema = sf.newSchema(ClientConfiguration.class.getResource("/schemas/config/client_config.xsd"));
             schema.newValidator().validate(new DOMSource(doc));
 
             doc.getDocumentElement().normalize();

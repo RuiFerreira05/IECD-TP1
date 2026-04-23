@@ -7,13 +7,13 @@
         <File name="MAIN" fileName="logs/main.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-        <File name="CLIENTS" fileName="logs/clients.log">
+        <File name="NETWORK" fileName="logs/network.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
         <File name="PROTOCOL" fileName="logs/protocol.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-        <File name="CLIENT-LOG" fileName="logs/client-log.log">
+        <File name="CLIENT" fileName="logs/client.log">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
     </Appenders>
@@ -23,23 +23,23 @@
         </Root>
 
         <Logger name="consoleLogger" level="INFO" additivity="false">
-            <AppenderRef ref="MAIN"/>
+            <AppenderRef ref="CONSOLE_LOGGER"/>
         </Logger>
 
         <Logger name="iecd.a51597.server" level="INFO" additivity="false">
             <AppenderRef ref="MAIN"/>
         </Logger>
 
-        <Logger name="iecd.a51597.server.network" level="DEBUG" additivity="false">
-            <AppenderRef ref="CLIENTS"/>
+        <Logger name="iecd.a51597.server.network" level="INFO" additivity="false">
+            <AppenderRef ref="NETWORK"/>
         </Logger>
 
-        <Logger name="iecd.a51597.server.protocol" level="DEBUG" additivity="false">
+        <Logger name="iecd.a51597.server.protocol" level="INFO" additivity="false">
             <AppenderRef ref="PROTOCOL"/>
         </Logger>
 
         <Logger name="iecd.a51597.client" level="INFO" additivity="false">
-            <AppenderRef ref="CLIENT-LOG"/>
+            <AppenderRef ref="CLIENT"/>
         </Logger>
     </Loggers>
 </Configuration>

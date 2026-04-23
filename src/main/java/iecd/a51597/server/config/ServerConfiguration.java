@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -19,7 +18,7 @@ import java.io.File;
  */
 public final class ServerConfiguration {
 
-    private static final String CONFIG_FILE = "config.xml";
+    private static final String CONFIG_FILE = "config/config.xml";
     private static final Logger logger = LogManager.getLogger(ServerConfiguration.class);
 
     private ServerConfiguration() {}
@@ -56,7 +55,7 @@ public final class ServerConfiguration {
             Document doc = builder.parse(file);
 
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Schema schema = sf.newSchema(ServerConfiguration.class.getResource("/config.xsd"));
+            Schema schema = sf.newSchema(ServerConfiguration.class.getResource("/schemas/config/config.xsd"));
             schema.newValidator().validate(new DOMSource(doc));
 
             doc.getDocumentElement().normalize();

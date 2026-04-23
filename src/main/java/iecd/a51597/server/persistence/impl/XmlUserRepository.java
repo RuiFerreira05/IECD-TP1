@@ -3,7 +3,7 @@ package iecd.a51597.server.persistence.impl;
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.persistence.UserRepository;
 import iecd.a51597.common.store.PlayerStats;
-import iecd.a51597.common.store.User;
+import iecd.a51597.server.store.entities.User;
 import iecd.a51597.server.store.UserStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +43,7 @@ public class XmlUserRepository implements UserRepository {
 
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            this.userSchema = sf.newSchema(getClass().getResource("/users.xsd"));
+            this.userSchema = sf.newSchema(getClass().getResource("/schemas/users.xsd"));
         } catch (SAXException e) {
             throw new IllegalStateException("Failed to load users.xsd — ensure it is on the classpath", e);
         }

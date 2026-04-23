@@ -1,6 +1,6 @@
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.server.game.*;
-import iecd.a51597.common.store.User;
+import iecd.a51597.server.store.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

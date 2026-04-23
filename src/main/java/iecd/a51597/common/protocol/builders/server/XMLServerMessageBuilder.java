@@ -2,7 +2,7 @@ package iecd.a51597.common.protocol.builders.server;
 
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.common.store.PlayerStats;
-import iecd.a51597.common.store.User;
+import iecd.a51597.server.store.entities.User;
 import iecd.a51597.common.protocol.ProtocolConstants;
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.ErrorCodeType;

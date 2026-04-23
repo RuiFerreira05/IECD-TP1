@@ -1,4 +1,6 @@
-package iecd.a51597.common.store;
+package iecd.a51597.server.store.entities;
+
+import iecd.a51597.common.store.PlayerStats;
 
 import java.time.LocalDate;
 import java.util.UUID;
