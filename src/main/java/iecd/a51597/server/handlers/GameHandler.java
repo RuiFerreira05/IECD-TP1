@@ -111,7 +111,7 @@ public class GameHandler extends BaseHandler {
             return;
         }
 
-        Game game = gameManager.createPendingGame(sender, target);
+        Game game = gameManager.createPendingGame(sender.getUserId(), target.getUserId());
 
         logger.info(
                 "Created pending game invitation: messageId={}, gameId={}, inviterUserId={}, invitedUserId={}",
@@ -320,7 +320,11 @@ public class GameHandler extends BaseHandler {
                 );
                 sendError(message, connection, ErrorCodeType.INVALID_MOVE, reason);
             }
-            case MoveResult.GameOver(UUID winner) -> {
+            case MoveResult.GameOver(UUID winnerId) -> {
+                User p1 = userStore.findById(game.getPlayer1Id()).orElseThrow();
+                User p2 = userStore.findById(game.getPlayer2Id()).orElseThrow();
+                User winner = winnerId == null ? null : (winnerId.equals(p1.getUserId()) ? p1 : p2);
+
                 logger.info(
                         "Game over reached after move: messageId={}, gameId={}, playerUserId={}, winnerUserId={}",
                         message.messageId(),
@@ -336,6 +340,14 @@ public class GameHandler extends BaseHandler {
                                 messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
                         )
                 );
+
+                double playTimeSecs = (System.currentTimeMillis() - game.getStartTimeMillis()) / 1000.0;
+                boolean p1Won = winner != null && winner.getUserId().equals(p1.getUserId());
+                boolean p2Won = winner != null && winner.getUserId().equals(p2.getUserId());
+
+                p1.setStats(p1.getStats().withMatch(p1Won, playTimeSecs, p2.getUserId(), p2.getUsername()));
+                p2.setStats(p2.getStats().withMatch(p2Won, playTimeSecs, p1.getUserId(), p1.getUsername()));
+
                 pushGameOver(game, winner);
                 gameManager.endGame(game.getGameId());
                 logger.info("Closed active game: gameId={}, winnerUserId={}", game.getGameId(), winner);
@@ -356,7 +368,7 @@ public class GameHandler extends BaseHandler {
         sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "GAME_OVER is server-initiated only");
     }
 
-    private void pushGameOver(Game game, UUID winner) {
+    private void pushGameOver(Game game, User winner) {
         logger.info(
                 "Broadcasting game over event: gameId={}, winnerUserId={}, player1UserId={}, player2UserId={}",
                 game.getGameId(),
@@ -364,7 +376,7 @@ public class GameHandler extends BaseHandler {
                 game.getPlayer1Id(),
                 game.getPlayer2Id()
         );
-        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), userStore.findById(winner).get()); // This might fail if for some reason the userId doesn't exist, but time doesn't allow me to fix it
+        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner);
         sessionManager.getSessionByUserId(game.getPlayer1Id())
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
         sessionManager.getSessionByUserId(game.getPlayer2Id())

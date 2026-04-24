@@ -1,13 +1,16 @@
 package iecd.a51597.client.network;
 
 import iecd.a51597.client.Client;
+import iecd.a51597.client.cli.screens.handlers.ClientInviteHandler;
 import iecd.a51597.client.cli.screens.handlers.ClientSearchHandler;
 import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.Message;
+import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.builders.client.ClientMessageBuilder;
 import iecd.a51597.common.protocol.exceptions.CommException;
 import iecd.a51597.common.protocol.parsers.CommParser;
+import iecd.a51597.common.protocol.types.MessageType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,17 +27,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerConnection implements Runnable {
 
     private volatile boolean connected = false;
-    private Map<UUID, CompletableFuture<Message>> pendingRequests;
+    private final Map<UUID, CompletableFuture<Message>> pendingRequests;
 
     private Socket socket;
-    private String serverHost;
-    private int serverPort;
+    private final String serverHost;
+    private final int serverPort;
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
-    private CommParser parser;
-    private ClientMessageBuilder messageBuilder;
+    private final CommParser parser;
+    private final ClientMessageBuilder messageBuilder;
     private int reconnectAttempts;
-    private ClientSearchHandler searchHandler;
+    private final ClientSearchHandler searchHandler;
+    private final ClientInviteHandler inviteHandler;
+    private final Client client;
 
     private ClientSessionManager sessionManager = null;
 
@@ -45,8 +50,10 @@ public class ServerConnection implements Runnable {
         this.serverPort = serverPort;
         this.parser = parser;
         this.messageBuilder = messageBuilder;
+        this.client = client;
 
         this.searchHandler = new ClientSearchHandler(this);
+        this.inviteHandler = new ClientInviteHandler(this);
         this.pendingRequests = new ConcurrentHashMap<>();
         this.reconnectAttempts = ClientConfiguration.RECONNECT_ATTEMPTS;
     }
@@ -119,10 +126,19 @@ public class ServerConnection implements Runnable {
                     Message message = parser.parseMessage(new ByteArrayInputStream(payload));
                     if (message != null) {
                         UUID messageId = message.messageId();
+                        logger.info("Received message from server: {}", messageId);
                         if (pendingRequests.containsKey(messageId)) {
+                            logger.info("Received message is a response to pending request: {}", messageId);
                             pendingRequests.remove(messageId).complete(message);
                         } else {
-                            logger.warn("Received unsolicited message with id {} and action {}", messageId, message.actionType());
+                            if (message.messageType() == MessageType.PUSH) {
+                                logger.info("Message is push");
+                                if (message.body() instanceof MessageBody.GameInvitePush) {
+                                    logger.info("Message is a game invite");
+                                    client.getPendingInvites().add((MessageBody.GameInvitePush) message.body());
+                                }
+                                client.getCliHandler().getStateMachine().getCurrentScreen().handlePush(message);
+                            }
                         }
                     } else {
                         logger.warn("Received invalid message from server");
@@ -144,12 +160,7 @@ public class ServerConnection implements Runnable {
 
     public void shutdown() {
         logger.info("Shutting down server connection");
-        persistSession();
         connected = false;
-    }
-
-    private void persistSession() {
-
     }
 
     public ClientSessionManager getSessionManager() {
@@ -162,5 +173,13 @@ public class ServerConnection implements Runnable {
 
     public ClientSearchHandler getSearchHandler() {
         return searchHandler;
+    }
+
+    public ClientInviteHandler getInviteHandler() {
+        return inviteHandler;
+    }
+
+    public Client getClient() {
+        return client;
     }
 }

@@ -1,5 +1,6 @@
 package iecd.a51597.server;
 
+import iecd.a51597.common.game.dotsandboxes.DotsAndBoxesGameFactory;
 import iecd.a51597.server.cli.CLIHandler;
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.common.game.GameFactory;
@@ -73,7 +74,8 @@ public class Server {
                 shutdown();
             }
         }));
-        // registerGameFactory(GAME GOES HERE);
+
+        registerGameFactory(new DotsAndBoxesGameFactory());
     }
 
     /**
@@ -85,20 +87,54 @@ public class Server {
         gameManager.registerFactory(factory);
     }
 
-    /** @return central frame/message handler */
-    public MessageDispatcher getMessageHandler() { return messageDispatcher; }
-    /** @return listener thread or {@code null} when not started */
-    public ListenerThread getListener() { return listener; }
-    /** @return message builder */
-    public ServerMessageBuilder getMessageBuilder() { return messageBuilder; }
-    /** @return communication parser */
-    public CommParser getCommParser() { return commParser; }
-    /** @return session manager */
-    public SessionManager getSessionManager() { return sessionManager; }
-    /** @return user store */
-    public UserStore getUserStore() { return userStore; }
-    /** @return game manager */
-    public GameManager getGameManager() { return gameManager; }
+    /**
+     * @return central frame/message handler
+     */
+    public MessageDispatcher getMessageHandler() {
+        return messageDispatcher;
+    }
+
+    /**
+     * @return listener thread or {@code null} when not started
+     */
+    public ListenerThread getListener() {
+        return listener;
+    }
+
+    /**
+     * @return message builder
+     */
+    public ServerMessageBuilder getMessageBuilder() {
+        return messageBuilder;
+    }
+
+    /**
+     * @return communication parser
+     */
+    public CommParser getCommParser() {
+        return commParser;
+    }
+
+    /**
+     * @return session manager
+     */
+    public SessionManager getSessionManager() {
+        return sessionManager;
+    }
+
+    /**
+     * @return user store
+     */
+    public UserStore getUserStore() {
+        return userStore;
+    }
+
+    /**
+     * @return game manager
+     */
+    public GameManager getGameManager() {
+        return gameManager;
+    }
 
     /**
      * Returns the singleton server instance.
@@ -118,21 +154,27 @@ public class Server {
      * @return snapshot of currently tracked connections
      */
     public List<Connection> getConnections() {
-        synchronized (connections) { return List.copyOf(connections); }
+        synchronized (connections) {
+            return List.copyOf(connections);
+        }
     }
 
     /**
      * Adds a connection to server tracking.
      */
     public void addConnection(Connection connection) {
-        synchronized (connections) { connections.add(connection); }
+        synchronized (connections) {
+            connections.add(connection);
+        }
     }
 
     /**
      * Removes a connection from server tracking.
      */
     public void removeConnection(Connection connection) {
-        synchronized (connections) { connections.remove(connection); }
+        synchronized (connections) {
+            connections.remove(connection);
+        }
     }
 
     private void handleCLIParams(String[] args) {
@@ -201,16 +243,24 @@ public class Server {
         // The reason we take a snapshot of the connections list here is to avoid a ConcurrentModificationException when
         // Connection calls server.removeConnection(). It's a little ugly but it works
         List<Connection> snapshot;
-        synchronized (connections) { snapshot = List.copyOf(connections); }
+        synchronized (connections) {
+            snapshot = List.copyOf(connections);
+        }
         snapshot.forEach(Connection::closeConnection);
         logger.info("Server shutdown complete");
         shutdownCompleted = true;
     }
 
-    /** @return default startup port */
-    public int getStartupPort() { return this.port; }
+    /**
+     * @return default startup port
+     */
+    public int getStartupPort() {
+        return this.port;
+    }
 
-    /** @return leaderboard projection */
+    /**
+     * @return leaderboard projection
+     */
     public Leaderboard getLeaderboard() {
         return leaderboard;
     }

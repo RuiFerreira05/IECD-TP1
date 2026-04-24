@@ -1,7 +1,5 @@
 package iecd.a51597.common.game;
 
-import iecd.a51597.server.store.entities.User;
-
 import java.util.UUID;
 
 /**
@@ -23,7 +21,7 @@ public interface Game {
      */
     UUID getPlayer2Id();
 
-    Long getStartTimeMillis();
+    long getStartTimeMillis();
 
     /**
      * Applies a move for one player.

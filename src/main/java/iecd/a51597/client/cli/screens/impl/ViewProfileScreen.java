@@ -8,17 +8,26 @@ import iecd.a51597.common.store.UserDTO;
 
 public class ViewProfileScreen extends OptionScreen {
 
-    private UserDTO user;
+    private final UserDTO user;
 
     public ViewProfileScreen(StateMachine sm, Client client) {
         super(sm, client);
+        this.user = client.getSessionManager().getUser();
         addOption("back", sm::back);
-        addOption("Back to main menu", () -> sm.transitionTo("main"));
+        addOption("Back to main menu", () -> sm.changeState(new MainMenuScreen(sm, client)));
+        addOption("Edit Profile", this::editProfile, () -> client.getSessionManager().getUser() == user);
+    }
+
+    public ViewProfileScreen(StateMachine sm, Client client, UserDTO user) {
+        super(sm, client);
+        this.user = user;
+        addOption("back", sm::back);
+        addOption("Back to main menu", () -> sm.changeState(new MainMenuScreen(sm, client)));
         addOption("Edit Profile", this::editProfile, () -> client.getSessionManager().getUser() == user);
     }
 
     private void editProfile() {
-        sm.transitionTo("edit-profile");
+        sm.changeState(new EditProfileScreen(sm, client));
     }
 
     @Override
@@ -49,16 +58,7 @@ public class ViewProfileScreen extends OptionScreen {
     }
 
     @Override
-    public void handleArgs(Object[] args) {
-        logger.info("passed args to ViewProfileScreen: {}", args);
-        if (args[0] instanceof UserDTO) {
-            user = (UserDTO) args[0];
-        }
-    }
-
-    @Override
     public void onEnter() {
-        user = client.getSessionManager().getUser(); // reset user
         logger.info("Entered ViewProfileScreen");
     }
 

@@ -2,6 +2,7 @@ package iecd.a51597.common.protocol;
 
 import iecd.a51597.common.protocol.types.ActionType;
 import iecd.a51597.common.protocol.types.MessageType;
+import iecd.a51597.common.store.UserDTO;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -76,6 +77,39 @@ public class MessageFactory {
                 new MessageBody.SearchUsersRequest(
                         query
                 )
+        );
+    }
+
+    public static Message createMoveRequest(String protocolVersion, UUID sessionUUID, UUID gameId, String rawMove) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.GAME_MOVE,
+                sessionUUID,
+                new MessageBody.GameMove(gameId, rawMove)
+        );
+    }
+
+    public static Message buildSendInviteRequest(String protocolVersion, UUID sessionToken, UUID targetId) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.GAME_INVITE,
+                sessionToken,
+                new MessageBody.GameInviteRequest(targetId)
+        );
+    }
+
+    public static Message buildAcceptInviteRequest(String protocolVersion, UUID sessionUUID, UUID gameId, boolean response) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.GAME_INVITE_RESPONSE,
+                sessionUUID,
+                new MessageBody.GameInviteResponseRequest(gameId, response)
         );
     }
 }

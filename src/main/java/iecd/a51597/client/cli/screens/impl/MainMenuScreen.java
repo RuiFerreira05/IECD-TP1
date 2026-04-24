@@ -11,6 +11,7 @@ public class MainMenuScreen extends OptionScreen {
 
     public MainMenuScreen(StateMachine sm, Client client) {
         super(sm, client);
+        addOption("Play Dots and Boxes!", () -> sm.changeState(new GameMenuScreen(sm, client)), () -> client.getSessionManager().isLoggedIn());
         addOption("Login", this::login, () -> !client.getSessionManager().isLoggedIn());
         addOption("Register", this::register, () -> !client.getSessionManager().isLoggedIn());
         addOption("View profile", this::viewProfile, () -> client.getSessionManager().isLoggedIn());
@@ -24,22 +25,17 @@ public class MainMenuScreen extends OptionScreen {
         // TODO
     }
 
-    @Override
-    public void handleArgs(Object[] args) {
-
-    }
-
     private void exit() {
         System.out.println("Goodbye!");
         client.exit();
     }
 
     private void viewProfile() {
-        sm.transitionTo("view-profile");
+        sm.changeState(new ViewProfileScreen(sm, client));
     }
 
     private void searchForPlayer() {
-        sm.transitionTo("search");
+        sm.changeState(new SearchForPlayerScreen(sm, client));
     }
 
     private void logout() {
@@ -58,11 +54,11 @@ public class MainMenuScreen extends OptionScreen {
     }
 
     private void login() {
-        sm.transitionTo("login");
+        sm.changeState(new LoginScreen(sm, client));
     }
 
     private void register() {
-        sm.transitionTo("register");
+        sm.changeState(new RegisterScreen(sm, client));
     }
 
     @Override

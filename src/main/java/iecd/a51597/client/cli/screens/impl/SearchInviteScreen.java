@@ -9,9 +9,9 @@ import iecd.a51597.common.store.UserDTO;
 
 import java.util.List;
 
-public class SearchForPlayerScreen extends Screen {
+public class SearchInviteScreen extends Screen {
 
-    public SearchForPlayerScreen(StateMachine sm, Client client) {
+    public SearchInviteScreen(StateMachine sm, Client client) {
         super(sm, client);
     }
 
@@ -27,7 +27,7 @@ public class SearchForPlayerScreen extends Screen {
             return;
         }
         if (client.getServerConnection().getSearchHandler().searchPlayers(input) instanceof ClientSearchHandler.SearchPlayerResult.SUCCESS(List<UserDTO> newUsers)) {
-            sm.changeState(new SearchResultsScreen(sm, client, newUsers));
+            sm.changeState(new InviteSearchResultsScreen(sm, client, newUsers));
         }
     }
 

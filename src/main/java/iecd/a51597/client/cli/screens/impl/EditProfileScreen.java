@@ -90,14 +90,14 @@ public class EditProfileScreen extends Screen {
         switch (client.getSessionManager().editProfile(tempUsername, tempPassword, tempPhoto, tempNationality, tempDob)) {
             case ClientSessionManager.EditProfileResult.Success ignored -> {
                 System.out.println("Profile updated successfully!");
-                sm.transitionTo("view-profile");
+                sm.changeState(new ViewProfileScreen(sm, client));
             }
             case ClientSessionManager.EditProfileResult.UsernameTaken ignored -> {
                 System.out.println("Username is already taken. Please choose a different username.");
             }
             case ClientSessionManager.EditProfileResult.Error message -> {
                 System.out.println("Failed to update profile: " + message);
-                sm.transitionTo("view-profile");
+                sm.changeState(new ViewProfileScreen(sm, client));
             }
         }
         resetState();
@@ -105,11 +105,6 @@ public class EditProfileScreen extends Screen {
 
     @Override
     public void handlePush(Message message) {
-
-    }
-
-    @Override
-    public void handleArgs(Object[] args) {
 
     }
 

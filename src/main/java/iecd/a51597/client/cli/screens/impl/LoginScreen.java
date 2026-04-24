@@ -34,7 +34,7 @@ public class LoginScreen extends Screen {
         switch (currentState) {
             case ENTER_USERNAME -> {
                 if (input.equalsIgnoreCase("exit")) {
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     return;
                 }
                 // Store username in a temporary variable
@@ -43,7 +43,7 @@ public class LoginScreen extends Screen {
             }
             case ENTER_PASSWORD -> {
                 if (input.equalsIgnoreCase("exit")) {
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     return;
                 }
                 // Store password in a temporary variable
@@ -57,7 +57,7 @@ public class LoginScreen extends Screen {
         switch (client.getSessionManager().login(tempUsername, tempPassword)) {
             case ClientSessionManager.LoginResult.Success ignored -> {
                 System.out.println("Login successful! Welcome back, " + client.getSessionManager().getUser().username() + "!");
-                sm.transitionTo("main");
+                sm.changeState(new MainMenuScreen(sm, client));
             }
             case ClientSessionManager.LoginResult.InvalidCredentials ignored -> {
                 System.out.println("Invalid username or password. Please try again.");
@@ -79,11 +79,6 @@ public class LoginScreen extends Screen {
     @Override
     public void handlePush(Message message) {
         // TODO
-    }
-
-    @Override
-    public void handleArgs(Object[] args) {
-
     }
 
 

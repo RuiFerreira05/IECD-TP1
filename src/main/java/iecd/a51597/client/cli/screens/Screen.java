@@ -27,8 +27,6 @@ public abstract class Screen {
 
     abstract public void handlePush(Message message);
 
-    abstract public void handleArgs(Object[] args);
-
     abstract public void onEnter();
 
     abstract public void onExit();

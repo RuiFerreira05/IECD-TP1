@@ -4,13 +4,10 @@ import iecd.a51597.client.cli.screens.Screen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 public class StateMachine {
 
-    private final Map<String, Screen> screens;
     private Screen currentScreen;
     private final Stack<Screen> history;
     private final ClientCliHandler cliHandler;
@@ -19,16 +16,13 @@ public class StateMachine {
 
     public StateMachine(ClientCliHandler cliHandler) {
         this.cliHandler = cliHandler;
-        this.screens = new HashMap<>();
         this.history = new Stack<>();
     }
 
-    public void registerScreen(String identifier, Screen screen) {
-        screens.put(identifier, screen);
-    }
-
-    public void transitionTo(String identifier) {
-        Screen nextScreen = screens.get(identifier);
+    /**
+     * Transitions to a newly instantiated screen.
+     */
+    public void changeState(Screen nextScreen) {
         if (nextScreen != null) {
             if (currentScreen != null) {
                 currentScreen.onExit();
@@ -37,19 +31,16 @@ public class StateMachine {
             currentScreen = nextScreen;
             currentScreen.onEnter();
         } else {
-            logger.warn("Attempted to transition to unregistered screen: {}", identifier);
-            System.out.println("Error: Screen not found: " + identifier);
+            logger.warn("Attempted to transition to a null screen.");
         }
     }
 
-    public void transitionTo(String identifier, Object[] args) {
-        if (!screens.containsKey(identifier)) {
-            logger.warn("Attempted to transition to unregistered screen: {}", identifier);
-            System.out.println("Error: Screen not found: " + identifier);
-            return;
-        }
-        transitionTo(identifier);
-        currentScreen.handleArgs(args);
+    /**
+     * Clears the history stack. Useful when transitioning to a root screen
+     * (like MainMenu) where you don't want the user to be able to go "back" to Login.
+     */
+    public void clearHistory() {
+        history.clear();
     }
 
     public Screen back() {

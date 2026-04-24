@@ -48,9 +48,9 @@ public class GameManager {
      * @param player2 invitee
      * @return pending game
      */
-    public Game createPendingGame(User player1, User player2) {
+    public Game createPendingGame(UUID player1, UUID player2) {
         UUID gameId = UUID.randomUUID();
-        Game game = factory.createGame(gameId, player1.getUserId(), player2.getUserId());
+        Game game = factory.createGame(gameId, player1, player2);
         pendingGames.put(gameId, game);
         // playerGameIndex intentionally not touched
         return game;

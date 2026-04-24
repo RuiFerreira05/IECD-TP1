@@ -34,7 +34,7 @@ public class RegisterScreen extends Screen {
         switch (currentState) {
             case ENTER_USERNAME -> {
                 if (input.equalsIgnoreCase("exit")) {
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     return;
                 }
                 // Store username in a temporary variable
@@ -43,7 +43,7 @@ public class RegisterScreen extends Screen {
             }
             case ENTER_PASSWORD -> {
                 if (input.equalsIgnoreCase("exit")) {
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     return;
                 }
                 // Store password in a temporary variable
@@ -58,11 +58,11 @@ public class RegisterScreen extends Screen {
             case ClientSessionManager.RegisterResult.Success ignored -> {
                 if (client.getSessionManager().login(tempUsername, tempPassword) instanceof ClientSessionManager.LoginResult.Success) {
                     System.out.println("Registration successful! Welcome, " + client.getSessionManager().getUser().username() + "!");
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     resetState();
                 } else {
                     System.out.println("Registration succeeded but login failed. Please try logging in from the main menu.");
-                    sm.transitionTo("main");
+                    sm.changeState(new MainMenuScreen(sm, client));
                     resetState();
                 }
             }
@@ -87,12 +87,6 @@ public class RegisterScreen extends Screen {
     public void handlePush(Message message) {
         // TODO
     }
-
-    @Override
-    public void handleArgs(Object[] args) {
-
-    }
-
 
     @Override
     public void onEnter() {
