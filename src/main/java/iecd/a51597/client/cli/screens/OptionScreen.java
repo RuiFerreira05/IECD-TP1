@@ -16,6 +16,10 @@ public abstract class OptionScreen extends Screen {
         this.options = new ArrayList<>();
     }
 
+    protected void clearOptions() {
+        this.options.clear();
+    }
+
     @Override
     public void display() {
         System.out.println("=== " + this.getClass().getSimpleName() + " ===");

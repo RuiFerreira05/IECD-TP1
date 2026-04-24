@@ -108,6 +108,11 @@ public class EditProfileScreen extends Screen {
 
     }
 
+    @Override
+    public void handleArgs(Object[] args) {
+
+    }
+
     private void resetState() {
         currentState = State.USERNAME;
         tempUsername = null;

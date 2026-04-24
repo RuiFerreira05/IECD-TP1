@@ -28,6 +28,8 @@ public class ClientCliHandler {
         this.stateMachine.registerScreen("register", new RegisterScreen(stateMachine, client));
         this.stateMachine.registerScreen("view-profile", new ViewProfileScreen(stateMachine, client));
         this.stateMachine.registerScreen("edit-profile", new EditProfileScreen(stateMachine, client));
+        this.stateMachine.registerScreen("search", new SearchForPlayerScreen(stateMachine, client));
+        this.stateMachine.registerScreen("searchSelect", new SearchUserSelectScreen(stateMachine, client));
     }
 
     public void loop() {

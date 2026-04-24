@@ -8,27 +8,13 @@ import iecd.a51597.common.store.UserDTO;
 
 public class ViewProfileScreen extends OptionScreen {
 
-    public enum collectState {
-        NORMAL,
-        USERNAME,
-        PASSWORD,
-        PHOTO,
-        NATIONALITY,
-        DOB,
-    }
-
-    private collectState currentState = collectState.NORMAL;
-
-    private String tempUsername;
-    private String tempPassword;
-    private String tempPhoto;
-    private String tempNationality;
-    private String tempDob;
+    private UserDTO user;
 
     public ViewProfileScreen(StateMachine sm, Client client) {
         super(sm, client);
+        addOption("back", sm::back);
         addOption("Back to main menu", () -> sm.transitionTo("main"));
-        addOption("Edit Profile", this::editProfile);
+        addOption("Edit Profile", this::editProfile, () -> client.getSessionManager().getUser() == user);
     }
 
     private void editProfile() {
@@ -38,15 +24,13 @@ public class ViewProfileScreen extends OptionScreen {
     @Override
     public void display() {
         System.out.println("=== Your Profile ===");
-        UserDTO user = client.getSessionManager().getUser();
         if (user == null) {
-            System.out.println("Error: No user information available.");
             return;
         }
         System.out.println("User ID: " + user.userId());
         System.out.println("Username: " + user.username());
         System.out.println("nationality: " + (user.nationality() == null ? "" : user.nationality()));
-        System.out.println("Date of Birth: " + (user.dob() == null ? "" : user.dob() + "(" + user.getAge() + " years old)"));
+        System.out.println("Date of Birth: " + (user.dob() == null ? "" : user.dob() + " (" + user.getAge() + " years old)"));
         if (user.stats() != null) {
             System.out.println("stats:");
             System.out.println("  Games played: " + user.stats().gamesPlayed());
@@ -65,7 +49,16 @@ public class ViewProfileScreen extends OptionScreen {
     }
 
     @Override
+    public void handleArgs(Object[] args) {
+        logger.info("passed args to ViewProfileScreen: {}", args);
+        if (args[0] instanceof UserDTO) {
+            user = (UserDTO) args[0];
+        }
+    }
+
+    @Override
     public void onEnter() {
+        user = client.getSessionManager().getUser(); // reset user
         logger.info("Entered ViewProfileScreen");
     }
 

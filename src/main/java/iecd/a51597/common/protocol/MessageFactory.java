@@ -8,7 +8,8 @@ import java.util.UUID;
 
 public class MessageFactory {
 
-    private MessageFactory() {}
+    private MessageFactory() {
+    }
 
     public static Message buildLoginRequest(String protocolVersion, UUID uuid, String username, String password) {
         if (uuid == null) {
@@ -63,5 +64,18 @@ public class MessageFactory {
                 ActionType.UPDATE_PROFILE,
                 sessionToken,
                 new MessageBody.UpdateProfile(username, password, photo, nationality, dob));
+    }
+
+    public static Message buildSearchRequest(String protocolVersion, String query) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.SEARCH_USERS,
+                null,
+                new MessageBody.SearchUsersRequest(
+                        query
+                )
+        );
     }
 }

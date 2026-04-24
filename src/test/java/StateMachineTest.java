@@ -65,10 +65,24 @@ class StateMachineTest {
         assertEquals(0, first.exitCount);
     }
 
+    @Test
+    void transitionToWithArgs_unregisteredScreen_keepsCurrent_andDoesNotCallHandleArgs() {
+        StateMachine sm = new StateMachine(mock(ClientCliHandler.class));
+        TestScreen first = new TestScreen(sm);
+        sm.registerScreen("first", first);
+        sm.transitionTo("first");
+
+        sm.transitionTo("missing", new Object[]{"payload"});
+
+        assertSame(first, sm.getCurrentScreen());
+        assertEquals(0, first.handleArgsCount);
+    }
+
     private static final class TestScreen extends Screen {
 
         int enterCount;
         int exitCount;
+        int handleArgsCount;
 
         private TestScreen(StateMachine sm) {
             super(sm, null);
@@ -87,6 +101,11 @@ class StateMachineTest {
         @Override
         public void handlePush(Message message) {
             // no-op for unit tests
+        }
+
+        @Override
+        public void handleArgs(Object[] args) {
+            handleArgsCount++;
         }
 
         @Override

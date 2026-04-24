@@ -81,6 +81,11 @@ public class LoginScreen extends Screen {
         // TODO
     }
 
+    @Override
+    public void handleArgs(Object[] args) {
+
+    }
+
 
     @Override
     public void onEnter() {

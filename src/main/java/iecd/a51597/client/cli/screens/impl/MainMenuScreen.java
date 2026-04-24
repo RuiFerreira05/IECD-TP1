@@ -24,6 +24,11 @@ public class MainMenuScreen extends OptionScreen {
         // TODO
     }
 
+    @Override
+    public void handleArgs(Object[] args) {
+
+    }
+
     private void exit() {
         System.out.println("Goodbye!");
         client.exit();

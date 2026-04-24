@@ -42,6 +42,16 @@ public class StateMachine {
         }
     }
 
+    public void transitionTo(String identifier, Object[] args) {
+        if (!screens.containsKey(identifier)) {
+            logger.warn("Attempted to transition to unregistered screen: {}", identifier);
+            System.out.println("Error: Screen not found: " + identifier);
+            return;
+        }
+        transitionTo(identifier);
+        currentScreen.handleArgs(args);
+    }
+
     public Screen back() {
         if (history.isEmpty()) {
             return null;

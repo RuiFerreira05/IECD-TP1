@@ -1,6 +1,7 @@
 package iecd.a51597.client.network;
 
 import iecd.a51597.client.Client;
+import iecd.a51597.client.cli.screens.handlers.ClientSearchHandler;
 import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.Message;
@@ -33,6 +34,7 @@ public class ServerConnection implements Runnable {
     private CommParser parser;
     private ClientMessageBuilder messageBuilder;
     private int reconnectAttempts;
+    private ClientSearchHandler searchHandler;
 
     private ClientSessionManager sessionManager = null;
 
@@ -44,6 +46,7 @@ public class ServerConnection implements Runnable {
         this.parser = parser;
         this.messageBuilder = messageBuilder;
 
+        this.searchHandler = new ClientSearchHandler(this);
         this.pendingRequests = new ConcurrentHashMap<>();
         this.reconnectAttempts = ClientConfiguration.RECONNECT_ATTEMPTS;
     }
@@ -155,5 +158,9 @@ public class ServerConnection implements Runnable {
 
     public void setSessionManager(ClientSessionManager sessionManager) {
         this.sessionManager = sessionManager;
+    }
+
+    public ClientSearchHandler getSearchHandler() {
+        return searchHandler;
     }
 }
