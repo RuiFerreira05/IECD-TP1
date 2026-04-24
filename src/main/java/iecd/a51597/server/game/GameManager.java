@@ -1,5 +1,8 @@
 package iecd.a51597.server.game;
 
+import iecd.a51597.common.game.Game;
+import iecd.a51597.common.game.GameFactory;
+import iecd.a51597.common.game.MoveCodec;
 import iecd.a51597.server.store.entities.User;
 
 import java.util.Collection;
@@ -47,7 +50,7 @@ public class GameManager {
      */
     public Game createPendingGame(User player1, User player2) {
         UUID gameId = UUID.randomUUID();
-        Game game = factory.createGame(gameId, player1, player2);
+        Game game = factory.createGame(gameId, player1.getUserId(), player2.getUserId());
         pendingGames.put(gameId, game);
         // playerGameIndex intentionally not touched
         return game;
@@ -62,12 +65,12 @@ public class GameManager {
     public Optional<Game> acceptGame(UUID gameId) {
         Game game = pendingGames.remove(gameId);
         if (game == null) return Optional.empty();
-        if (isInGame(game.getPlayer1().getUserId()) || isInGame(game.getPlayer2().getUserId())) {
+        if (isInGame(game.getPlayer1Id()) || isInGame(game.getPlayer2Id())) {
             return Optional.empty();
         }
         activeGames.put(gameId, game);
-        playerGameIndex.put(game.getPlayer1().getUserId(), gameId);
-        playerGameIndex.put(game.getPlayer2().getUserId(), gameId);
+        playerGameIndex.put(game.getPlayer1Id(), gameId);
+        playerGameIndex.put(game.getPlayer2Id(), gameId);
         return Optional.of(game);
     }
 
@@ -134,8 +137,8 @@ public class GameManager {
     public void endGame(UUID gameId) {
         Game game = activeGames.remove(gameId);
         if (game != null) {
-            playerGameIndex.remove(game.getPlayer1().getUserId());
-            playerGameIndex.remove(game.getPlayer2().getUserId());
+            playerGameIndex.remove(game.getPlayer1Id());
+            playerGameIndex.remove(game.getPlayer2Id());
         }
     }
 

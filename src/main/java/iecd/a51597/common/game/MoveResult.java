@@ -1,6 +1,8 @@
-package iecd.a51597.server.game;
+package iecd.a51597.common.game;
 
 import iecd.a51597.server.store.entities.User;
+
+import java.util.UUID;
 
 /**
  * Outcome of applying a move in a game instance.
@@ -21,7 +23,7 @@ public sealed interface MoveResult {
     /**
      * Move ended the game with a winner.
      *
-     * @param winner winning player
+     * @param winnerId winning player uuid
      */
-    record GameOver(User winner) implements MoveResult {}
+    record GameOver(UUID winnerId) implements MoveResult {}
 }

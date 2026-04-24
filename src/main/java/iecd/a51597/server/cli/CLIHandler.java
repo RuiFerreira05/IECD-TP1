@@ -44,18 +44,16 @@ public class CLIHandler {
      */
     public CLIHandler(Server server) {
         this.server = server;
-        commands.put("help",            new Command(this::help, null, "Show this help message"));
-        commands.put("status",          new Command(this::status, null, "Print server status"));
-        commands.put("start",           new Command(this::start, "[port]", "Start the server on the given port (default: configured port)"));
-        commands.put("stop",            new Command(this::stop, null, "Stop the server from accepting new connections"));
-        commands.put("exit",            new Command(this::exit, null, "Shutdown the server and exit"));
-        commands.put("sessions",        new Command(this::sessions, null, "List all active sessions"));
-        commands.put("users",           new Command(this::users, null, "List all registered users"));
-        commands.put("games",           new Command(this::games, null, "List all pending and active games"));
-        commands.put("connections",     new Command(this::connections, null, "List all open connections"));
-        commands.put("kick",            new Command(this::kick, "<username>", "Close a user's connection and invalidate their session"));
-        commands.put("endgame",         new Command(this::endgame, "<game-id>", "Force-end an active game (player1 recorded as winner)"));
-        commands.put("leaderboard",     new Command(this::leaderboard, "[limit]", "Show the player leaderboard"));
+        commands.put("help", new Command(this::help, null, "Show this help message"));
+        commands.put("status", new Command(this::status, null, "Print server status"));
+        commands.put("start", new Command(this::start, "[port]", "Start the server on the given port (default: configured port)"));
+        commands.put("stop", new Command(this::stop, null, "Stop the server from accepting new connections"));
+        commands.put("exit", new Command(this::exit, null, "Shutdown the server and exit"));
+        commands.put("sessions", new Command(this::sessions, null, "List all active sessions"));
+        commands.put("users", new Command(this::users, null, "List all registered users"));
+        commands.put("connections", new Command(this::connections, null, "List all open connections"));
+        commands.put("kick", new Command(this::kick, "<username>", "Close a user's connection and invalidate their session"));
+        commands.put("leaderboard", new Command(this::leaderboard, "[limit]", "Show the player leaderboard"));
     }
 
     /**
@@ -105,24 +103,6 @@ public class CLIHandler {
                     u.getUsername(),
                     online ? "● online" : "○ offline"
             );
-        }
-    }
-
-    private void games(String[] args) {
-        var active = server.getGameManager().getAllActiveGames();
-        var pending = server.getGameManager().getAllPendingGames();
-        System.out.printf("Active games: %d  |  Pending games: %d%n", active.size(), pending.size());
-        if (active.isEmpty() && pending.isEmpty()) return;
-        System.out.printf("  %-8s  %-10s  %-16s  %s%n", "STATE", "GAME ID", "PLAYER 1", "PLAYER 2");
-        for (var g : active) {
-            System.out.printf("  %-8s  %-10s  %-16s  %s%n",
-                    "ACTIVE", shortId(g.getGameId()),
-                    g.getPlayer1().getUsername(), g.getPlayer2().getUsername());
-        }
-        for (var g : pending) {
-            System.out.printf("  %-8s  %-10s  %-16s  %s%n",
-                    "PENDING", shortId(g.getGameId()),
-                    g.getPlayer1().getUsername(), g.getPlayer2().getUsername());
         }
     }
 
@@ -187,41 +167,6 @@ public class CLIHandler {
                 ),
                 () -> System.out.println("No user found with username: " + username)
         );
-    }
-
-    private void endgame(String[] args) {
-        if (args.length == 0) {
-            System.out.println("Usage: endgame <game-id>");
-            return;
-        }
-        String prefix = args[0].toLowerCase();
-
-        var matches = server.getGameManager().getAllActiveGames().stream()
-                .filter(g -> g.getGameId().toString().toLowerCase().startsWith(prefix))
-                .toList();
-
-        if (matches.isEmpty()) {
-            System.out.println("No active game found matching: " + prefix);
-            return;
-        }
-        if (matches.size() > 1) {
-            System.out.println("Ambiguous prefix — " + matches.size() + " games match. Be more specific.");
-            return;
-        }
-
-        var game = matches.getFirst();
-        var winner = game.getPlayer1(); // nominal winner for protocol compliance
-
-        byte[] payload = server.getMessageBuilder().gameOverPush(game.getGameId(), winner);
-        server.getSessionManager().getSessionByUserId(game.getPlayer1().getUserId())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
-        server.getSessionManager().getSessionByUserId(game.getPlayer2().getUserId())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
-
-        server.getGameManager().endGame(game.getGameId());
-        System.out.printf("Ended game %s (winner recorded as %s)%n",
-                shortId(game.getGameId()), winner.getUsername());
-        logger.info("Admin force-ended game {}", game.getGameId());
     }
 
     private static String shortId(UUID id) {

@@ -1,4 +1,4 @@
-package iecd.a51597.server.game;
+package iecd.a51597.common.game;
 
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 

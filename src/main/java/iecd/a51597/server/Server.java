@@ -2,7 +2,7 @@ package iecd.a51597.server;
 
 import iecd.a51597.server.cli.CLIHandler;
 import iecd.a51597.server.config.ServerConfiguration;
-import iecd.a51597.server.game.GameFactory;
+import iecd.a51597.common.game.GameFactory;
 import iecd.a51597.server.game.GameManager;
 import iecd.a51597.server.handlers.*;
 import iecd.a51597.server.network.Connection;

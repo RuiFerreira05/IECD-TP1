@@ -296,7 +296,7 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
         Element body = s.body();
 
         body.appendChild(textElement(doc, "game-id",         gameId.toString()));
-        body.appendChild(textElement(doc, "winner-id",       winner.getUserId().toString()));
+        body.appendChild(textElement(doc, "winner-id",       winner.toString()));
         body.appendChild(textElement(doc, "winner-username", winner.getUsername()));
 
         return serialize(doc);

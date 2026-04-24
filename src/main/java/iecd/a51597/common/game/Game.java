@@ -1,4 +1,4 @@
-package iecd.a51597.server.game;
+package iecd.a51597.common.game;
 
 import iecd.a51597.server.store.entities.User;
 
@@ -14,21 +14,23 @@ public interface Game {
     UUID getGameId();
 
     /**
-     * @return first player (inviter/origin player)
+     * @return first player uuid (inviter/origin player)
      */
-    User getPlayer1();
+    UUID getPlayer1Id();
 
     /**
-     * @return second player (invitee)
+     * @return second player uuid (invitee)
      */
-    User getPlayer2();
+    UUID getPlayer2Id();
+
+    Long getStartTimeMillis();
 
     /**
      * Applies a move for one player.
      *
-     * @param player player issuing the move
+     * @param playerId playerId issuing the move
      * @param move move to apply
      * @return domain result indicating acceptance, rejection, or game completion
      */
-    MoveResult applyMove(User player, Move move);
+    MoveResult applyMove(UUID playerId, Move move);
 }

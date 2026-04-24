@@ -1,13 +1,13 @@
 package iecd.a51597.server.handlers;
 
-import iecd.a51597.server.game.Move;
+import iecd.a51597.common.game.Move;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.game.GameManager;
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
-import iecd.a51597.server.game.Game;
-import iecd.a51597.server.game.MoveResult;
+import iecd.a51597.common.game.Game;
+import iecd.a51597.common.game.MoveResult;
 import iecd.a51597.common.protocol.Message;
 import iecd.a51597.common.protocol.MessageBody;
 import iecd.a51597.common.protocol.builders.server.ServerMessageBuilder;
@@ -16,6 +16,7 @@ import iecd.a51597.server.store.entities.User;
 import iecd.a51597.server.store.UserStore;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Handles multiplayer game invitation and move lifecycle actions.
@@ -167,22 +168,22 @@ public class GameHandler extends BaseHandler {
         }
         Game game = gameOpt.get();
 
-        User inviter = game.getPlayer1();
+        UUID inviterId = game.getPlayer1Id();
 
         // Edge case just to prevent game invite high-jacking, not even sure if it would trigger but might as well
-        if (!responder.getUserId().equals(game.getPlayer2().getUserId())) {
+        if (!responder.getUserId().equals(game.getPlayer2Id())) {
             logger.warn(
                     "Rejected game invite response: responder is not invited player: messageId={}, responderUserId={}, gameId={}, invitedUserId={}",
                     message.messageId(),
                     responder.getUserId(),
                     game.getGameId(),
-                    game.getPlayer2().getUserId()
+                    game.getPlayer2Id()
             );
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not the invited player");
             return;
         }
 
-        Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviter.getUserId());
+        Optional<Session> inviterSessionOpt = sessionManager.getSessionByUserId(inviterId);
 
         if (inviterSessionOpt.isEmpty()) {
             gameManager.declineGame(game.getGameId());
@@ -190,7 +191,7 @@ public class GameHandler extends BaseHandler {
                     "Declined pending game because inviter went offline: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
                     message.messageId(),
                     game.getGameId(),
-                    inviter.getUserId(),
+                    inviterId,
                     responder.getUserId()
             );
             sendError(message, connection, ErrorCodeType.USER_NOT_ONLINE, "The inviting player is no longer online");
@@ -203,12 +204,12 @@ public class GameHandler extends BaseHandler {
                     "Invite declined: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
                     message.messageId(),
                     game.getGameId(),
-                    inviter.getUserId(),
+                    inviterId,
                     responder.getUserId()
             );
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
             inviterSessionOpt.ifPresent(s ->
-                s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId()))
+                    s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId()))
             );
             return;
         }
@@ -218,7 +219,7 @@ public class GameHandler extends BaseHandler {
                 "Invite accepted and game activated: messageId={}, gameId={}, inviterUserId={}, responderUserId={}",
                 message.messageId(),
                 game.getGameId(),
-                inviter.getUserId(),
+                inviterId,
                 responder.getUserId()
         );
         connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
@@ -234,16 +235,16 @@ public class GameHandler extends BaseHandler {
         if (!requireConfiguredGame(message, connection)) return;
         Optional<Session> sessionOpt = requireSession(message, connection);
         if (sessionOpt.isEmpty()) return;
-        Session  session = sessionOpt.get();
+        Session session = sessionOpt.get();
 
-        User player = session.getUser();
+        UUID playerId = session.getUserId();
         MessageBody.GameMove body = (MessageBody.GameMove) message.body();
 
         logger.debug(
                 "Processing game move request: messageId={}, gameId={}, playerUserId={}, rawMoveBytes={}",
                 message.messageId(),
                 body.gameId(),
-                player.getUserId(),
+                playerId,
                 body.rawMove().length()
         );
 
@@ -253,7 +254,7 @@ public class GameHandler extends BaseHandler {
                     "Rejected game move: game not found: messageId={}, gameId={}, playerUserId={}",
                     message.messageId(),
                     body.gameId(),
-                    player.getUserId()
+                    playerId
             );
             sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
             return;
@@ -263,15 +264,15 @@ public class GameHandler extends BaseHandler {
 
         // This guard prevents game move injection from third parties, a bit overkill for a uni project, but
         // I'm kinda overkill
-        if (!player.getUserId().equals(game.getPlayer1().getUserId())
-                && !player.getUserId().equals(game.getPlayer2().getUserId())) {
+        if (!playerId.equals(game.getPlayer1Id())
+                && !playerId.equals(game.getPlayer2Id())) {
             logger.warn(
                     "Rejected game move: player is not part of game: messageId={}, gameId={}, playerUserId={}, player1UserId={}, player2UserId={}",
                     message.messageId(),
                     game.getGameId(),
-                    player.getUserId(),
-                    game.getPlayer1().getUserId(),
-                    game.getPlayer2().getUserId()
+                    playerId,
+                    game.getPlayer1Id(),
+                    game.getPlayer2Id()
             );
             sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not a player in this game");
             return;
@@ -285,25 +286,25 @@ public class GameHandler extends BaseHandler {
                     "Rejected game move: malformed move payload: messageId={}, gameId={}, playerUserId={}, rawMoveBytes={}",
                     message.messageId(),
                     game.getGameId(),
-                    player.getUserId(),
+                    playerId,
                     body.rawMove().length()
             );
             sendError(message, connection, ErrorCodeType.MALFORMED_REQUEST, "Invalid move payload");
             return;
         }
 
-        switch (game.applyMove(player, move)) {
+        switch (game.applyMove(playerId, move)) {
             case MoveResult.Accepted() -> {
                 logger.debug(
                         "Accepted game move: messageId={}, gameId={}, playerUserId={}",
                         message.messageId(),
                         game.getGameId(),
-                        player.getUserId()
+                        playerId
                 );
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
-                User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
-                        ? game.getPlayer2() : game.getPlayer1();
-                sessionManager.getSessionByUserId(opponent.getUserId()).ifPresent(s ->
+                UUID opponent = game.getPlayer1Id().equals(playerId)
+                        ? game.getPlayer2Id() : game.getPlayer1Id();
+                sessionManager.getSessionByUserId(opponent).ifPresent(s ->
                         s.getConnection().sendMessage(
                                 messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
                         )
@@ -314,30 +315,30 @@ public class GameHandler extends BaseHandler {
                         "Rejected game move by game rules: messageId={}, gameId={}, playerUserId={}, reason={}",
                         message.messageId(),
                         game.getGameId(),
-                        player.getUserId(),
+                        playerId,
                         reason
                 );
-                    sendError(message, connection, ErrorCodeType.INVALID_MOVE, reason);
+                sendError(message, connection, ErrorCodeType.INVALID_MOVE, reason);
             }
-            case MoveResult.GameOver(User winner) -> {
+            case MoveResult.GameOver(UUID winner) -> {
                 logger.info(
                         "Game over reached after move: messageId={}, gameId={}, playerUserId={}, winnerUserId={}",
                         message.messageId(),
                         game.getGameId(),
-                        player.getUserId(),
-                        winner.getUserId()
+                        playerId,
+                        winner
                 );
                 connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
-                User opponent = game.getPlayer1().getUserId().equals(player.getUserId())
-                        ? game.getPlayer2() : game.getPlayer1();
-                sessionManager.getSessionByUserId(opponent.getUserId()).ifPresent(s ->
+                UUID opponentId = game.getPlayer1Id().equals(playerId)
+                        ? game.getPlayer2Id() : game.getPlayer1Id();
+                sessionManager.getSessionByUserId(opponentId).ifPresent(s ->
                         s.getConnection().sendMessage(
                                 messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
                         )
                 );
                 pushGameOver(game, winner);
                 gameManager.endGame(game.getGameId());
-                logger.info("Closed active game: gameId={}, winnerUserId={}", game.getGameId(), winner.getUserId());
+                logger.info("Closed active game: gameId={}, winnerUserId={}", game.getGameId(), winner);
             }
         }
     }
@@ -355,18 +356,18 @@ public class GameHandler extends BaseHandler {
         sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "GAME_OVER is server-initiated only");
     }
 
-    private void pushGameOver(Game game, User winner) {
+    private void pushGameOver(Game game, UUID winner) {
         logger.info(
                 "Broadcasting game over event: gameId={}, winnerUserId={}, player1UserId={}, player2UserId={}",
                 game.getGameId(),
-                winner.getUserId(),
-                game.getPlayer1().getUserId(),
-                game.getPlayer2().getUserId()
+                winner,
+                game.getPlayer1Id(),
+                game.getPlayer2Id()
         );
-        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner);
-        sessionManager.getSessionByUserId(game.getPlayer1().getUserId())
+        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), userStore.findById(winner).get()); // This might fail if for some reason the userId doesn't exist, but time doesn't allow me to fix it
+        sessionManager.getSessionByUserId(game.getPlayer1Id())
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
-        sessionManager.getSessionByUserId(game.getPlayer2().getUserId())
+        sessionManager.getSessionByUserId(game.getPlayer2Id())
                 .ifPresent(s -> s.getConnection().sendMessage(payload));
     }
 

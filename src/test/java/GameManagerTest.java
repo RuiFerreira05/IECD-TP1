@@ -1,3 +1,4 @@
+import iecd.a51597.common.game.*;
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
 import iecd.a51597.server.game.*;
 import iecd.a51597.server.store.entities.User;
@@ -29,23 +30,28 @@ class GameManagerTest {
 
     static class DummyGame implements Game {
         private final UUID id;
-        private final User p1;
-        private final User p2;
+        private final UUID p1;
+        private final UUID p2;
 
-        DummyGame(UUID id, User p1, User p2) { this.id = id; this.p1 = p1; this.p2 = p2; }
+        DummyGame(UUID id, UUID p1, UUID p2) { this.id = id; this.p1 = p1; this.p2 = p2; }
 
         @Override public UUID getGameId()  { return id; }
-        @Override public User getPlayer1() { return p1; }
-        @Override public User getPlayer2() { return p2; }
-        @Override public MoveResult applyMove(User player, Move move) {
+        @Override public UUID getPlayer1Id() { return p1; }
+        @Override public UUID getPlayer2Id() { return p2; }
+        @Override public MoveResult applyMove(UUID player, Move move) {
             return new MoveResult.Accepted();
+        }
+
+        @Override
+        public Long getStartTimeMillis() {
+            return 0L; // not testing this rn
         }
     }
 
     static class DummyFactory implements GameFactory {
         private final DummyCodec codec = new DummyCodec();
-        @Override public Game createGame(UUID gameId, User p1, User p2) {
-            return new DummyGame(gameId, p1, p2);
+        @Override public Game createGame(UUID gameId, UUID p1Id, UUID p2Id) {
+            return new DummyGame(gameId, p1Id, p2Id);
         }
         @Override public MoveCodec getMoveCodec() { return codec; }
     }
