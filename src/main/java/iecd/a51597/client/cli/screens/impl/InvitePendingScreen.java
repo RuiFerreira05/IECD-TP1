@@ -61,7 +61,10 @@ public class InvitePendingScreen extends Screen {
             case ClientInviteHandler.InviteResult.Success(UUID gameId) -> {
                 System.out.println("Invite sent to " + target.username() + ", waiting for response...");
             }
-            case ClientInviteHandler.InviteResult.Error(String message) -> System.out.println("Failed to send invite to " + target.username() + ": " + message);
+            case ClientInviteHandler.InviteResult.Error(String message) -> {
+                System.out.println("Failed to send invite to " + target.username() + ": " + message);
+                sm.back();
+            }
         }
     }
 
