@@ -1,6 +1,7 @@
 package iecd.a51597.server.handlers;
 
 import iecd.a51597.server.network.Connection;
+import iecd.a51597.server.persistence.PersistenceManager;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.protocol.Message;
@@ -18,6 +19,7 @@ public abstract class BaseHandler {
 
     protected final ServerMessageBuilder messageBuilder;
     protected final SessionManager sessionManager;
+    protected final PersistenceManager persistenceManager;
 
     // Inherited by concrete handlers so logs are tagged with subclass type.
     protected final Logger logger = LogManager.getLogger(getClass());
@@ -28,9 +30,10 @@ public abstract class BaseHandler {
      * @param messageBuilder response builder
      * @param sessionManager session manager
      */
-    protected BaseHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager) {
+    protected BaseHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, PersistenceManager persistenceManager) {
         this.messageBuilder = messageBuilder;
         this.sessionManager = sessionManager;
+        this.persistenceManager = persistenceManager;
     }
 
     /**

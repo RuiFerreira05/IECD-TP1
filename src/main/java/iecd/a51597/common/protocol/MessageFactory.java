@@ -57,7 +57,7 @@ public class MessageFactory {
         );
     }
 
-    public static Message buildUpdateProfileRequest(String protocolVersion, UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
+    public static Message buildUpdateProfileRequest(String protocolVersion, UUID sessionToken, String username, String password, byte[] photo, String nationality, LocalDate dob) {
         return new Message(
                 UUID.randomUUID(),
                 MessageType.REQUEST,

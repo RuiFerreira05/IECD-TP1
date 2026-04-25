@@ -12,6 +12,7 @@ public class PersistenceManager {
 
     private static final Logger logger = LogManager.getLogger(PersistenceManager.class);
     private final UserRepository userRepository;
+    private final Thread persistenceThread;
 
     private final UserStore userStore;
 
@@ -23,6 +24,19 @@ public class PersistenceManager {
     public PersistenceManager(UserStore userStore) {
         this.userStore = userStore;
         this.userRepository = RepositoryFactory.createUserRepository(ServerConfiguration.PERSISTENCE_TYPE, logger);
+        this.persistenceThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(ServerConfiguration.PERSISTENCE_INTERVAL_MS);
+                    save();
+                } catch (InterruptedException e) {
+                    logger.info("Persistence thread interrupted, shutting down...");
+                    break;
+                } catch (Exception e) {
+                    logger.error("Error during periodic persistence", e);
+                }
+            }
+        });
     }
 
     /**
@@ -38,4 +52,6 @@ public class PersistenceManager {
     public void save() {
         userRepository.saveFrom(userStore);
     }
+
+    public String savePhoto(byte[] photo, String oldPhoto) {return userRepository.savePhoto(photo, oldPhoto);}
 }

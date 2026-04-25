@@ -95,6 +95,9 @@ public class EditProfileScreen extends Screen {
             case ClientSessionManager.EditProfileResult.UsernameTaken ignored -> {
                 System.out.println("Username is already taken. Please choose a different username.");
             }
+            case ClientSessionManager.EditProfileResult.PhotoNotFoundError ignored -> {
+                System.out.println("Photo file not found. Please check the provided path and try again.");
+            }
             case ClientSessionManager.EditProfileResult.Error message -> {
                 System.out.println("Failed to update profile: " + message);
                 sm.changeState(new ViewProfileScreen(sm, client));

@@ -25,6 +25,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -130,7 +131,7 @@ public class XMLParser implements CommParser {
             case LOGIN -> new MessageBody.LoginRequest(require(body, "username"), require(body, "password"));
             case LOGOUT -> new MessageBody.Logout();
             case UPDATE_PROFILE ->
-                    new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getField(body, "photo"), getField(body, "nationality"), getLocalDate(body, "dob"));
+                    new MessageBody.UpdateProfile(getField(body, "username"), getField(body, "password"), getBytes(body, "photo"), getField(body, "nationality"), getLocalDate(body, "dob"));
             case SEARCH_USERS -> new MessageBody.SearchUsersRequest(require(body, "query"));
             case GAME_INVITE -> new MessageBody.GameInviteRequest(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE ->
@@ -139,16 +140,6 @@ public class XMLParser implements CommParser {
                     new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
             case GAME_OVER, GAME_OVER_DRAW, UNKNOWN -> new MessageBody.Unknown();
         };
-    }
-
-    private LocalDate getLocalDate(Element body, String ld) throws MalformedMessageException {
-        String dobStr = getField(body, ld);
-        if (dobStr == null) return null;
-        try {
-            return LocalDate.parse(dobStr);
-        } catch (Exception e) {
-            throw new MalformedMessageException("Invalid date format in field <" + ld + ">: " + dobStr, e);
-        }
     }
 
     private MessageBody parseResponseBody(ActionType action, Element body) throws MalformedMessageException {
@@ -325,6 +316,22 @@ public class XMLParser implements CommParser {
         NodeList nodes = rootElement.getElementsByTagName(tag);
         if (nodes.getLength() == 0) return null;
         return nodes.item(0).getTextContent().trim();
+    }
+
+    private byte[] getBytes(Element rootElement, String tag) {
+        NodeList nodes = rootElement.getElementsByTagName(tag);
+        if (nodes.getLength() == 0) return null;
+        return Base64.getDecoder().decode(nodes.item(0).getTextContent());
+    }
+
+    private LocalDate getLocalDate(Element body, String tag) throws MalformedMessageException {
+        String dobStr = getField(body, tag);
+        if (dobStr == null) return null;
+        try {
+            return LocalDate.parse(dobStr);
+        } catch (Exception e) {
+            throw new MalformedMessageException("Invalid date format in field <" + tag + ">: " + dobStr, e);
+        }
     }
 
     /**

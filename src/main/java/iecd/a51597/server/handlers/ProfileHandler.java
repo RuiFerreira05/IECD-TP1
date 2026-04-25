@@ -1,6 +1,7 @@
 package iecd.a51597.server.handlers;
 
 import iecd.a51597.server.network.Connection;
+import iecd.a51597.server.persistence.PersistenceManager;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.protocol.Message;
@@ -23,8 +24,8 @@ public class ProfileHandler extends BaseHandler {
     /**
      * Creates a profile handler.
      */
-    public ProfileHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore) {
-        super(messageBuilder, sessionManager);
+    public ProfileHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, PersistenceManager persistenceManager) {
+        super(messageBuilder, sessionManager, persistenceManager);
         this.userStore = userStore;
     }
 
@@ -45,8 +46,11 @@ public class ProfileHandler extends BaseHandler {
         try {
             if (body.username() != null && !body.username().isBlank()) userStore.updateUsername(user, body.username());
             if (body.password() != null && !body.password().isBlank()) userStore.updatePassword(user, body.password());
-            if (body.photo() != null && !body.photo().isBlank()) userStore.updatePhoto(user, body.photo());
             if (body.nationality() != null && !body.nationality().isBlank()) userStore.updateNationality(user, body.nationality());
+            if (body.photo() != null) {
+                String reference = persistenceManager.savePhoto(body.photo(), user.getPhoto());
+                userStore.updatePhoto(user, reference);
+            }
             if (body.dob() != null) userStore.updateDob(user, body.dob());
         } catch (UsernameAlreadyTakenException e) {
             logger.error("Failed to update profile for user {}", user.getUserId(), e);

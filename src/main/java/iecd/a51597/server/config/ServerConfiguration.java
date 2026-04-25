@@ -31,14 +31,18 @@ public final class ServerConfiguration {
     public static int MAX_FRAME_SIZE = 1024 * 1024;
     /** Session timeout in seconds. */
     public static long SESSION_TIMEOUT_SECONDS = 60 * 30; // 30 mins
-    /** User persistence file path. */
-    public static String USER_STORE = "data/users.xml";
     /** Width used by CLI status box rendering. */
     public static int STATUS_BOX_WIDTH = 42;
     /** Supported protocol version string. */
     public static String PROTOCOL_VERSION = "1.0";
     /** Which way to store data */
     public static String PERSISTENCE_TYPE = "xml";
+    /** User persistence file path. (only has effect if PERSISTENCE_TYPE=xml) */
+    public static String USER_STORE = "data/users.xml";
+    /** Photo persistence folder path. (only has effect if PERSISTENCE_TYPE=xml)*/
+    public static String PHOTO_STORE = "data/photos/";
+    /** number of Milliseconds between save intervals */
+    public static long PERSISTENCE_INTERVAL_MS = 60 * 1000; // 1 min
 
     /**
      * Loads configuration overrides from {@code config.xml} when present and valid.
@@ -65,10 +69,12 @@ public final class ServerConfiguration {
             DEFAULT_PORT = parseInt(root, "defaultPort", DEFAULT_PORT);
             MAX_FRAME_SIZE = parseInt(root, "maxFrameSize", MAX_FRAME_SIZE);
             SESSION_TIMEOUT_SECONDS = parseLong(root, "sessionTimeoutSeconds", SESSION_TIMEOUT_SECONDS);
-            USER_STORE = parseString(root, "userStore", USER_STORE);
             STATUS_BOX_WIDTH = parseInt(root, "statusBoxWidth", STATUS_BOX_WIDTH);
             PROTOCOL_VERSION = parseString(root, "protocolVersion", PROTOCOL_VERSION);
             PERSISTENCE_TYPE = parseString(root, "persistenceType", PERSISTENCE_TYPE);
+            USER_STORE = parseString(root, "userStore", USER_STORE);
+            PHOTO_STORE = parseString(root, "photoStore", PHOTO_STORE);
+            PERSISTENCE_INTERVAL_MS = parseLong(root, "persistenceIntervalMs", PERSISTENCE_INTERVAL_MS);
 
             logger.info("Configuration loaded from '{}'", CONFIG_FILE);
         } catch (Exception e) {

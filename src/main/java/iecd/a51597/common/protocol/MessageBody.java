@@ -60,7 +60,7 @@ public sealed interface MessageBody {
     /**
      * Profile update payload.
      */
-    record UpdateProfile(String username, String password, String photo, String nationality, LocalDate dob) implements MessageBody {}
+    record UpdateProfile(String username, String password, byte[] photo, String nationality, LocalDate dob) implements MessageBody {}
 
     /**
      * Profile update response payload.

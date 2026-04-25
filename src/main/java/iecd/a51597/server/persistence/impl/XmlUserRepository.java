@@ -24,8 +24,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +36,8 @@ public class XmlUserRepository implements UserRepository {
     private final DocumentBuilderFactory dbf;
     private final TransformerFactory tf;
     private final Schema userSchema;
+
+    private final File userStorePath;
 
     private static final Logger logger = LogManager.getLogger(XmlUserRepository.class);
 
@@ -47,6 +51,9 @@ public class XmlUserRepository implements UserRepository {
         } catch (SAXException e) {
             throw new IllegalStateException("Failed to load users.xsd — ensure it is on the classpath", e);
         }
+
+        this.userStorePath = new File(ServerConfiguration.USER_STORE);
+        this.userStorePath.getParentFile().mkdirs();
     }
 
     private Validator newValidator() {
@@ -63,15 +70,10 @@ public class XmlUserRepository implements UserRepository {
 
     @Override
     public void loadInto(UserStore userStore) {
-        File file = new File(ServerConfiguration.USER_STORE);
-        if (!file.exists()) {
-            logger.info("No users file found at '{}' — starting fresh", ServerConfiguration.USER_STORE);
-            return;
-        }
 
         try {
             DocumentBuilder builder = dbf.newDocumentBuilder();
-            Document doc = builder.parse(file);
+            Document doc = builder.parse(userStorePath);
             doc.getDocumentElement().normalize();
 
             try {
@@ -134,9 +136,6 @@ public class XmlUserRepository implements UserRepository {
     @Override
     public void saveFrom(UserStore userStore) {
         try {
-            File file = new File(ServerConfiguration.USER_STORE);
-            file.getParentFile().mkdirs();
-
             DocumentBuilder builder = dbf.newDocumentBuilder();
             Document doc = builder.newDocument();
             doc.setXmlStandalone(true);
@@ -175,11 +174,58 @@ public class XmlUserRepository implements UserRepository {
 
             Transformer transformer = tf.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.transform(new DOMSource(doc), new StreamResult(file));
+            transformer.transform(new DOMSource(doc), new StreamResult(userStorePath));
 
             logger.info("Saved {} user(s) to '{}'", userStore.getAllUsers().size(), ServerConfiguration.USER_STORE);
         } catch (Exception e) {
             logger.error("Failed to save users to '{}'", ServerConfiguration.USER_STORE, e);
         }
+    }
+
+    @Override
+    public String savePhoto(byte[] photo, String oldPhoto) {
+        File oldPhotoFile = new File(ServerConfiguration.PHOTO_STORE + oldPhoto);
+        if (oldPhotoFile.exists()) {
+            if (oldPhotoFile.delete()) {
+                logger.info("Deleted old photo '{}'", oldPhotoFile.getName());
+            } else {
+                logger.warn("Failed to delete old photo '{}'", oldPhotoFile.getName());
+            }
+        }
+
+        String reference = UUID.randomUUID().toString() + readFileSignature(photo);
+        new Thread(() -> {
+            try (FileOutputStream fos = new FileOutputStream(ServerConfiguration.PHOTO_STORE + reference);) {
+                fos.write(photo);
+                fos.flush();
+                logger.info("Saved photo to '{}'", ServerConfiguration.PHOTO_STORE);
+            } catch (Exception e) {
+                logger.error("Failed to save photo to '{}'", ServerConfiguration.PHOTO_STORE, e);
+            }
+        }).start();
+        
+        return reference;
+    }
+
+    /**
+     * This method reads the file signature of the given photo to store
+     *
+     * @param photo the photo
+     * @return the correct extension matching the encoding
+     */
+    private String readFileSignature(byte[] photo) {
+        byte[] jpg = new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+        if (Arrays.equals(Arrays.copyOfRange(photo, 0, jpg.length), jpg)) {
+            return ".jpg";
+        }
+        byte[] png = new byte[] {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47, (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A};
+        if (Arrays.equals(Arrays.copyOfRange(photo, 0, png.length), png)) {
+            return ".png";
+        }
+        byte[] webp = new byte[] {(byte) 0x42, (byte) 0x49, (byte) 0x46, (byte) 0x46};
+        if (Arrays.equals(Arrays.copyOfRange(photo, 0, webp.length), webp)) {
+            return ".webp";
+        }
+        return ""; //unknown gets stored without extension
     }
 }

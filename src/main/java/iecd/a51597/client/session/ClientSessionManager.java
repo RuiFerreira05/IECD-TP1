@@ -8,6 +8,7 @@ import iecd.a51597.common.protocol.MessageFactory;
 import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.common.store.UserDTO;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,16 +29,26 @@ public class ClientSessionManager {
     public sealed interface EditProfileResult {
         record Success() implements EditProfileResult {}
         record UsernameTaken() implements EditProfileResult {}
+        record PhotoNotFoundError() implements EditProfileResult {}
         record Error(String message) implements EditProfileResult {}
     }
 
-    public EditProfileResult editProfile(String username, String password, String photo, String nationality, LocalDate dob) {
+    public EditProfileResult editProfile(String username, String password, String photopath, String nationality, LocalDate dob) {
+        byte[] photoBytes = null;
+        try {
+            photoBytes = photoToBytes(photopath);
+        } catch (FileNotFoundException e) {
+            return new EditProfileResult.PhotoNotFoundError();
+        } catch (IOException e) {
+            return new EditProfileResult.Error("Error reading photo file: " + e.getMessage());
+        }
+
         Message request = MessageFactory.buildUpdateProfileRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
                 sessionUUID,
                 username,
                 password,
-                photo,
+                photoBytes,
                 nationality,
                 dob
         );
@@ -54,7 +65,7 @@ public class ClientSessionManager {
                 user = new UserDTO(
                         user.userId(),
                         username != null ? username : user.username(),
-                        photo != null ? photo : user.photo(),
+                        photopath != null ? photopath : user.photo(),
                         nationality != null ? nationality : user.nationality(),
                         dob != null ? dob : user.dob(),
                         user.stats()
@@ -68,6 +79,21 @@ public class ClientSessionManager {
             }
         } else {
             return new EditProfileResult.Error("Unexpected response type: " + response.body().getClass());
+        }
+    }
+
+    private byte[] photoToBytes(String photoPath) throws FileNotFoundException, IOException {
+        if (photoPath == null) {
+            return null;
+        }
+
+        File photoFile = new File(photoPath);
+        if (!photoFile.exists() || !photoFile.isFile()) {
+            throw new FileNotFoundException("Photo file not found: " + photoPath);
+        }
+
+        try (FileInputStream fis = new FileInputStream(photoFile)){
+            return fis.readAllBytes();
         }
     }
 

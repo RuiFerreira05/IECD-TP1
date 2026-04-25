@@ -1,5 +1,6 @@
 package iecd.a51597.server.network;
 
+import iecd.a51597.common.protocol.types.ErrorCodeType;
 import iecd.a51597.server.Server;
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.handlers.MessageDispatcher;
@@ -71,7 +72,6 @@ public class Connection implements Runnable {
 
             if (length <= 0 || length > ServerConfiguration.MAX_FRAME_SIZE) {
                 logger.warn("Invalid frame length {} from {}, closing", length, clientSocket.getInetAddress());
-                closeConnection();
                 return;
             }
 

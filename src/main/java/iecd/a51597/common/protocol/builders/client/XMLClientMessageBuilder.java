@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -82,7 +84,7 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
                     return logout(messageId, message.sessionToken());
                 }
                 case MessageBody.UpdateProfile(
-                        String username, String password, String photo, String nationality, LocalDate dob
+                        String username, String password, byte[] photo, String nationality, LocalDate dob
                 ) -> {
                     return updateProfile(messageId, message.sessionToken(), username, password, photo, nationality, dob);
                 }
@@ -252,11 +254,11 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
      * treats absent elements as "no change", consistent with the protocol spec.</p>
      */
     @Override
-    public byte[] updateProfile(UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
+    public byte[] updateProfile(UUID sessionToken, String username, String password, byte[] photo, String nationality, LocalDate dob) {
         return updateProfile(UUID.randomUUID(), sessionToken, username, password, photo, nationality, dob);
     }
 
-    private byte[] updateProfile(UUID messageId, UUID sessionToken, String username, String password, String photo, String nationality, LocalDate dob) {
+    private byte[] updateProfile(UUID messageId, UUID sessionToken, String username, String password, byte[] photo, String nationality, LocalDate dob) {
         MessageSkeleton s = getSkeleton(ActionType.UPDATE_PROFILE, sessionToken, messageId);
         Document doc = s.document();
         Element body = s.body();
@@ -265,8 +267,8 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
             body.appendChild(textElement(doc, "username", username));
         if (password != null && !password.isBlank())
             body.appendChild(textElement(doc, "password", password));
-        if (photo != null && !photo.isBlank())
-            body.appendChild(textElement(doc, "photo", photo));
+        if (photo != null && photo.length != 0)
+            body.appendChild(textElement(doc, "photo", Base64.getEncoder().encodeToString(photo)));
         if (nationality != null && !nationality.isBlank())
             body.appendChild(textElement(doc, "nationality", nationality));
         if (dob != null && !dob.toString().isBlank())

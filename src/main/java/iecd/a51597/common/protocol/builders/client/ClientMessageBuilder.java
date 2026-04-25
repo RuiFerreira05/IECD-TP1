@@ -61,10 +61,10 @@ public interface ClientMessageBuilder {
      * @param sessionToken active session token
      * @param username     new username, or {@code null}
      * @param password     new password, or {@code null}
-     * @param photo        new photo value, or {@code null}
+     * @param photo        new photo bytes, or {@code null}
      * @return serialized REQUEST payload
      */
-    byte[] updateProfile(UUID sessionToken, String username, String password, String photo, String Nationality, LocalDate dob);
+    byte[] updateProfile(UUID sessionToken, String username, String password, byte[] photo, String Nationality, LocalDate dob);
 
     // ── Search ────────────────────────────────────────────────────────────────
 

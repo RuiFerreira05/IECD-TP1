@@ -4,6 +4,7 @@ import iecd.a51597.common.game.Move;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.game.GameManager;
 import iecd.a51597.common.protocol.exceptions.MalformedMessageException;
+import iecd.a51597.server.persistence.PersistenceManager;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.game.Game;
@@ -29,8 +30,8 @@ public class GameHandler extends BaseHandler {
     /**
      * Creates a game handler.
      */
-    public GameHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, GameManager gameManager) {
-        super(messageBuilder, sessionManager);
+    public GameHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, GameManager gameManager, PersistenceManager persistenceManager) {
+        super(messageBuilder, sessionManager, persistenceManager);
         this.userStore = userStore;
         this.gameManager = gameManager;
     }

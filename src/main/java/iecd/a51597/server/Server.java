@@ -60,10 +60,10 @@ public class Server {
 
         persistenceManager.load();
 
-        AuthHandler authHandler = new AuthHandler(messageBuilder, sessionManager, userStore);
-        ProfileHandler profileHandler = new ProfileHandler(messageBuilder, sessionManager, userStore);
-        SearchHandler searchHandler = new SearchHandler(messageBuilder, sessionManager, userStore);
-        GameHandler gameHandler = new GameHandler(messageBuilder, sessionManager, userStore, gameManager);
+        AuthHandler authHandler = new AuthHandler(messageBuilder, sessionManager, userStore, persistenceManager);
+        ProfileHandler profileHandler = new ProfileHandler(messageBuilder, sessionManager, userStore, persistenceManager);
+        SearchHandler searchHandler = new SearchHandler(messageBuilder, sessionManager, userStore, persistenceManager);
+        GameHandler gameHandler = new GameHandler(messageBuilder, sessionManager, userStore, gameManager, persistenceManager);
 
         this.messageDispatcher = new MessageDispatcher(commParser, messageBuilder, authHandler, profileHandler, searchHandler, gameHandler);
 

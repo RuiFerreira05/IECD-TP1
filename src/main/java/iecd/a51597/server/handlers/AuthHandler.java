@@ -1,6 +1,7 @@
 package iecd.a51597.server.handlers;
 
 import iecd.a51597.server.network.Connection;
+import iecd.a51597.server.persistence.PersistenceManager;
 import iecd.a51597.server.session.Session;
 import iecd.a51597.server.session.SessionManager;
 import iecd.a51597.common.protocol.Message;
@@ -20,8 +21,8 @@ public class AuthHandler extends BaseHandler {
     /**
      * Creates an auth handler.
      */
-    public AuthHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore) {
-        super(messageBuilder, sessionManager);
+    public AuthHandler(ServerMessageBuilder messageBuilder, SessionManager sessionManager, UserStore userStore, PersistenceManager persistenceManager) {
+        super(messageBuilder, sessionManager, persistenceManager);
         this.userStore = userStore;
     }
 
