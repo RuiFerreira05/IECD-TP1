@@ -95,7 +95,7 @@ public class CLIHandler {
                         System.out.println("Matches won: " + user.getStats().gamesWon());
                         System.out.println("Matches lost: " + user.getStats().gamesLost());
                         System.out.println("Total play time: " + user.getStats().totalPlayTimeSecs() + "s");
-                        System.out.println("Win-rate: " + user.getStats().winRate() + "%");
+                        System.out.println("Win-rate: " + user.getStats().winRate()*100 + "%");
                     }
                 },
                 () -> System.out.println("No user found with username: " + username)
