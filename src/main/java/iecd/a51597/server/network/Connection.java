@@ -98,7 +98,7 @@ public class Connection implements Runnable {
      *
      * @param payload serialized protocol payload bytes
      */
-    public void sendMessage(byte[] payload) {
+    public synchronized void sendMessage(byte[] payload) {
         if (payload == null) {return;}
         try {
             outputStream.writeInt(payload.length);
