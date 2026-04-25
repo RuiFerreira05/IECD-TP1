@@ -98,6 +98,15 @@ public interface ClientMessageBuilder {
     byte[] gameInviteResponse(UUID sessionToken, UUID gameId, boolean accept);
 
     /**
+     * Builds a GAME_INVITE_CANCEL request.
+     *
+     * @param sessionToken active session token
+     * @param gameId       pending game id to cancel
+     * @return serialized REQUEST payload
+     */
+    byte[] gameInviteCancel(UUID sessionToken, UUID gameId);
+
+    /**
      * Builds a GAME_MOVE request.
      *
      * <p>The move payload is wrapped in a CDATA section so that game-specific

@@ -103,6 +103,21 @@ public sealed interface MessageBody {
     record GameInviteResponseResult(String status, ErrorDetail error) implements MessageBody {}
 
     /**
+     * Cancel an active game invite request (Client -> Server)
+     */
+    record GameInviteCancelRequest(UUID gameId) implements MessageBody {}
+    
+    /**
+     * Acknowledgment of invite cancellation (Server -> Inviter)
+     */
+    record GameInviteCancelResponse(String status, ErrorDetail error) implements MessageBody {}
+    
+    /**
+     * Push notification that an invite was cancelled (Server -> Invitee)
+     */
+    record GameInviteCancelPush(UUID gameId) implements MessageBody {}
+
+    /**
      * Invitation response push (Server -> Original Inviter).
      */
     record GameInviteResponsePush(UUID gameId, boolean accepted, String opponentUsername) implements MessageBody {}

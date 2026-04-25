@@ -238,6 +238,16 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
     }
 
     /**
+     * Creates a push payload for cancelling an invite.
+     */
+    @Override
+    public byte[] gameInviteCancelPush(UUID gameId) {
+        MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_INVITE_CANCEL);
+        s.body().appendChild(textElement(s.document(), "game-id", gameId.toString()));
+        return serialize(s.document());
+    }
+
+    /**
      * Creates a push payload indicating that an invitation was accepted.
      */
     @Override

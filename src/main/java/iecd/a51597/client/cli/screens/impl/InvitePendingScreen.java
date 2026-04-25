@@ -16,19 +16,26 @@ public class InvitePendingScreen extends Screen {
 
     private final UserDTO target;
 
+    private UUID pendingGameId;
+
     public InvitePendingScreen(StateMachine sm, Client client, UserDTO target) {
         super(sm, client);
         this.target = target;
+        this.prompt = "Waiting> ";
     }
 
     @Override
     public void display() {
-
+        System.out.println("You can type 'cancel' to cancel the invitation.");
     }
 
     @Override
     public void handleInput(String input) {
-
+        if ("cancel".equalsIgnoreCase(input.trim()) && pendingGameId != null) {
+            System.out.println("Cancelling invite...");
+            client.getServerConnection().getInviteHandler().cancelInvite(pendingGameId);
+            sm.back();
+        }
     }
 
     @Override
@@ -59,6 +66,7 @@ public class InvitePendingScreen extends Screen {
     public void onEnter() {
         switch (client.getServerConnection().getInviteHandler().sendInvite(target)) {
             case ClientInviteHandler.InviteResult.Success(UUID gameId) -> {
+                this.pendingGameId = gameId;
                 System.out.println("Invite sent to " + target.username() + ", waiting for response...");
             }
             case ClientInviteHandler.InviteResult.Error(String message) -> {

@@ -47,6 +47,7 @@
             <xs:enumeration value="SEARCH_USERS"/>
             <xs:enumeration value="GAME_INVITE"/>
             <xs:enumeration value="GAME_INVITE_RESPONSE"/>
+            <xs:enumeration value="GAME_INVITE_CANCEL"/>
             <xs:enumeration value="GAME_MOVE"/>
             <xs:enumeration value="GAME_OVER"/>
             <xs:enumeration value="GAME_OVER_DRAW"/>

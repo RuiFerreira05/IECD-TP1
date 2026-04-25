@@ -12,6 +12,7 @@ public enum ActionType {
     SEARCH_USERS,
     GAME_INVITE,
     GAME_INVITE_RESPONSE,
+    GAME_INVITE_CANCEL,
     GAME_MOVE,
     GAME_OVER,
     GAME_OVER_DRAW,

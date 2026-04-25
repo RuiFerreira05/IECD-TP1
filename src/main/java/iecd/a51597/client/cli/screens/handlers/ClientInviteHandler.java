@@ -68,6 +68,39 @@ public class ClientInviteHandler {
         record Error(String message) implements InviteResult {}
     }
 
+    public sealed interface CancelInviteResponse {
+        record Success() implements CancelInviteResponse {}
+        record Error(String message) implements CancelInviteResponse {}
+    }
+
+    public CancelInviteResponse cancelInvite(UUID gameId) {
+        Message request = MessageFactory.buildCancelInviteRequest(
+                ClientConfiguration.PROTOCOL_VERSION,
+                serverConnection.getSessionManager().getSessionUUID(),
+                gameId
+        );
+
+        Message response;
+        try {
+            response = serverConnection.sendRequest(request).get();
+        } catch (Exception e) {
+            logger.warn("Cancel invite request interrupted: {}", e.getMessage());
+            return new CancelInviteResponse.Error("Failed to cancel invite: " + e.getMessage());
+        }
+
+        if (response.body() instanceof MessageBody.GameInviteCancelResponse(
+                String status, MessageBody.ErrorDetail error
+        )) {
+            if (status.equals("OK")) {
+                return new CancelInviteResponse.Success();
+            } else {
+                return new CancelInviteResponse.Error("Failed to cancel invite: " + error.message());
+            }
+        } else {
+            return new CancelInviteResponse.Error("Invalid response from server");
+        }
+    }
+
     public InviteResult sendInvite(UserDTO target) {
         Message request = MessageFactory.buildSendInviteRequest(
                 ClientConfiguration.PROTOCOL_VERSION,

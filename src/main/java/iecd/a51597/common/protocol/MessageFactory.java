@@ -113,6 +113,17 @@ public class MessageFactory {
         );
     }
 
+    public static Message buildCancelInviteRequest(String protocolVersion, UUID sessionToken, UUID gameId) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.GAME_INVITE_CANCEL,
+                sessionToken,
+                new MessageBody.GameInviteCancelRequest(gameId)
+        );
+    }
+
     public static Message buildAcceptInviteRequest(String protocolVersion, UUID sessionUUID, UUID gameId, boolean response) {
         return new Message(
                 UUID.randomUUID(),

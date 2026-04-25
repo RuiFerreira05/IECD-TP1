@@ -135,6 +135,9 @@ public class ServerConnection implements Runnable {
                                 if (message.body() instanceof MessageBody.GameInvitePush) {
                                     logger.info("Message is a game invite");
                                     client.getPendingInvites().add((MessageBody.GameInvitePush) message.body());
+                                } else if (message.body() instanceof MessageBody.GameInviteCancelPush cancelPush) {
+                                    logger.info("Message is a game invite cancellation");
+                                    client.getPendingInvites().removeIf(push -> push.gameId().equals(cancelPush.gameId()));
                                 }
                                 client.getCliHandler().getStateMachine().getCurrentScreen().handlePush(message);
                             }

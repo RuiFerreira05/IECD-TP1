@@ -79,6 +79,14 @@ public interface ServerMessageBuilder {
     byte[] gameInvitePush(UUID gameId, User fromUser);
 
     /**
+     * Builds a push notification sent to the invited player when an invite is cancelled.
+     *
+     * @param gameId pending game id
+     * @return serialized message payload
+     */
+    byte[] gameInviteCancelPush(UUID gameId);
+
+    /**
      * Builds a push notification signaling invite acceptance.
      *
      * @param gameId accepted game id

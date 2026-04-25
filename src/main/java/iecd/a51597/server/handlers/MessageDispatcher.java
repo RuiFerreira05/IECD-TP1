@@ -106,6 +106,7 @@ public class MessageDispatcher {
             case SEARCH_USERS -> searchHandler.searchUsers(message, connection);
             case GAME_INVITE -> gameHandler.gameInvite(message, connection);
             case GAME_INVITE_RESPONSE -> gameHandler.gameInviteResponse(message, connection);
+            case GAME_INVITE_CANCEL -> gameHandler.gameInviteCancel(message, connection);
             case GAME_MOVE -> gameHandler.gameMove(message, connection);
             case SURRENDER -> gameHandler.surrender(message, connection);
             case GAME_OVER -> gameHandler.gameOver(message, connection);

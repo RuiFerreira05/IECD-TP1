@@ -97,6 +97,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
                 case MessageBody.GameInviteResponseRequest(UUID gameId, boolean accept) -> {
                     return gameInviteResponse(messageId, message.sessionToken(), gameId, accept);
                 }
+                case MessageBody.GameInviteCancelRequest(UUID gameId) -> {
+                    return gameInviteCancel(messageId, message.sessionToken(), gameId);
+                }
                 case MessageBody.GameMove(UUID gameId, String rawMove) -> {
                     return gameMove(messageId, message.sessionToken(), gameId, rawMove);
                 }
@@ -332,6 +335,20 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         body.appendChild(textElement(doc, "accept", String.valueOf(accept)));
 
         return serialize(doc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] gameInviteCancel(UUID sessionToken, UUID gameId) {
+        return gameInviteCancel(UUID.randomUUID(), sessionToken, gameId);
+    }
+
+    private byte[] gameInviteCancel(UUID messageId, UUID sessionToken, UUID gameId) {
+        MessageSkeleton s = getSkeleton(ActionType.GAME_INVITE_CANCEL, sessionToken, messageId);
+        s.body().appendChild(textElement(s.document(), "game-id", gameId.toString()));
+        return serialize(s.document());
     }
 
     /**

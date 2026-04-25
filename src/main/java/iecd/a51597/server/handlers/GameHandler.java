@@ -129,6 +129,54 @@ public class GameHandler extends BaseHandler {
     }
 
     /**
+     * Handles game invite cancellation.
+     */
+    public void gameInviteCancel(Message message, Connection connection) {
+        Optional<Session> sessionOpt = requireSession(message, connection);
+        if (sessionOpt.isEmpty()) return;
+        Session session = sessionOpt.get();
+        MessageBody.GameInviteCancelRequest body = (MessageBody.GameInviteCancelRequest) message.body();
+
+        logger.debug(
+                "Processing game invite cancel: messageId={}, senderUserId={}, gameId={}",
+                message.messageId(),
+                session.getUserId(),
+                body.gameId()
+        );
+
+        Optional<Game> gameOpt = gameManager.getPendingGame(body.gameId());
+        if (gameOpt.isEmpty()) {
+            logger.warn(
+                    "Rejected game invite cancel: pending game not found: messageId={}, gameId={}",
+                    message.messageId(),
+                    body.gameId()
+            );
+            sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
+            return;
+        }
+
+        Game game = gameOpt.get();
+        if (!game.getPlayer1Id().equals(session.getUserId())) {
+            logger.warn(
+                    "Rejected game invite cancel: not the inviter: messageId={}, gameId={}, userId={}",
+                    message.messageId(),
+                    body.gameId(),
+                    session.getUserId()
+            );
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "Only the inviter can cancel the invite");
+            return;
+        }
+
+        gameManager.declineGame(game.getGameId());
+        connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+        
+        sessionManager.getSessionByUserId(game.getPlayer2Id()).ifPresent(s ->
+                s.getConnection().sendMessage(messageBuilder.gameInviteCancelPush(game.getGameId()))
+        );
+        logger.info("Game invite cancelled: gameId={}", game.getGameId());
+    }
+
+    /**
      * Handles invitation acceptance/decline responses.
      */
     public void gameInviteResponse(Message message, Connection connection) {

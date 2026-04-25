@@ -136,6 +136,7 @@ public class XMLParser implements CommParser {
             case GAME_INVITE -> new MessageBody.GameInviteRequest(requireUUID(body, "target-user-id"));
             case GAME_INVITE_RESPONSE ->
                     new MessageBody.GameInviteResponseRequest(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
+            case GAME_INVITE_CANCEL -> new MessageBody.GameInviteCancelRequest(requireUUID(body, "game-id"));
             case GAME_MOVE ->
                     new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
             case SURRENDER -> new MessageBody.Surrender(requireUUID(body, "game-id"));
@@ -166,6 +167,7 @@ public class XMLParser implements CommParser {
                     ? new MessageBody.GameInviteResponse(status, requireUUID(body, "game-id"), null)
                     : new MessageBody.GameInviteResponse(status, null, error);
             case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponseResult(status, error);
+            case GAME_INVITE_CANCEL -> new MessageBody.GameInviteCancelResponse(status, error);
             case GAME_MOVE -> new MessageBody.GameMoveResponse(status, error);
             case SURRENDER -> new MessageBody.GenericResponse(status, error);
             case UNKNOWN -> new MessageBody.GenericResponse(status, error);
@@ -185,6 +187,7 @@ public class XMLParser implements CommParser {
                     Boolean.parseBoolean(require(body, "accepted")),
                     getField(body, "opponent-username")
             );
+            case GAME_INVITE_CANCEL -> new MessageBody.GameInviteCancelPush(requireUUID(body, "game-id"));
             case GAME_MOVE ->
                     new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
             case GAME_OVER -> new MessageBody.GameOver(
