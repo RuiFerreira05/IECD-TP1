@@ -95,11 +95,6 @@ class OptionScreenTest {
         }
 
         @Override
-        public void handleArgs(Object[] args) {
-
-        }
-
-        @Override
         public void onEnter() {
             // no-op for unit tests
         }

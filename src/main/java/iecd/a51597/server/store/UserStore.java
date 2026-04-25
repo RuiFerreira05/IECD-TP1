@@ -2,10 +2,8 @@ package iecd.a51597.server.store;
 
 import iecd.a51597.server.store.entities.User;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
+import org.mindrot.jbcrypt.BCrypt;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,22 +41,25 @@ public class UserStore {
     }
 
     // Package-private to allow controlled password hashing
+
     /**
-     * Hashes a plaintext password using SHA-256.
+     * Hashes a plaintext password using SHA-256 and 12 rounds of salt.
      *
      * @param password plaintext password
      * @return hex-encoded hash
      */
     public static String hash(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) sb.append(String.format("%02x", b));
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
-        }
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    /**
+     * Verifies a plaintext password against a stored hash.
+     * @param plaintext the unhashed password
+     * @param hash the stored hash
+     * @return true if they match, false otherwise
+     */
+    public static boolean checkPassword(String plaintext, String hash) {
+        return BCrypt.checkpw(plaintext, hash);
     }
 
     /**
@@ -70,8 +71,7 @@ public class UserStore {
      */
     public Optional<User> findByCredentials(String username, String password) {
         User user = usernameIndex.get(username);
-        String passwordHash = hash(password);
-        if (user != null && user.getPasswordHash().equals(passwordHash)) {
+        if (user != null && checkPassword(password, user.getPasswordHash())) {
             return Optional.of(user);
         }
         return Optional.empty();
@@ -113,7 +113,7 @@ public class UserStore {
     /**
      * Renames a user.
      *
-     * @param user target user
+     * @param user        target user
      * @param newUsername new unique username
      * @throws UsernameAlreadyTakenException when target username is already taken
      */
@@ -127,7 +127,8 @@ public class UserStore {
 
     /**
      * Updates a user's password. The provided password will be hashed internally.
-     * @param user The user to update
+     *
+     * @param user                 The user to update
      * @param newPlaintextPassword The new plaintext password (will be hashed)
      */
     public void updatePassword(User user, String newPlaintextPassword) {
@@ -137,7 +138,7 @@ public class UserStore {
     /**
      * Updates user photo metadata.
      *
-     * @param user target user
+     * @param user  target user
      * @param photo new photo value
      */
     public void updatePhoto(User user, String photo) {
