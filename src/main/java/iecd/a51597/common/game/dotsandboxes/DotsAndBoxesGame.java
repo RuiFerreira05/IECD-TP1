@@ -54,10 +54,13 @@ public class DotsAndBoxesGame implements Game {
         boolean capturedAnyBox = checkAndCaptureBoxes(dbMove, playerId);
 
         if (isGameOver()) {
-            UUID winnerId = null;
-            if (player1Score > player2Score) winnerId = player1Id;
-            else if (player2Score > player1Score) winnerId = player2Id;
-            return new MoveResult.GameOver(winnerId);
+            if (player1Score > player2Score) {
+                return new MoveResult.GameOver(player1Id);
+            } else if (player2Score > player1Score) {
+                return new MoveResult.GameOver(player2Id);
+            } else {
+                return new MoveResult.Draw();
+            }
         }
 
         if (!capturedAnyBox) {

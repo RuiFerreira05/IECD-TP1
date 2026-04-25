@@ -123,6 +123,11 @@ public sealed interface MessageBody {
     record GameOver(UUID gameId, UUID winnerId, String winnerUsername) implements MessageBody {}
 
     /**
+     * Server-initiated game over draw payload.
+     */
+    record GameOverDraw(UUID gameId) implements MessageBody {}
+
+    /**
      * Fallback payload for unknown/unmapped actions.
      */
     record Unknown() implements MessageBody {}

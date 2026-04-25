@@ -26,4 +26,9 @@ public sealed interface MoveResult {
      * @param winnerId winning player uuid
      */
     record GameOver(UUID winnerId) implements MoveResult {}
+
+    /**
+     * Move ended the game in a draw.
+     */
+    record Draw() implements MoveResult {}
 }

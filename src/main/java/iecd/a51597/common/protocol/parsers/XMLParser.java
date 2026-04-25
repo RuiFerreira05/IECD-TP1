@@ -137,7 +137,7 @@ public class XMLParser implements CommParser {
                     new MessageBody.GameInviteResponseRequest(requireUUID(body, "game-id"), Boolean.parseBoolean(require(body, "accept")));
             case GAME_MOVE ->
                     new MessageBody.GameMove(requireUUID(body, "game-id"), requireElement(body, "move").getTextContent());
-            case GAME_OVER, UNKNOWN -> new MessageBody.Unknown();
+            case GAME_OVER, GAME_OVER_DRAW, UNKNOWN -> new MessageBody.Unknown();
         };
     }
 
@@ -176,7 +176,7 @@ public class XMLParser implements CommParser {
             case GAME_INVITE_RESPONSE -> new MessageBody.GameInviteResponseResult(status, error);
             case GAME_MOVE -> new MessageBody.GameMoveResponse(status, error);
             case UNKNOWN -> new MessageBody.GenericResponse(status, error);
-            case GAME_OVER -> new MessageBody.Unknown();
+            case GAME_OVER, GAME_OVER_DRAW -> new MessageBody.Unknown();
         };
     }
 
@@ -199,6 +199,7 @@ public class XMLParser implements CommParser {
                     requireUUID(body, "winner-id"),
                     require(body, "winner-username")
             );
+            case GAME_OVER_DRAW -> new MessageBody.GameOverDraw(requireUUID(body, "game-id"));
             case REGISTER, LOGIN, LOGOUT, UPDATE_PROFILE, SEARCH_USERS, UNKNOWN -> new MessageBody.Unknown();
         };
     }

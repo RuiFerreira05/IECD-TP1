@@ -13,7 +13,8 @@ public enum ActionType {
     GAME_INVITE,
     GAME_INVITE_RESPONSE,
     GAME_MOVE,
-    GAME_OVER;
+    GAME_OVER,
+    GAME_OVER_DRAW;
 
     /**
      * Parses an action string while accepting hyphen or underscore naming.

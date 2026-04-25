@@ -352,6 +352,35 @@ public class GameHandler extends BaseHandler {
                 gameManager.endGame(game.getGameId());
                 logger.info("Closed active game: gameId={}, winnerUserId={}", game.getGameId(), winner);
             }
+            case MoveResult.Draw ignored -> {
+                logger.info(
+                        "Game over (draw) reached after move: messageId={}, gameId={}, playerUserId={}",
+                        message.messageId(),
+                        game.getGameId(),
+                        playerId
+                );
+                connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+                UUID opponentId = game.getPlayer1Id().equals(playerId)
+                        ? game.getPlayer2Id() : game.getPlayer1Id();
+                sessionManager.getSessionByUserId(opponentId).ifPresent(s ->
+                        s.getConnection().sendMessage(
+                                messageBuilder.gameMovePush(game.getGameId(), body.rawMove())
+                        )
+                );
+
+                double playTimeSecs = (System.currentTimeMillis() - game.getStartTimeMillis()) / 1000.0;
+
+                userStore.findById(game.getPlayer1Id()).ifPresent(p -> {
+                    p.setStats(p.getStats().withMatch(false, playTimeSecs, game.getPlayer2Id(), null));
+                });
+                userStore.findById(game.getPlayer2Id()).ifPresent(p -> {
+                    p.setStats(p.getStats().withMatch(false, playTimeSecs, game.getPlayer1Id(), null));
+                });
+
+                pushGameDraw(game);
+                gameManager.endGame(game.getGameId());
+                logger.info("Closed active game: gameId={}, result=draw", game.getGameId());
+            }
         }
     }
 
@@ -366,6 +395,20 @@ public class GameHandler extends BaseHandler {
                 message.sessionToken() != null
         );
         sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "GAME_OVER is server-initiated only");
+    }
+
+    public void pushGameDraw(Game game) {
+        logger.info(
+                "Broadcasting game over (draw) event: gameId={}, player1UserId={}, player2UserId={}",
+                game.getGameId(),
+                game.getPlayer1Id(),
+                game.getPlayer2Id()
+        );
+        byte[] payload = messageBuilder.gameOverDrawPush(game.getGameId());
+        sessionManager.getSessionByUserId(game.getPlayer1Id())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
+        sessionManager.getSessionByUserId(game.getPlayer2Id())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
     }
 
     private void pushGameOver(Game game, User winner) {

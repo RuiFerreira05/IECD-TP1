@@ -301,4 +301,15 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
 
         return serialize(doc);
     }
+
+    @Override
+    public byte[] gameOverDrawPush(UUID gameId) {
+        MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_OVER_DRAW);
+        Document doc = s.document();
+        Element body = s.body();
+
+        body.appendChild(textElement(doc, "game-id",         gameId.toString()));
+
+        return serialize(doc);
+    }
 }

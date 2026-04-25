@@ -51,7 +51,6 @@ public class GameController {
         // 2. If valid locally, send to the server
         String rawMove = move.x1() + "," + move.y1() + "," + move.x2() + "," + move.y2();
 
-        // FIX: Use Message object and sendRequest
         Message request = MessageFactory.createMoveRequest(
                 ClientConfiguration.PROTOCOL_VERSION,
                 connection.getSessionManager().getSessionUUID(),

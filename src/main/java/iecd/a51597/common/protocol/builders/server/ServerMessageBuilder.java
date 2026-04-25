@@ -112,4 +112,12 @@ public interface ServerMessageBuilder {
      * @return serialized message payload
      */
     byte[] gameOverPush(UUID gameId, User winner);
+
+    /**
+     * builds a game-over-draw push notification
+     *
+     * @param gameId game id
+     * @return serialized message payload
+     */
+    byte[] gameOverDrawPush(UUID gameId);
 }
