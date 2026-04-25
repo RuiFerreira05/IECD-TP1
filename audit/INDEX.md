@@ -49,17 +49,42 @@
 | QA/Tester | AUDIT_COMPLETE_CHECKLIST.md | 5 min |
 | Security | COMPREHENSIVE_SERIALIZATION_AUDIT.md | 30 min |
 
+### 2026-04-25 - Full Codebase Audit
+**Status:** REPORTED - Fixes Pending
+**Location:** `/audit/2026-04-25/`
+
+#### Summary
+- **Issues Found:** 88 (16 Critical, 24 High, 30 Medium, 6 Test, 12 Build/Config)
+- **Issues Fixed:** 0 (audit only)
+- **Components Audited:** Full codebase (server, client, common, tests, build, config)
+- **Production Ready:** NO - critical security and crash bugs present
+
+#### Quick Start
+1. Read: `audit/2026-04-25/EXECUTIVE_SUMMARY.md` (2 minutes)
+2. Full report: `audit/2026-04-25/COMPREHENSIVE_CODEBASE_AUDIT.md`
+
+#### Files in This Audit
+- **EXECUTIVE_SUMMARY.md** - 2-minute overview with severity breakdown
+- **COMPREHENSIVE_CODEBASE_AUDIT.md** - All 88 findings with problem descriptions and suggested fixes
+
+#### Top Issues
+1. `winner.toString()` emits garbage UUID — every game-over crashes the client
+2. Unsalted SHA-256 password hashing — all passwords trivially crackable
+3. No TLS — credentials transmitted in plaintext
+4. XXE vulnerability in 6 XML parsers — arbitrary server file read
+5. Non-atomic persistence write — crash loses all user data
+
 ---
 
 ## Quick Links
 
-- **Current Audit:** `2026-04-20/`
-- **Code Changes:** See XMLMessageBuilder.java and UserStore.java in src/
-- **Details:** Open `2026-04-20/COMPREHENSIVE_SERIALIZATION_AUDIT.md`
+- **Latest Audit:** `2026-04-25/`
+- **Previous Audit:** `2026-04-20/`
+- **Details:** Open `2026-04-25/COMPREHENSIVE_CODEBASE_AUDIT.md`
 
 ---
 
-**Last Updated:** April 20, 2026  
-**Status:** ✅ PRODUCTION READY
+**Last Updated:** April 25, 2026
+**Status:** AUDIT COMPLETE - FIXES PENDING
 
 
