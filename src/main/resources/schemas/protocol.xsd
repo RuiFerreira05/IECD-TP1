@@ -50,6 +50,7 @@
             <xs:enumeration value="GAME_MOVE"/>
             <xs:enumeration value="GAME_OVER"/>
             <xs:enumeration value="GAME_OVER_DRAW"/>
+            <xs:enumeration value="SURRENDER"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -250,6 +251,7 @@
             <xs:element name="move" type="MoveType" minOccurs="0"/>
             <xs:element name="winner-id" type="UUIDType" minOccurs="0"/>
             <xs:element name="winner-username" type="xs:string" minOccurs="0"/>
+            <xs:element name="reason" type="xs:string" minOccurs="0"/>
         </xs:all>
     </xs:complexType>
 

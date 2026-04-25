@@ -148,7 +148,7 @@ class XMLParserTest {
         MessageBody.UpdateProfile body = (MessageBody.UpdateProfile) msg.body();
         assertEquals("x",  body.username());
         assertEquals("np", body.password());
-        assertEquals("ph", body.photo());
+        assertArrayEquals(java.util.Base64.getDecoder().decode("ph"), body.photo());
     }
 
     // ── SEARCH_USERS ──────────────────────────────────────────────────────────

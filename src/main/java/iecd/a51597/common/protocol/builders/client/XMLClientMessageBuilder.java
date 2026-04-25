@@ -100,6 +100,9 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
                 case MessageBody.GameMove(UUID gameId, String rawMove) -> {
                     return gameMove(messageId, message.sessionToken(), gameId, rawMove);
                 }
+                case MessageBody.Surrender(UUID gameId) -> {
+                    return surrender(messageId, message.sessionToken(), gameId);
+                }
                 default -> {
                     logger.warn("Unsupported client REQUEST body type {} for action {}",
                             body.getClass().getSimpleName(), message.actionType());
@@ -354,6 +357,24 @@ public class XMLClientMessageBuilder implements ClientMessageBuilder {
         Element moveEl = doc.createElement("move");
         moveEl.appendChild(doc.createCDATASection(rawMove));
         body.appendChild(moveEl);
+
+        return serialize(doc);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public byte[] surrender(UUID sessionToken, UUID gameId) {
+        return surrender(UUID.randomUUID(), sessionToken, gameId);
+    }
+
+    private byte[] surrender(UUID messageId, UUID sessionToken, UUID gameId) {
+        MessageSkeleton s = getSkeleton(ActionType.SURRENDER, sessionToken, messageId);
+        Document doc = s.document();
+        Element body = s.body();
+
+        body.appendChild(textElement(doc, "game-id", gameId.toString()));
 
         return serialize(doc);
     }

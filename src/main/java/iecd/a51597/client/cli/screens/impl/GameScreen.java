@@ -39,9 +39,9 @@ public class GameScreen extends Screen {
         ClientBoardRenderer.printBoard(controller);
 
         if (controller.isMyTurn()) {
-            System.out.print("\nYour turn! Enter coordinates (x1 y1 x2 y2): ");
+            System.out.print("\nYour turn! Enter coordinates (x1 y1 x2 y2) or 'surrender': ");
         } else {
-            System.out.println("\nWaiting for " + controller.getOpponentUsername() + " to play...");
+            System.out.println("\nWaiting for " + controller.getOpponentUsername() + " to play... (type 'surrender' to forfeit)");
         }
     }
 
@@ -53,8 +53,14 @@ public class GameScreen extends Screen {
             return;
         }
 
+        if ("surrender".equalsIgnoreCase(input.trim()) || "q".equalsIgnoreCase(input.trim())) {
+            System.out.println("Surrendering...");
+            controller.attemptSurrender();
+            return;
+        }
+
         if (!controller.isMyTurn()) {
-            System.out.println("[!] It is not your turn yet. Please wait for the opponent.");
+            System.out.println("[!] It is not your turn yet. Please wait for the opponent. (Or type 'surrender' to forfeit)");
             return;
         }
 
@@ -93,6 +99,14 @@ public class GameScreen extends Screen {
             } catch (MalformedMessageException e) {
                 throw new RuntimeException(e);
             }
+        } else if (message.actionType() == ActionType.GAME_OVER) {
+            MessageBody.GameOver body = (MessageBody.GameOver) message.body();
+            controller.getState().forceGameOver(body.winnerId());
+            if ("SURRENDER".equals(body.reason())) {
+                System.out.println("\n[The game ended because a player surrendered!]");
+            }
+        } else if (message.actionType() == ActionType.GAME_OVER_DRAW) {
+            controller.getState().forceGameOver(null);
         }
 
         System.out.println("\n[Update received from server]");

@@ -111,5 +111,14 @@ public interface ClientMessageBuilder {
      */
     byte[] gameMove(UUID sessionToken, UUID gameId, String rawMove);
 
+    /**
+     * Builds a SURRENDER request.
+     *
+     * @param sessionToken active session token
+     * @param gameId       active game id
+     * @return serialized REQUEST payload
+     */
+    byte[] surrender(UUID sessionToken, UUID gameId);
+
     byte[] getMessageInBytes(Message message);
 }

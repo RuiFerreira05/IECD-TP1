@@ -120,12 +120,17 @@ public sealed interface MessageBody {
     /**
      * Server-initiated game over payload.
      */
-    record GameOver(UUID gameId, UUID winnerId, String winnerUsername) implements MessageBody {}
+    record GameOver(UUID gameId, UUID winnerId, String winnerUsername, String reason) implements MessageBody {}
 
     /**
      * Server-initiated game over draw payload.
      */
     record GameOverDraw(UUID gameId) implements MessageBody {}
+
+    /**
+     * Surrender request payload.
+     */
+    record Surrender(UUID gameId) implements MessageBody {}
 
     /**
      * Fallback payload for unknown/unmapped actions.

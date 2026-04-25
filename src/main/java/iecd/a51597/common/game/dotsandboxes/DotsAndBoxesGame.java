@@ -22,6 +22,9 @@ public class DotsAndBoxesGame implements Game {
     private int player1Score = 0;
     private int player2Score = 0;
 
+    private boolean isForcedGameOver = false;
+    private UUID forcedWinnerId = null;
+
     public DotsAndBoxesGame(UUID gameId, UUID player1Id, UUID player2Id) {
         this.gameId = gameId;
         this.player1Id = player1Id;
@@ -37,8 +40,13 @@ public class DotsAndBoxesGame implements Game {
 
     // Client-side UI helper methods
     public UUID getCurrentPlayerId() { return currentPlayerId; }
-    public boolean isGameOver() { return capturedBoxes.size() == (WIDTH - 1) * (HEIGHT - 1); }
+    public boolean isGameOver() { return isForcedGameOver || capturedBoxes.size() == (WIDTH - 1) * (HEIGHT - 1); }
     public Set<DotsAndBoxesMove> getDrawnLines() { return drawnLines; }
+    
+    public void forceGameOver(UUID winnerId) {
+        this.isForcedGameOver = true;
+        this.forcedWinnerId = winnerId;
+    }
 
     @Override
     public synchronized MoveResult applyMove(UUID playerId, Move move) {
@@ -118,6 +126,7 @@ public class DotsAndBoxesGame implements Game {
     }
 
     public UUID getWinnerId() {
+        if (isForcedGameOver) return forcedWinnerId;
         if (player1Score > player2Score) return player1Id;
         if (player2Score > player1Score) return player2Id;
         return null;

@@ -386,6 +386,95 @@ public class GameHandler extends BaseHandler {
     }
 
     /**
+     * Handles surrender requests for active games.
+     */
+    public void surrender(Message message, Connection connection) {
+        if (!requireConfiguredGame(message, connection)) return;
+        Optional<Session> sessionOpt = requireSession(message, connection);
+        if (sessionOpt.isEmpty()) return;
+        Session session = sessionOpt.get();
+
+        UUID playerId = session.getUserId();
+        MessageBody.Surrender body = (MessageBody.Surrender) message.body();
+
+        logger.debug(
+                "Processing surrender request: messageId={}, gameId={}, playerUserId={}",
+                message.messageId(),
+                body.gameId(),
+                playerId
+        );
+
+        Optional<Game> gameOpt = gameManager.getGame(body.gameId());
+        if (gameOpt.isEmpty()) {
+            logger.warn(
+                    "Rejected surrender: game not found: messageId={}, gameId={}, playerUserId={}",
+                    message.messageId(),
+                    body.gameId(),
+                    playerId
+            );
+            sendError(message, connection, ErrorCodeType.GAME_NOT_FOUND, "Game not found");
+            return;
+        }
+
+        Game game = gameOpt.get();
+
+        if (!playerId.equals(game.getPlayer1Id())
+                && !playerId.equals(game.getPlayer2Id())) {
+            logger.warn(
+                    "Rejected surrender: player is not part of game: messageId={}, gameId={}, playerUserId={}",
+                    message.messageId(),
+                    game.getGameId(),
+                    playerId
+            );
+            sendError(message, connection, ErrorCodeType.UNEXPECTED_MESSAGE_ACTION, "You are not a player in this game");
+            return;
+        }
+
+        UUID winnerId = game.getPlayer1Id().equals(playerId) ? game.getPlayer2Id() : game.getPlayer1Id();
+
+        User p1 = userStore.findById(game.getPlayer1Id()).orElseThrow();
+        User p2 = userStore.findById(game.getPlayer2Id()).orElseThrow();
+        User winner = winnerId.equals(p1.getUserId()) ? p1 : p2;
+
+        logger.info(
+                "Game over reached by surrender: messageId={}, gameId={}, surrenderingPlayerId={}, winnerUserId={}",
+                message.messageId(),
+                game.getGameId(),
+                playerId,
+                winner.getUserId()
+        );
+
+        // Acknowledge surrender
+        connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+
+        double playTimeSecs = (System.currentTimeMillis() - game.getStartTimeMillis()) / 1000.0;
+        boolean p1Won = winner.getUserId().equals(p1.getUserId());
+        boolean p2Won = winner.getUserId().equals(p2.getUserId());
+
+        p1.setStats(p1.getStats().withMatch(p1Won, playTimeSecs, p2.getUserId(), p2.getUsername()));
+        p2.setStats(p2.getStats().withMatch(p2Won, playTimeSecs, p1.getUserId(), p1.getUsername()));
+
+        pushGameOverSurrender(game, winner);
+        gameManager.endGame(game.getGameId());
+        logger.info("Closed active game: gameId={}, winnerUserId={} (reason: SURRENDER)", game.getGameId(), winner.getUserId());
+    }
+
+    private void pushGameOverSurrender(Game game, User winner) {
+        logger.info(
+                "Broadcasting game over event (surrender): gameId={}, winnerUserId={}, player1UserId={}, player2UserId={}",
+                game.getGameId(),
+                winner,
+                game.getPlayer1Id(),
+                game.getPlayer2Id()
+        );
+        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner, "SURRENDER");
+        sessionManager.getSessionByUserId(game.getPlayer1Id())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
+        sessionManager.getSessionByUserId(game.getPlayer2Id())
+                .ifPresent(s -> s.getConnection().sendMessage(payload));
+    }
+
+    /**
      * Rejects client-originated game-over requests.
      */
     public void gameOver(Message message, Connection connection) {

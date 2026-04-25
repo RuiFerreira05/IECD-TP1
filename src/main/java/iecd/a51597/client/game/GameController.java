@@ -61,6 +61,20 @@ public class GameController {
     }
 
     /**
+     * Called by the GameScreen when the user wants to surrender.
+     */
+    public void attemptSurrender() {
+        if (localGameState.isGameOver()) return;
+
+        Message request = MessageFactory.buildSurrenderRequest(
+                ClientConfiguration.PROTOCOL_VERSION,
+                connection.getSessionManager().getSessionUUID(),
+                localGameState.getGameId()
+        );
+        connection.sendRequest(request);
+    }
+
+    /**
      * Called by your network message parser when a GAME_MOVE_PUSH arrives from the server.
      */
     public void applyOpponentMove(DotsAndBoxesMove move) {

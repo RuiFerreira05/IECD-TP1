@@ -291,6 +291,11 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
      */
     @Override
     public byte[] gameOverPush(UUID gameId, User winner) {
+        return gameOverPush(gameId, winner, null);
+    }
+
+    @Override
+    public byte[] gameOverPush(UUID gameId, User winner, String reason) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_OVER);
         Document doc = s.document();
         Element body = s.body();
@@ -298,6 +303,10 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
         body.appendChild(textElement(doc, "game-id",         gameId.toString()));
         body.appendChild(textElement(doc, "winner-id",       winner.getUserId().toString()));
         body.appendChild(textElement(doc, "winner-username", winner.getUsername()));
+        
+        if (reason != null) {
+            body.appendChild(textElement(doc, "reason", reason));
+        }
 
         return serialize(doc);
     }

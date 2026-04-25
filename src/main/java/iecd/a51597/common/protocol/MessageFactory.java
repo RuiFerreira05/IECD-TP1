@@ -91,6 +91,17 @@ public class MessageFactory {
         );
     }
 
+    public static Message buildSurrenderRequest(String protocolVersion, UUID sessionUUID, UUID gameId) {
+        return new Message(
+                UUID.randomUUID(),
+                MessageType.REQUEST,
+                protocolVersion,
+                ActionType.SURRENDER,
+                sessionUUID,
+                new MessageBody.Surrender(gameId)
+        );
+    }
+
     public static Message buildSendInviteRequest(String protocolVersion, UUID sessionToken, UUID targetId) {
         return new Message(
                 UUID.randomUUID(),

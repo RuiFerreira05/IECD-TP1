@@ -114,6 +114,16 @@ public interface ServerMessageBuilder {
     byte[] gameOverPush(UUID gameId, User winner);
 
     /**
+     * Builds a game-over push notification with a reason.
+     *
+     * @param gameId game id
+     * @param winner winning user
+     * @param reason the reason for game over (e.g. SURRENDER)
+     * @return serialized message payload
+     */
+    byte[] gameOverPush(UUID gameId, User winner, String reason);
+
+    /**
      * builds a game-over-draw push notification
      *
      * @param gameId game id
