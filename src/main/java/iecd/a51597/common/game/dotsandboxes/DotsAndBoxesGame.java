@@ -4,9 +4,7 @@ import iecd.a51597.common.game.Game;
 import iecd.a51597.common.game.Move;
 import iecd.a51597.common.game.MoveResult;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class DotsAndBoxesGame implements Game {
     private static final int WIDTH = 5;
@@ -18,7 +16,7 @@ public class DotsAndBoxesGame implements Game {
     private final long startTimeMillis;
 
     private final Set<DotsAndBoxesMove> drawnLines = new HashSet<>();
-    private final Set<String> capturedBoxes = new HashSet<>();
+    Map<String, UUID> capturedBoxes = new HashMap<>(); // "x,y" -> playerId
 
     private UUID currentPlayerId;
     private int player1Score = 0;
@@ -100,11 +98,15 @@ public class DotsAndBoxesGame implements Game {
     }
 
     private boolean captureBox(int x, int y, UUID playerId) {
-        if (capturedBoxes.add(x + "," + y)) {
+        if (capturedBoxes.put(x + "," + y, playerId) == null) {
             if (playerId.equals(player1Id)) player1Score++; else player2Score++;
             return true;
         }
         return false;
+    }
+
+    public UUID getBoxOwner(int x, int y) {
+        return capturedBoxes.get(x + "," + y);
     }
 
     public int getPlayer1Score() {

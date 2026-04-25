@@ -13,9 +13,9 @@ public class ViewProfileScreen extends OptionScreen {
     public ViewProfileScreen(StateMachine sm, Client client) {
         super(sm, client);
         this.user = client.getSessionManager().getUser();
-        addOption("back", sm::back);
+        addOption("Edit Profile", this::editProfile, () -> user == client.getSessionManager().getUser());
+        addOption("Back", sm::back, () -> user != client.getSessionManager().getUser());
         addOption("Back to main menu", () -> sm.changeState(new MainMenuScreen(sm, client)));
-        addOption("Edit Profile", this::editProfile, () -> client.getSessionManager().getUser() == user);
     }
 
     public ViewProfileScreen(StateMachine sm, Client client, UserDTO user) {

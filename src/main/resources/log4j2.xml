@@ -41,7 +41,6 @@
 
         <Logger name="iecd.a51597.client" level="INFO" additivity="false">
             <AppenderRef ref="CLIENT"/>
-            <AppenderRef ref="CONSOLE_LOGGER"/>
         </Logger>
     </Loggers>
 </Configuration>

@@ -184,18 +184,20 @@ public class XmlUserRepository implements UserRepository {
 
     @Override
     public String savePhoto(byte[] photo, String oldPhoto) {
-        File oldPhotoFile = new File(ServerConfiguration.PHOTO_STORE + oldPhoto);
-        if (oldPhotoFile.exists()) {
-            if (oldPhotoFile.delete()) {
-                logger.info("Deleted old photo '{}'", oldPhotoFile.getName());
-            } else {
-                logger.warn("Failed to delete old photo '{}'", oldPhotoFile.getName());
+        if (oldPhoto != null && !oldPhoto.isBlank()) {
+            File oldPhotoFile = new File(ServerConfiguration.PHOTO_STORE + oldPhoto);
+            if (oldPhotoFile.exists()) {
+                if (oldPhotoFile.delete()) {
+                    logger.info("Deleted old photo '{}'", oldPhotoFile.getName());
+                } else {
+                    logger.warn("Failed to delete old photo '{}'", oldPhotoFile.getName());
+                }
             }
         }
 
         String reference = UUID.randomUUID().toString() + readFileSignature(photo);
         new Thread(() -> {
-            try (FileOutputStream fos = new FileOutputStream(ServerConfiguration.PHOTO_STORE + reference);) {
+            try (FileOutputStream fos = new FileOutputStream(ServerConfiguration.PHOTO_STORE + reference)) {
                 fos.write(photo);
                 fos.flush();
                 logger.info("Saved photo to '{}'", ServerConfiguration.PHOTO_STORE);
@@ -203,29 +205,28 @@ public class XmlUserRepository implements UserRepository {
                 logger.error("Failed to save photo to '{}'", ServerConfiguration.PHOTO_STORE, e);
             }
         }).start();
-        
+
         return reference;
     }
 
-    /**
-     * This method reads the file signature of the given photo to store
-     *
-     * @param photo the photo
-     * @return the correct extension matching the encoding
-     */
     private String readFileSignature(byte[] photo) {
+        // FIX B: Guard against array length exceptions
+        if (photo == null || photo.length < 4) {
+            return "";
+        }
+
         byte[] jpg = new byte[] {(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
         if (Arrays.equals(Arrays.copyOfRange(photo, 0, jpg.length), jpg)) {
             return ".jpg";
         }
         byte[] png = new byte[] {(byte) 0x89, (byte) 0x50, (byte) 0x4E, (byte) 0x47, (byte) 0x0D, (byte) 0x0A, (byte) 0x1A, (byte) 0x0A};
-        if (Arrays.equals(Arrays.copyOfRange(photo, 0, png.length), png)) {
+        if (photo.length >= png.length && Arrays.equals(Arrays.copyOfRange(photo, 0, png.length), png)) {
             return ".png";
         }
         byte[] webp = new byte[] {(byte) 0x42, (byte) 0x49, (byte) 0x46, (byte) 0x46};
         if (Arrays.equals(Arrays.copyOfRange(photo, 0, webp.length), webp)) {
             return ".webp";
         }
-        return ""; //unknown gets stored without extension
+        return ""; // Unknown
     }
 }

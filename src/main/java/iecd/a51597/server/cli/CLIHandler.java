@@ -54,6 +54,7 @@ public class CLIHandler {
         commands.put("connections", new Command(this::connections, null, "List all open connections"));
         commands.put("kick", new Command(this::kick, "<username>", "Close a user's connection and invalidate their session"));
         commands.put("leaderboard", new Command(this::leaderboard, "[limit]", "Show the player leaderboard"));
+        commands.put("see-user", new Command(this::seeUser, "<username>", "Show detailed info about a user"));
     }
 
     /**
@@ -74,6 +75,31 @@ public class CLIHandler {
                 logger.error("CLI read error", e);
             }
         }
+    }
+
+    private void seeUser(String[] args) {
+        if (args.length == 0) {
+            System.out.println("Usage: see-user <username>");
+            return;
+        }
+        String username = args[0];
+        server.getUserStore().findByUsername(username).ifPresentOrElse(
+                user -> {
+                    System.out.println("User ID: " + user.getUserId());
+                    System.out.println("Username: " + user.getUsername());
+                    if (user.getPhoto() != null) System.out.println("photo reference: " + user.getPhoto());
+                    if (user.getNationality() != null) System.out.println("Nationality: " + user.getNationality());
+                    if (user.getDob() != null) System.out.println("Dob: " + user.getDob());
+                    if (!user.getStats().matches().isEmpty()) {
+                        System.out.println("Matches played: " + user.getStats().gamesPlayed());
+                        System.out.println("Matches won: " + user.getStats().gamesWon());
+                        System.out.println("Matches lost: " + user.getStats().gamesLost());
+                        System.out.println("Total play time: " + user.getStats().totalPlayTimeSecs() + "s");
+                        System.out.println("Win-rate: " + user.getStats().winRate() + "%");
+                    }
+                },
+                () -> System.out.println("No user found with username: " + username)
+        );
     }
 
     private void sessions(String[] args) {

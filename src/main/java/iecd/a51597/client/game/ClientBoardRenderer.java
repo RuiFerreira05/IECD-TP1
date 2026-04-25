@@ -4,6 +4,7 @@ import iecd.a51597.common.game.dotsandboxes.DotsAndBoxesGame;
 import iecd.a51597.common.game.dotsandboxes.DotsAndBoxesMove;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class ClientBoardRenderer {
 
@@ -41,11 +42,32 @@ public class ClientBoardRenderer {
                 System.out.print("    ");
                 for (int x = 0; x < WIDTH; x++) {
                     boolean hasLine = lines.contains(new DotsAndBoxesMove(x, y, x, y + 1));
-                    System.out.print(hasLine ? "|   " : "    ");
+                    UUID owner = controller.getState().getBoxOwner(x, y);
+                    String initial = getInitial(controller, owner);
+                    System.out.print(hasLine ? "| " + initial + " " : "  " + initial + " ");
                 }
                 System.out.println();
             }
         }
         System.out.println("(Y)\n");
+    }
+
+    /**
+     * helper method to identify box owners by their initial, so the cli tui looks nice
+     *
+     * @param controller game controller
+     * @param owner the box owner
+     * @return empty space for no owner, "1"/"2" if both players have the same initial, or the owner's initial otherwise
+     */
+    private static String getInitial(GameController controller, UUID owner) {
+        String initial = " ";
+        if (owner != null) {
+            if (controller.getMyUsername().substring(0, 1).equals(controller.getOpponentUsername().substring(0, 1))) {
+                initial = owner.equals(controller.getState().getPlayer1Id()) ? "1" : "2";
+            } else {
+                initial = owner.equals(controller.getMyUserId()) ? controller.getMyUsername().substring(0, 1) : controller.getOpponentUsername().substring(0, 1);
+            }
+        }
+        return initial;
     }
 }

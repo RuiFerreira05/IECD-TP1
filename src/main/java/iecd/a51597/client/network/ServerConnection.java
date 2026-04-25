@@ -57,7 +57,6 @@ public class ServerConnection implements Runnable {
         this.pendingRequests = new ConcurrentHashMap<>();
         this.reconnectAttempts = ClientConfiguration.RECONNECT_ATTEMPTS;
     }
-
     public CompletableFuture<Message> sendRequest(Message request) {
         CompletableFuture<Message> future = new CompletableFuture<>();
         pendingRequests.put(request.messageId(), future);

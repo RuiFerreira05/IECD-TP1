@@ -37,6 +37,8 @@ public class PersistenceManager {
                 }
             }
         });
+
+        this.persistenceThread.start();
     }
 
     /**
@@ -49,7 +51,7 @@ public class PersistenceManager {
     /**
      * Saves in-memory state to persistence files.
      */
-    public void save() {
+    public synchronized void save() {
         userRepository.saveFrom(userStore);
     }
 
