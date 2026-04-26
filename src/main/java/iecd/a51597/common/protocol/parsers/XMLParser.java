@@ -224,7 +224,7 @@ public class XMLParser implements CommParser {
         NodeList matches = statsEl.getElementsByTagName("match");
         for (int i = 0; i < matches.getLength(); i++) {
             Element matchEl = (Element) matches.item(i);
-            stats.withMatch(
+            stats = stats.withMatch(
                     requireAttribute(matchEl, "result").equals("WON"),
                     requireDoubleAttribute(matchEl, "playtime"),
                     parseUuidAttribute(matchEl, "opponent-id"),

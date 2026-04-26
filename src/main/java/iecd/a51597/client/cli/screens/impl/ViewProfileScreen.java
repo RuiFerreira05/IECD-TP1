@@ -21,9 +21,9 @@ public class ViewProfileScreen extends OptionScreen {
     public ViewProfileScreen(StateMachine sm, Client client, UserDTO user) {
         super(sm, client);
         this.user = user;
-        addOption("back", sm::back);
+        addOption("Edit Profile", this::editProfile, () -> user == client.getSessionManager().getUser());
+        addOption("Back", sm::back, () -> user != client.getSessionManager().getUser());
         addOption("Back to main menu", () -> sm.changeState(new MainMenuScreen(sm, client)));
-        addOption("Edit Profile", this::editProfile, () -> client.getSessionManager().getUser() == user);
     }
 
     private void editProfile() {
@@ -46,7 +46,7 @@ public class ViewProfileScreen extends OptionScreen {
             System.out.println("  Games won: " + user.stats().gamesWon());
             System.out.println("  Games lost: " + user.stats().gamesLost());
             System.out.println("  Win-rate: " + user.stats().winRate());
-            System.out.println("  Total Play Time: " + (user.stats().totalPlayTimeSecs() / 60) + " minutes");
+            System.out.printf("  Total Play Time: %.2f minutes%n", user.stats().totalPlayTimeSecs()/60.0);
         }
         System.out.println();
         displayOptions();
