@@ -12,7 +12,7 @@ public class GameMenuScreen extends OptionScreen {
         super(sm, client);
         addOption("Invite another player", () -> sm.changeState(new SearchInviteScreen(sm, client)));
         addOption("View Invites (" + client.getPendingInvites().size() + ")", () -> sm.changeState(new ViewInvitesScreen(sm, client)));
-        addOption("Back", sm::back);
+        addOption("Back to main menu", () -> sm.changeState(new MainMenuScreen(sm, client)));
     }
 
     @Override
