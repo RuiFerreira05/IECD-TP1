@@ -1,3 +1,5 @@
+package iecd.a51597.server.store;
+
 import iecd.a51597.server.store.entities.User;
 import iecd.a51597.server.store.UserStore;
 import iecd.a51597.server.store.exceptions.UsernameAlreadyTakenException;
@@ -30,8 +32,8 @@ class UserStoreTest {
         assertNotNull(user.getUserId());
         // password must be stored as a hash, not plaintext
         assertNotEquals("secret", user.getPasswordHash());
-        // hash must be consistent (SHA-256 of "secret")
-        assertEquals(UserStore.hash("secret"), user.getPasswordHash());
+        // hash must be consistent (BCrypt)
+        assertTrue(UserStore.checkPassword("secret", user.getPasswordHash()));
     }
 
     @Test
@@ -115,7 +117,7 @@ class UserStoreTest {
         store.updatePassword(alice, "newpass");
 
         assertNotEquals("newpass", alice.getPasswordHash());
-        assertEquals(UserStore.hash("newpass"), alice.getPasswordHash());
+        assertTrue(UserStore.checkPassword("newpass", alice.getPasswordHash()));
     }
 
     // ── updateUsername ──────────────────────────────────────────────────────
@@ -206,19 +208,7 @@ class UserStoreTest {
     // ── hash determinism ─────────────────────────────────────────────────────
 
     @Test
-    void hash_sameInput_producesSameOutput() {
-        assertEquals(UserStore.hash("password"), UserStore.hash("password"));
-    }
-
-    @Test
     void hash_differentInputs_produceDifferentOutputs() {
         assertNotEquals(UserStore.hash("password1"), UserStore.hash("password2"));
-    }
-
-    @Test
-    void hash_outputIsHex64Chars() {
-        String h = UserStore.hash("test");
-        assertEquals(64, h.length());
-        assertTrue(h.matches("[0-9a-f]+"));
     }
 }

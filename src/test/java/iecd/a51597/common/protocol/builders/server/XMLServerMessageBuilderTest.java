@@ -1,3 +1,5 @@
+package iecd.a51597.common.protocol.builders.server;
+
 import iecd.a51597.common.protocol.ProtocolConstants;
 import iecd.a51597.common.protocol.builders.server.XMLServerMessageBuilder;
 import iecd.a51597.common.protocol.types.ActionType;

@@ -1,3 +1,5 @@
+package iecd.a51597.server.persistence;
+
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.persistence.PersistenceManager;
 import iecd.a51597.server.store.entities.User;

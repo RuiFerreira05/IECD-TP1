@@ -1,3 +1,5 @@
+package iecd.a51597.server.session;
+
 import iecd.a51597.server.config.ServerConfiguration;
 import iecd.a51597.server.network.Connection;
 import iecd.a51597.server.session.Session;

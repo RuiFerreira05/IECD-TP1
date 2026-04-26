@@ -1,3 +1,5 @@
+package iecd.a51597.common.store;
+
 import iecd.a51597.common.store.PlayerStats;
 import org.junit.jupiter.api.Test;
 

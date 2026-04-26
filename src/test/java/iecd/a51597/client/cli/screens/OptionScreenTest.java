@@ -1,3 +1,5 @@
+package iecd.a51597.client.cli.screens;
+
 import iecd.a51597.client.cli.ClientCliHandler;
 import iecd.a51597.client.cli.StateMachine;
 import iecd.a51597.client.cli.screens.OptionScreen;
@@ -105,4 +107,3 @@ class OptionScreenTest {
         }
     }
 }
-

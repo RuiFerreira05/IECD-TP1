@@ -1,3 +1,5 @@
+package iecd.a51597.server.store;
+
 import iecd.a51597.server.store.Leaderboard;
 import iecd.a51597.common.store.PlayerStats;
 import iecd.a51597.server.store.entities.User;
