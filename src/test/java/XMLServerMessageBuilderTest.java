@@ -218,7 +218,7 @@ class XMLServerMessageBuilderTest {
 
     @Test
     void gameInviteDeclinedPush_acceptedFalse() throws Exception {
-        byte[] bytes = builder.gameInviteDeclinedPush(GAME_ID);
+        byte[] bytes = builder.gameInviteDeclinedPush(GAME_ID, makeUser("bob", false));
         Document doc = parse(bytes);
 
         assertEquals("false", text(doc, "accepted"));

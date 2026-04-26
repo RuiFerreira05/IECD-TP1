@@ -101,7 +101,7 @@ public interface ServerMessageBuilder {
      * @param gameId declined game id
      * @return serialized message payload
      */
-    byte[] gameInviteDeclinedPush(UUID gameId);
+    byte[] gameInviteDeclinedPush(UUID gameId, User user);
 
     /**
      * Builds a push notification with an opponent's accepted move.

@@ -258,7 +258,7 @@ public class GameHandler extends BaseHandler {
             );
             connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
             inviterSessionOpt.ifPresent(s ->
-                    s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId()))
+                    s.getConnection().sendMessage(messageBuilder.gameInviteDeclinedPush(game.getGameId(), responder))
             );
             return;
         }

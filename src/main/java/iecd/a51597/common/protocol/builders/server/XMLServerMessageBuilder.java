@@ -267,13 +267,14 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
      * Creates a push payload indicating that an invitation was declined.
      */
     @Override
-    public byte[] gameInviteDeclinedPush(UUID gameId) {
+    public byte[] gameInviteDeclinedPush(UUID gameId, User opponent) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_INVITE_RESPONSE);
         Document doc = s.document();
         Element body = s.body();
 
         body.appendChild(textElement(doc, "game-id",  gameId.toString()));
         body.appendChild(textElement(doc, "accepted", "false"));
+        body.appendChild(textElement(doc, "opponent-username", opponent.getUsername()));
 
         return serialize(doc);
     }
