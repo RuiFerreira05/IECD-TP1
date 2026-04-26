@@ -12,10 +12,10 @@ public class SearchResultsScreen extends OptionScreen {
 
     public SearchResultsScreen(StateMachine sm, Client client, List<UserDTO> users) {
         super(sm, client);
-        addOption("back", sm::back);
         for (UserDTO user : users) {
             addOption(user.username(), () -> sm.changeState(new ViewProfileScreen(sm, client, user)));
         }
+        addOption("Back", sm::back);
     }
 
     @Override
