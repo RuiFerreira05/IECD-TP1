@@ -20,7 +20,7 @@ public class Session {
     /**
      * Creates a new session.
      *
-     * @param user authenticated user
+     * @param user       authenticated user
      * @param connection connection currently associated with the user
      */
     public Session(User user, Connection connection) {
@@ -49,14 +49,38 @@ public class Session {
         this.lastActivity = Instant.now();
     }
 
-    /** @return session token */
-    public UUID getToken()            { return token; }
-    /** @return user id */
-    public UUID getUserId()           { return userId; }
-    /** @return user */
-    public User getUser()             { return user; }
-    /** @return bound connection */
-    public Connection getConnection() { return connection; }
-    /** @return last observed activity instant */
-    public Instant getLastActivity()  { return lastActivity; }
+    /**
+     * @return session token
+     */
+    public UUID getToken() {
+        return token;
+    }
+
+    /**
+     * @return user id
+     */
+    public UUID getUserId() {
+        return userId;
+    }
+
+    /**
+     * @return user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @return bound connection
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    /**
+     * @return last observed activity instant
+     */
+    public Instant getLastActivity() {
+        return lastActivity;
+    }
 }

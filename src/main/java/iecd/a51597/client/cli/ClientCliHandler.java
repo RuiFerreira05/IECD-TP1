@@ -50,9 +50,6 @@ public class ClientCliHandler {
                 }
 
                 input = input.trim();
-                if (input.isEmpty()) {
-                    continue;
-                }
 
                 stateMachine.getCurrentScreen().handleInput(input);
             }

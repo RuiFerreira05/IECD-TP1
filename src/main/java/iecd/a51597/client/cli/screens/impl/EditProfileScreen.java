@@ -34,44 +34,50 @@ public class EditProfileScreen extends Screen {
 
     @Override
     public void display() {
-            switch (currentState) {
-                case USERNAME -> System.out.print("Enter new username (or \"skip\" to keep current): ");
-                case PASSWORD -> System.out.print("Enter new password (or \"skip\" to keep current): ");
-                case PHOTO -> System.out.print("Enter new photo URL (or \"skip\" to keep current): ");
-                case NATIONALITY -> System.out.print("Enter new nationality (or \"skip\" to keep current): ");
-                case DOB -> System.out.print("Enter new date of birth (YYYY-MM-DD) (or \"skip\" to keep current): ");
-            }
+        if (currentState == State.USERNAME) {
+            System.out.println("========================================");
+            System.out.println("              EDIT PROFILE              ");
+            System.out.println("========================================");
+            System.out.println("Leave empty and press enter to keep current value.");
+        }
+        switch (currentState) {
+            case USERNAME -> this.prompt = "New username: ";
+            case PASSWORD -> this.prompt = "New password: ";
+            case PHOTO -> this.prompt = "New photo URL: ";
+            case NATIONALITY -> this.prompt = "New nationality: ";
+            case DOB -> this.prompt = "New date of birth (YYYY-MM-DD): ";
+        }
     }
 
     @Override
     public void handleInput(String input) {
         switch (currentState) {
             case USERNAME -> {
-                if (!input.equals("skip")) {
+                if (!input.isEmpty()) {
                     tempUsername = input;
                 }
                 currentState = State.PASSWORD;
             }
             case PASSWORD -> {
-                if (!input.equals("skip")) {
+                if (!input.isEmpty()) {
                     tempPassword = input;
                 }
                 currentState = State.PHOTO;
             }
             case PHOTO -> {
-                if (!input.equals("skip")) {
+                if (!input.isEmpty()) {
                     tempPhoto = input;
                 }
                 currentState = State.NATIONALITY;
             }
             case NATIONALITY -> {
-                if (!input.equals("skip")) {
+                if (!input.isEmpty()) {
                     tempNationality = input;
                 }
                 currentState = State.DOB;
             }
             case DOB -> {
-                if (!input.equals("skip")) {
+                if (!input.isEmpty()) {
                     try {
                         tempDob = LocalDate.parse(input);
                         if (tempDob.isAfter(LocalDate.now())) {

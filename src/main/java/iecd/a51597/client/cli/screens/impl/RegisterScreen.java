@@ -26,14 +26,22 @@ public class RegisterScreen extends Screen {
 
     @Override
     public void display() {
-        switch (currentState) {
-            case ENTER_USERNAME -> System.out.print("Enter username (type 'exit' to go back to main menu): ");
-            case ENTER_PASSWORD -> System.out.print("Enter password (type 'exit' to go back to main menu): ");
+        if (currentState == RegisterState.ENTER_USERNAME) {
+            System.out.println("========================================");
+            System.out.println("                REGISTER                ");
+            System.out.println("========================================");
+            System.out.println("Type 'exit' to go back to the main menu.");
+            this.prompt = "Username: ";
+        } else if (currentState == RegisterState.ENTER_PASSWORD) {
+            this.prompt = "Password: ";
         }
     }
 
     @Override
     public void handleInput(String input) {
+        if (input.isEmpty()) {
+            return;
+        }
         switch (currentState) {
             case ENTER_USERNAME -> {
                 if (input.equalsIgnoreCase("exit")) {
