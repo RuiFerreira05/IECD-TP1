@@ -1,6 +1,6 @@
 # Project Map: Dots and Boxes Server/Client
 
-Welcome to the Dots and Boxes Server/Client project! This guide provides a comprehensive overview of the application architecture, its features, quirks, design decisions, and testing gotchas to help you onboard and navigate the codebase efficiently.
+This guide provides a comprehensive overview of the application architecture, its features, quirks, design decisions, and testing gotchas to help you onboard and navigate the codebase efficiently.
 
 ## 1. High-Level Overview
 
