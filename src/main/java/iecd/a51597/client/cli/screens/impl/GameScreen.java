@@ -105,8 +105,11 @@ public class GameScreen extends Screen {
             if ("SURRENDER".equals(body.reason())) {
                 System.out.println("\n[The game ended because a player surrendered!]");
             }
+            client.getSessionManager().updateUser(body.user());
         } else if (message.actionType() == ActionType.GAME_OVER_DRAW) {
+            MessageBody.GameOverDraw body = (MessageBody.GameOverDraw) message.body();
             controller.getState().forceGameOver(null);
+            client.getSessionManager().updateUser(body.user());
         }
 
         System.out.println("\n[Update received from server]");

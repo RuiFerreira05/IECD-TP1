@@ -251,7 +251,7 @@ class XMLServerMessageBuilderTest {
     @Test
     void gameOverPush_containsWinnerInfo() throws Exception {
         User alice = makeUser("alice", false);
-        byte[] bytes = builder.gameOverPush(GAME_ID, alice);
+        byte[] bytes = builder.gameOverPush(GAME_ID, alice, alice);
         Document doc = parse(bytes);
 
         assertEquals("PUSH",     doc.getDocumentElement().getAttribute("type"));

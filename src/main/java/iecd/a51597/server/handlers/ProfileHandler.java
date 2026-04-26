@@ -58,6 +58,6 @@ public class ProfileHandler extends BaseHandler {
             return;
         }
 
-        connection.sendMessage(messageBuilder.ok(message.messageId(), message.actionType()));
+        connection.sendMessage(messageBuilder.updateProfileSuccess(message.messageId(), user));
     }
 }

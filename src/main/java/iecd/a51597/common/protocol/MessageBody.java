@@ -65,7 +65,7 @@ public sealed interface MessageBody {
     /**
      * Profile update response payload.
      */
-    record UpdateProfileResponse(String status, ErrorDetail error) implements MessageBody {}
+    record UpdateProfileResponse(String status, UserDTO user, ErrorDetail error) implements MessageBody {}
 
     /**
      * User search request.
@@ -135,12 +135,12 @@ public sealed interface MessageBody {
     /**
      * Server-initiated game over payload.
      */
-    record GameOver(UUID gameId, UUID winnerId, String winnerUsername, String reason) implements MessageBody {}
+    record GameOver(UUID gameId, UUID winnerId, String winnerUsername, String reason, UserDTO user) implements MessageBody {}
 
     /**
      * Server-initiated game over draw payload.
      */
-    record GameOverDraw(UUID gameId) implements MessageBody {}
+    record GameOverDraw(UUID gameId, UserDTO user) implements MessageBody {}
 
     /**
      * Surrender request payload.

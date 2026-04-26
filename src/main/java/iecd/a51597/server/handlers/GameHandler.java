@@ -515,11 +515,10 @@ public class GameHandler extends BaseHandler {
                 game.getPlayer1Id(),
                 game.getPlayer2Id()
         );
-        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner, "SURRENDER");
         sessionManager.getSessionByUserId(game.getPlayer1Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverPush(game.getGameId(), winner, "SURRENDER", s.getUser())));
         sessionManager.getSessionByUserId(game.getPlayer2Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverPush(game.getGameId(), winner, "SURRENDER", s.getUser())));
     }
 
     /**
@@ -542,11 +541,10 @@ public class GameHandler extends BaseHandler {
                 game.getPlayer1Id(),
                 game.getPlayer2Id()
         );
-        byte[] payload = messageBuilder.gameOverDrawPush(game.getGameId());
         sessionManager.getSessionByUserId(game.getPlayer1Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverDrawPush(game.getGameId(), s.getUser())));
         sessionManager.getSessionByUserId(game.getPlayer2Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverDrawPush(game.getGameId(), s.getUser())));
     }
 
     private void pushGameOver(Game game, User winner) {
@@ -557,11 +555,10 @@ public class GameHandler extends BaseHandler {
                 game.getPlayer1Id(),
                 game.getPlayer2Id()
         );
-        byte[] payload = messageBuilder.gameOverPush(game.getGameId(), winner);
         sessionManager.getSessionByUserId(game.getPlayer1Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverPush(game.getGameId(), winner, s.getUser())));
         sessionManager.getSessionByUserId(game.getPlayer2Id())
-                .ifPresent(s -> s.getConnection().sendMessage(payload));
+                .ifPresent(s -> s.getConnection().sendMessage(messageBuilder.gameOverPush(game.getGameId(), winner, s.getUser())));
     }
 
     private boolean requireConfiguredGame(Message message, Connection connection) {

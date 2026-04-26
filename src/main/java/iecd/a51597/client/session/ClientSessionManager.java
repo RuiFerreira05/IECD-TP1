@@ -60,16 +60,9 @@ public class ClientSessionManager {
             return new EditProfileResult.Error(e.getMessage());
         }
 
-        if (response.body() instanceof MessageBody.UpdateProfileResponse(String status, MessageBody.ErrorDetail error)) {
+        if (response.body() instanceof MessageBody.UpdateProfileResponse(String status, UserDTO updatedUser, MessageBody.ErrorDetail error)) {
             if (status.equals("OK")) {
-                user = new UserDTO(
-                        user.userId(),
-                        username != null ? username : user.username(),
-                        photopath != null ? photopath : user.photo(),
-                        nationality != null ? nationality : user.nationality(),
-                        dob != null ? dob : user.dob(),
-                        user.stats()
-                        );
+                this.user = updatedUser;
                 return new EditProfileResult.Success();
             } else {
                 if (error.code() == ErrorCodeType.USERNAME_TAKEN) {
@@ -215,6 +208,10 @@ public class ClientSessionManager {
 
     public boolean isLoggedIn() {
         return sessionUUID != null;
+    }
+
+    public void updateUser(UserDTO user) {
+        this.user = user;
     }
 
     public UUID getSessionUUID() {

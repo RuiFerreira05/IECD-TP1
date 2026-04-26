@@ -159,7 +159,9 @@ public class XMLParser implements CommParser {
             )
                     : new MessageBody.LoginResponse(status, null, null, error);
             case LOGOUT -> new MessageBody.LogoutResponse(status, error);
-            case UPDATE_PROFILE -> new MessageBody.UpdateProfileResponse(status, error);
+            case UPDATE_PROFILE -> "OK".equals(status)
+                    ? new MessageBody.UpdateProfileResponse(status, parseUserDTO(requireElement(body, "user")), null)
+                    : new MessageBody.UpdateProfileResponse(status, null, error);
             case SEARCH_USERS -> "OK".equals(status)
                     ? new MessageBody.SearchUsersResponse(status, parseUserResults(body), null)
                     : new MessageBody.SearchUsersResponse(status, null, error);
@@ -194,9 +196,10 @@ public class XMLParser implements CommParser {
                     requireUUID(body, "game-id"),
                     requireUUID(body, "winner-id"),
                     require(body, "winner-username"),
-                    getField(body, "reason")
+                    getField(body, "reason"),
+                    parseUserDTO(requireElement(body, "user"))
             );
-            case GAME_OVER_DRAW -> new MessageBody.GameOverDraw(requireUUID(body, "game-id"));
+            case GAME_OVER_DRAW -> new MessageBody.GameOverDraw(requireUUID(body, "game-id"), parseUserDTO(requireElement(body, "user")));
             case SURRENDER, REGISTER, LOGIN, LOGOUT, UPDATE_PROFILE, SEARCH_USERS, UNKNOWN -> new MessageBody.Unknown();
         };
     }

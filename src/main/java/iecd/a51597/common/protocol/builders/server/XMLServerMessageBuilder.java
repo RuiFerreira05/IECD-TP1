@@ -182,6 +182,18 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
         return serialize(doc);
     }
 
+    @Override
+    public byte[] updateProfileSuccess(UUID messageId, User user) {
+        MessageSkeleton s = getSkeleton(MessageType.RESPONSE, messageId, ActionType.UPDATE_PROFILE);
+        Document doc = s.document();
+        Element body = s.body();
+
+        body.appendChild(textElement(doc, "status",  "OK"));
+        body.appendChild(userElement(doc, user));
+
+        return serialize(doc);
+    }
+
     // ====== SEARCH ======
 
     /**
@@ -301,12 +313,12 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
      * Creates a game-over push payload.
      */
     @Override
-    public byte[] gameOverPush(UUID gameId, User winner) {
-        return gameOverPush(gameId, winner, null);
+    public byte[] gameOverPush(UUID gameId, User winner, User user) {
+        return gameOverPush(gameId, winner, null, user);
     }
 
     @Override
-    public byte[] gameOverPush(UUID gameId, User winner, String reason) {
+    public byte[] gameOverPush(UUID gameId, User winner, String reason, User user) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_OVER);
         Document doc = s.document();
         Element body = s.body();
@@ -319,16 +331,24 @@ public class XMLServerMessageBuilder implements ServerMessageBuilder {
             body.appendChild(textElement(doc, "reason", reason));
         }
 
+        if (user != null) {
+            body.appendChild(userElement(doc, user));
+        }
+
         return serialize(doc);
     }
 
     @Override
-    public byte[] gameOverDrawPush(UUID gameId) {
+    public byte[] gameOverDrawPush(UUID gameId, User user) {
         MessageSkeleton s = getSkeleton(MessageType.PUSH, UUID.randomUUID(), ActionType.GAME_OVER_DRAW);
         Document doc = s.document();
         Element body = s.body();
 
         body.appendChild(textElement(doc, "game-id",         gameId.toString()));
+
+        if (user != null) {
+            body.appendChild(userElement(doc, user));
+        }
 
         return serialize(doc);
     }

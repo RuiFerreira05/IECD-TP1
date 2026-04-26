@@ -42,6 +42,15 @@ public interface ServerMessageBuilder {
     byte[] ok(UUID messageId, ActionType actionType);
 
     /**
+     * Builds an update profile success response payload containing the updated user.
+     *
+     * @param messageId request message id
+     * @param user updated user
+     * @return serialized message payload
+     */
+    byte[] updateProfileSuccess(UUID messageId, User user);
+
+    /**
      * Builds a successful login response.
      *
      * @param messageId request message id
@@ -117,9 +126,10 @@ public interface ServerMessageBuilder {
      *
      * @param gameId game id
      * @param winner winning user
+     * @param user the receiving user's updated profile
      * @return serialized message payload
      */
-    byte[] gameOverPush(UUID gameId, User winner);
+    byte[] gameOverPush(UUID gameId, User winner, User user);
 
     /**
      * Builds a game-over push notification with a reason.
@@ -127,15 +137,17 @@ public interface ServerMessageBuilder {
      * @param gameId game id
      * @param winner winning user
      * @param reason the reason for game over (e.g. SURRENDER)
+     * @param user the receiving user's updated profile
      * @return serialized message payload
      */
-    byte[] gameOverPush(UUID gameId, User winner, String reason);
+    byte[] gameOverPush(UUID gameId, User winner, String reason, User user);
 
     /**
      * builds a game-over-draw push notification
      *
      * @param gameId game id
+     * @param user the receiving user's updated profile
      * @return serialized message payload
      */
-    byte[] gameOverDrawPush(UUID gameId);
+    byte[] gameOverDrawPush(UUID gameId, User user);
 }
