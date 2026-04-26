@@ -38,6 +38,10 @@ public abstract class BaseHandler {
 
     /**
      * Sends a correlated protocol error.
+     * @param message the message being responded to
+     * @param connection the client connection
+     * @param errorCode the error code
+     * @param description human-readable description of the error
      */
     protected void sendError(Message message, Connection connection, ErrorCodeType errorCode, String description) {
         connection.sendMessage(messageBuilder.error(
@@ -51,6 +55,8 @@ public abstract class BaseHandler {
     /**
      * Validates that a request carries a live session.
      *
+     * @param message the message to validate
+     * @param connection the client connection
      * @return valid session when available; empty after sending an error otherwise
      */
     protected Optional<Session> requireSession(Message message, Connection connection) {

@@ -28,6 +28,8 @@ public class AuthHandler extends BaseHandler {
 
     /**
      * Handles user registration requests.
+     * @param message the registration request message
+     * @param connection the client connection
      */
     public void register(Message message, Connection connection) {
         logger.info("Received registration request from connection");
@@ -45,6 +47,8 @@ public class AuthHandler extends BaseHandler {
 
     /**
      * Handles user login requests.
+     * @param message the login request message
+     * @param connection the client connection
      */
     public void login(Message message, Connection connection) {
         logger.info("Received login request from connection");
@@ -65,6 +69,8 @@ public class AuthHandler extends BaseHandler {
 
     /**
      * Handles logout requests by invalidating the current session.
+     * @param message the logout request message
+     * @param connection the client connection
      */
     public void logout(Message message, Connection connection) {
         logger.info("Received logout request from connection");

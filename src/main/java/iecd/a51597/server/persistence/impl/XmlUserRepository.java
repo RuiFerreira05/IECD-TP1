@@ -31,6 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * XML-based implementation of the {@link UserRepository}.
+ */
 public class XmlUserRepository implements UserRepository {
 
     private final DocumentBuilderFactory dbf;
@@ -41,6 +44,10 @@ public class XmlUserRepository implements UserRepository {
 
     private static final Logger logger = LogManager.getLogger(XmlUserRepository.class);
 
+    /**
+     * Creates an XML user repository.
+     * @param logger the logger to use
+     */
     public XmlUserRepository(Logger logger) {
         this.dbf = DocumentBuilderFactory.newInstance();
         this.tf = TransformerFactory.newInstance();

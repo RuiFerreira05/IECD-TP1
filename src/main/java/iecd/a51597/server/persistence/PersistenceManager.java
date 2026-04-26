@@ -55,5 +55,11 @@ public class PersistenceManager {
         userRepository.saveFrom(userStore);
     }
 
+    /**
+     * Saves a photo and returns its reference.
+     * @param photo the photo bytes
+     * @param oldPhoto the old photo reference (to be deleted)
+     * @return the new photo reference
+     */
     public String savePhoto(byte[] photo, String oldPhoto) {return userRepository.savePhoto(photo, oldPhoto);}
 }

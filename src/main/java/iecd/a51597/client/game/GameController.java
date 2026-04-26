@@ -10,6 +10,9 @@ import iecd.a51597.common.protocol.MessageFactory;
 
 import java.util.UUID;
 
+/**
+ * Controller responsible for managing active game state and server communication.
+ */
 public class GameController {
     private final DotsAndBoxesGame localGameState;
     private final ServerConnection connection;

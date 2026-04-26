@@ -7,6 +7,9 @@ import iecd.a51597.client.config.ClientConfiguration;
 import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.Message;
 
+/**
+ * The main menu screen displayed after authentication.
+ */
 public class MainMenuScreen extends OptionScreen {
 
     public MainMenuScreen(StateMachine sm, Client client) {

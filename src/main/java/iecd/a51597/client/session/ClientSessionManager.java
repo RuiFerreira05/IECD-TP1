@@ -14,6 +14,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Manages the client-side session state and authentication workflows.
+ */
 public class ClientSessionManager {
 
     private final ServerConnection serverConnection;

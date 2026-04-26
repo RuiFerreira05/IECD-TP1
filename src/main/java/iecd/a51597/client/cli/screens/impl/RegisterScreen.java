@@ -6,6 +6,9 @@ import iecd.a51597.client.cli.screens.Screen;
 import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.Message;
 
+/**
+ * Screen for new user registration.
+ */
 public class RegisterScreen extends Screen {
 
     private enum RegisterState {

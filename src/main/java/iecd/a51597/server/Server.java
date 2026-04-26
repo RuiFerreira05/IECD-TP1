@@ -151,7 +151,7 @@ public class Server {
     }
 
     /**
-     * @return snapshot of currently tracked connections
+     * @return snapshots of currently tracked connections
      */
     public List<Connection> getConnections() {
         synchronized (connections) {
@@ -161,6 +161,7 @@ public class Server {
 
     /**
      * Adds a connection to server tracking.
+     * @param connection the connection to add
      */
     public void addConnection(Connection connection) {
         synchronized (connections) {
@@ -170,6 +171,7 @@ public class Server {
 
     /**
      * Removes a connection from server tracking.
+     * @param connection the connection to remove
      */
     public void removeConnection(Connection connection) {
         synchronized (connections) {
@@ -199,6 +201,7 @@ public class Server {
 
     /**
      * Starts listener on an explicit port.
+     * @param port the port to listen on
      */
     public void startListener(int port) {
         if (!this.isListening()) {
@@ -267,6 +270,7 @@ public class Server {
 
     /**
      * Application entry point.
+     * @param args CLI arguments (optional port)
      */
     public static void main(String[] args) {
         Server server = Server.getInstance();

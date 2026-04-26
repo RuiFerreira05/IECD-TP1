@@ -14,6 +14,9 @@ import iecd.a51597.common.protocol.types.ActionType;
 
 import java.util.UUID;
 
+/**
+ * Screen displayed during an active game session.
+ */
 public class GameScreen extends Screen {
 
     private final GameController controller;

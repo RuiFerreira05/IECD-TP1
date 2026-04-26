@@ -7,15 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
+/**
+ * A screen that displays a list of numbered options to the user.
+ */
 public abstract class OptionScreen extends Screen {
 
     protected List<ScreenOption> options;
 
+    /**
+     * Creates a new option screen.
+     * @param sm the state machine
+     * @param client the client instance
+     */
     protected OptionScreen(StateMachine sm, Client client) {
         super(sm, client);
         this.options = new ArrayList<>();
     }
 
+    /**
+     * Removes all current options from the screen.
+     */
     protected void clearOptions() {
         this.options.clear();
     }
@@ -26,6 +37,9 @@ public abstract class OptionScreen extends Screen {
         displayOptions();
     };
 
+    /**
+     * Prints the list of visible options.
+     */
     public void displayOptions() {
         List<ScreenOption> visibleOptions = getVisibleOptions();
         int counter = 1;
@@ -50,10 +64,21 @@ public abstract class OptionScreen extends Screen {
         }
     }
 
+    /**
+     * Adds a conditional option to the screen.
+     * @param description label of the option
+     * @param action behavior when selected
+     * @param condition visibility condition
+     */
     protected void addOption(String description, Runnable action, BooleanSupplier condition) {
         options.add(new ScreenOption(description, action, condition));
     }
 
+    /**
+     * Adds an always-visible option to the screen.
+     * @param description label of the option
+     * @param action behavior when selected
+     */
     protected void addOption(String description, Runnable action) {
         addOption(description, action, () -> true);
     }
@@ -64,6 +89,9 @@ public abstract class OptionScreen extends Screen {
                 .toList();
     }
 
+    /**
+     * Represents a single menu option.
+     */
     protected record ScreenOption(String description, Runnable action, BooleanSupplier condition) {
         private boolean isVisible() {
             return condition.getAsBoolean();

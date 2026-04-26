@@ -6,6 +6,9 @@ import iecd.a51597.common.game.dotsandboxes.DotsAndBoxesMove;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Helper class for rendering the game board to the console.
+ */
 public class ClientBoardRenderer {
 
     private static final int WIDTH = 5;

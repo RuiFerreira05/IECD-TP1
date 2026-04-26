@@ -8,6 +8,9 @@ import iecd.a51597.common.protocol.Message;
 
 import java.time.LocalDate;
 
+/**
+ * Screen for editing user profile information.
+ */
 public class EditProfileScreen extends Screen {
 
     public enum State {

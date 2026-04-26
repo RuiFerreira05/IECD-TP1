@@ -6,6 +6,9 @@ import iecd.a51597.client.cli.screens.Screen;
 import iecd.a51597.client.session.ClientSessionManager;
 import iecd.a51597.common.protocol.Message;
 
+/**
+ * Screen for user authentication.
+ */
 public class LoginScreen extends Screen {
 
     private enum LoginState {

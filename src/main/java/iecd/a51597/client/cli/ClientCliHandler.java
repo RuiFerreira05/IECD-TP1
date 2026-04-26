@@ -9,6 +9,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Main handler for the client-side Command Line Interface.
+ */
 public class ClientCliHandler {
 
     private final Client client;
@@ -17,11 +20,18 @@ public class ClientCliHandler {
 
     private static final Logger logger = LogManager.getLogger(ClientCliHandler.class);
 
+    /**
+     * Creates a new CLI handler.
+     * @param client the client instance
+     */
     public ClientCliHandler(Client client) {
         this.client = client;
         this.stateMachine = new StateMachine(this);
     }
 
+    /**
+     * Starts the main CLI input loop.
+     */
     public void loop() {
         running = true;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {

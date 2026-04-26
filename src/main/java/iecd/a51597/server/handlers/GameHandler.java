@@ -38,6 +38,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Handles game invitation requests.
+     * @param message the invite request message
+     * @param connection the client connection
      */
     public void gameInvite(Message message, Connection connection) {
         if (!requireConfiguredGame(message, connection)) return;
@@ -130,6 +132,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Handles game invite cancellation.
+     * @param message the cancel request message
+     * @param connection the client connection
      */
     public void gameInviteCancel(Message message, Connection connection) {
         Optional<Session> sessionOpt = requireSession(message, connection);
@@ -178,6 +182,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Handles invitation acceptance/decline responses.
+     * @param message the response message
+     * @param connection the client connection
      */
     public void gameInviteResponse(Message message, Connection connection) {
         Optional<Session> sessionOpt = requireSession(message, connection);
@@ -279,6 +285,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Handles game move requests for active games.
+     * @param message the move request message
+     * @param connection the client connection
      */
     public void gameMove(Message message, Connection connection) {
         if (!requireConfiguredGame(message, connection)) return;
@@ -435,6 +443,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Handles surrender requests for active games.
+     * @param message the surrender request message
+     * @param connection the client connection
      */
     public void surrender(Message message, Connection connection) {
         if (!requireConfiguredGame(message, connection)) return;
@@ -523,6 +533,8 @@ public class GameHandler extends BaseHandler {
 
     /**
      * Rejects client-originated game-over requests.
+     * @param message the game over message
+     * @param connection the client connection
      */
     public void gameOver(Message message, Connection connection) {
         // GAME_OVER is server-initiated (PUSH only), client should never send this

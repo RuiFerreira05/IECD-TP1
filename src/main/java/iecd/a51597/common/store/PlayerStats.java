@@ -59,6 +59,9 @@ public record PlayerStats(List<MatchRecord> matches) {
         return (int) matches.stream().filter(m -> !m.won()).count();
     }
 
+    /**
+     * @return ratio of wins to total games played
+     */
     public float winRate() {
         return gamesPlayed() == 0 ? 0 : (float) gamesWon() / gamesPlayed();
     }

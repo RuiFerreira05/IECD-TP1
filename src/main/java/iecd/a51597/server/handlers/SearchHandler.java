@@ -27,6 +27,8 @@ public class SearchHandler extends BaseHandler {
 
     /**
      * Executes a username search and returns matching users.
+     * @param message the search request message
+     * @param connection the client connection
      */
     public void searchUsers(Message message, Connection connection) {
         logger.info("Received search users request from connection");

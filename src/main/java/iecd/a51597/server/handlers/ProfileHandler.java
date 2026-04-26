@@ -31,6 +31,8 @@ public class ProfileHandler extends BaseHandler {
 
     /**
      * Applies profile changes from an update request.
+     * @param message the update request message
+     * @param connection the client connection
      */
     public void updateProfile(Message message, Connection connection) {
         logger.info("Received profile update request from connection");

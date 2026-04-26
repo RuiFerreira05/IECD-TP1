@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Stack;
 
+/**
+ * Manages the navigation state of the client CLI.
+ */
 public class StateMachine {
 
     private Screen currentScreen;
@@ -14,6 +17,10 @@ public class StateMachine {
 
     private static final Logger logger = LogManager.getLogger(StateMachine.class);
 
+    /**
+     * Creates a new state machine.
+     * @param cliHandler the parent CLI handler
+     */
     public StateMachine(ClientCliHandler cliHandler) {
         this.cliHandler = cliHandler;
         this.history = new Stack<>();
@@ -21,6 +28,7 @@ public class StateMachine {
 
     /**
      * Transitions to a newly instantiated screen.
+     * @param nextScreen the screen to transition to
      */
     public void changeState(Screen nextScreen) {
         if (nextScreen != null) {

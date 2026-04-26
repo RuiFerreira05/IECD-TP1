@@ -21,6 +21,9 @@ public interface Game {
      */
     UUID getPlayer2Id();
 
+    /**
+     * @return timestamp when the game was created
+     */
     long getStartTimeMillis();
 
     /**

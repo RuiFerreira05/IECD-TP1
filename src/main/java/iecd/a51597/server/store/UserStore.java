@@ -172,10 +172,20 @@ public class UserStore {
         return userMap.values();
     }
 
+    /**
+     * Updates a user's nationality.
+     * @param user target user
+     * @param nationality new nationality
+     */
     public void updateNationality(User user, String nationality) {
         user.setNationality(nationality);
     }
 
+    /**
+     * Updates a user's date of birth.
+     * @param user target user
+     * @param dob new date of birth
+     */
     public void updateDob(User user, LocalDate dob) {
         user.setDob(dob);
     }

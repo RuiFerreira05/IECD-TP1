@@ -24,6 +24,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Manages the TCP connection to the server on the client side.
+ */
 public class ServerConnection implements Runnable {
 
     private volatile boolean connected = false;

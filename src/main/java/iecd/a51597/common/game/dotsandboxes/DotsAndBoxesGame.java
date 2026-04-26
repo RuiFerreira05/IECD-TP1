@@ -6,6 +6,9 @@ import iecd.a51597.common.game.MoveResult;
 
 import java.util.*;
 
+/**
+ * Implementation of the Dots and Boxes game logic.
+ */
 public class DotsAndBoxesGame implements Game {
     private static final int WIDTH = 5;
     private static final int HEIGHT = 5;
@@ -38,11 +41,28 @@ public class DotsAndBoxesGame implements Game {
     @Override public UUID getPlayer2Id() { return player2Id; }
     @Override public long getStartTimeMillis() { return startTimeMillis; }
 
-    // Client-side UI helper methods
+    /**
+     * Gets the ID of the current player whose turn it is.
+     * @return current player UUID
+     */
     public UUID getCurrentPlayerId() { return currentPlayerId; }
+
+    /**
+     * Checks if the game is over.
+     * @return true if the game is over, false otherwise
+     */
     public boolean isGameOver() { return isForcedGameOver || capturedBoxes.size() == (WIDTH - 1) * (HEIGHT - 1); }
+
+    /**
+     * Gets the set of lines already drawn on the board.
+     * @return set of drawn lines
+     */
     public Set<DotsAndBoxesMove> getDrawnLines() { return drawnLines; }
     
+    /**
+     * Forces the game to end with a specific winner.
+     * @param winnerId ID of the winning player
+     */
     public void forceGameOver(UUID winnerId) {
         this.isForcedGameOver = true;
         this.forcedWinnerId = winnerId;
@@ -113,18 +133,36 @@ public class DotsAndBoxesGame implements Game {
         return false;
     }
 
+    /**
+     * Gets the owner of a specific box.
+     * @param x box x coordinate
+     * @param y box y coordinate
+     * @return UUID of the player who captured the box, or null if not captured
+     */
     public UUID getBoxOwner(int x, int y) {
         return capturedBoxes.get(x + "," + y);
     }
 
+    /**
+     * Gets player 1's current score.
+     * @return player 1 score
+     */
     public int getPlayer1Score() {
         return player1Score;
     }
 
+    /**
+     * Gets player 2's current score.
+     * @return player 2 score
+     */
     public int getPlayer2Score() {
         return player2Score;
     }
 
+    /**
+     * Gets the ID of the winner if the game is over.
+     * @return winning player UUID, or null if it's a draw or game not over
+     */
     public UUID getWinnerId() {
         if (isForcedGameOver) return forcedWinnerId;
         if (player1Score > player2Score) return player1Id;
