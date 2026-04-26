@@ -242,6 +242,7 @@ public class Server {
     public void shutdown() {
         stopListener();
         persistenceManager.save();
+        persistenceManager.shutdownThread();
 
         // The reason we take a snapshot of the connections list here is to avoid a ConcurrentModificationException when
         // Connection calls server.removeConnection(). It's a little ugly but it works

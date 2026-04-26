@@ -24,6 +24,8 @@ public class PersistenceManager {
     public PersistenceManager(UserStore userStore) {
         this.userStore = userStore;
         this.userRepository = RepositoryFactory.createUserRepository(ServerConfiguration.PERSISTENCE_TYPE, logger);
+
+        // this would probably be much better with a ScheduledThreadExecutor, but it's good for now.
         this.persistenceThread = new Thread(() -> {
             while (true) {
                 try {
@@ -62,4 +64,8 @@ public class PersistenceManager {
      * @return the new photo reference
      */
     public String savePhoto(byte[] photo, String oldPhoto) {return userRepository.savePhoto(photo, oldPhoto);}
+
+    public void shutdownThread() {
+        this.persistenceThread.interrupt();
+    }
 }
