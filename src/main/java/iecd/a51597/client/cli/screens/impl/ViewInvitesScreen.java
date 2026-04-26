@@ -14,7 +14,7 @@ public class ViewInvitesScreen extends OptionScreen {
         for (MessageBody.GameInvitePush messageBody : client.getPendingInvites()) {
             addOption(messageBody.fromUsername(), () -> sm.changeState(new AnswerInviteScreen(sm, client, messageBody)));
         }
-        addOption("Back", sm::back);
+        addOption("Back to game menu", () -> sm.changeState(new GameMenuScreen(sm, client)));
     }
 
     @Override
